@@ -1,0 +1,9 @@
+---
+layout: post
+title:  "Tonight's dinner"
+date:   2014-11-13 18:28:19
+categories: food
+---
+I made this for dinner, it seems like as good a first post as any. But this is *not* a food blog.
+
+![Dinner](/resources/2014-11-13-dinner.jpg "Dinner")
