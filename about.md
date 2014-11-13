@@ -4,8 +4,14 @@ title: About
 permalink: /about/
 ---
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](http://jekyllrb.com/)
+I work for Adobe as a Computer Scientist. I was recently involved in the Adobe Creative Cloud project and work mainly on file synchronisation. I finished my PhD on constraint programming in early 2011.
 
-You can find the source code for the Jekyll new theme at: [github.com/jglovier/jekyll-new](https://github.com/jglovier/jekyll-new)
+Contact
+=======
 
-You can find the source code for Jekyll at [github.com/jekyll/jekyll](https://github.com/jekyll/jekyll)
+*Email:* neil (squiggle) bigOh.co.uk
+
+*Phone:* 07806 773 983 (mobile)
+
+![Portrait](/resources/neil02.jpg "Portrait")
+
