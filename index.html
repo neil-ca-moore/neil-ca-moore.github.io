@@ -8,6 +8,8 @@ layout: default
 
   <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p>
 
+  {% include mailchimp.html %} 
+
   <ul class="post-list">
     {% for post in site.posts %}
       <li>
