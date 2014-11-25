@@ -5,6 +5,9 @@
     border-top: 5px solid $grey-color-dark;
     border-bottom: 1px solid $grey-color-light;
     min-height: 56px;
+    background-image: url("/resources/top.jpg");
+    background-size: cover;
+    background-position: top;
 
     // Positioning context for the mobile navigation icon
     position: relative;
@@ -94,6 +97,9 @@
 .site-footer {
     border-top: 1px solid $grey-color-light;
     padding: $spacing-unit 0;
+    background-image: url("/resources/background.jpg");
+    background-size: cover;
+    background-position: top;
 }
 
 .footer-heading {
