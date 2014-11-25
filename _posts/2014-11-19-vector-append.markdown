@@ -77,7 +77,7 @@ numbers.insert(numbers.begin(), a); //doesn't work, how annoying!
 
 So that's why you cannot insert a vector into a vector! If I had the characterise the reasons, I'd say:
 
-1. Overly dogmatic library design. Really, there should be a function to just insert a vector. It's possible. It's useful.
-2. When working in combination with templates, overload resolution cannot resolve functions with the same number of parameters properly. That is a problem "concepts" is designed to solve. Concepts is a candidate for a future version of C++, and after writing this I understand why it needs to be included in the language.
+1. Overly dogmatic library design. In my uneducated opinion, there should just be a function to insert a vector. It's possible. It's useful.
+2. When working in combination with templates, overload resolution cannot resolve functions with the same number of parameters properly. That is a problem "concepts" is designed to solve. [Concepts](http://en.wikipedia.org/wiki/Concepts_%28C%2B%2B%29) is a candidate for a future version of C++, and after writing this I begin to understand why it needs to be included in the language.
 
 If you have any corrections or something else to say please leave a comment.
