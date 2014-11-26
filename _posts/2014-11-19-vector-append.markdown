@@ -81,3 +81,6 @@ So that's why you cannot insert a vector into a vector! If I had the characteris
 2. When working in combination with templates, overload resolution cannot resolve functions with the same number of parameters properly. That is a problem "concepts" is designed to solve. [Concepts](http://en.wikipedia.org/wiki/Concepts_%28C%2B%2B%29) is a candidate for a future version of C++, and after writing this I begin to understand why it needs to be included in the language.
 
 If you have any corrections or something else to say please leave a comment.
+
+**Update 26th Nov 2014:**
+My Adobe colleague Sean Parent pointed me at Eric Niebler's [range library](https://github.com/ericniebler/range-v3) that could become a part of C++ at some point. It includes a [push_back function](https://github.com/ericniebler/range-v3/blob/b160114d3bb5c616a7a891183d17ed803fe8d810/test/container/push_back.cpp) that does roughly what I wanted. But it does a lot more besides and seems to make it possible to do many operations on containers without using iterators. I will read it over, consider using it for some test projects and see how it goes.
