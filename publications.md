@@ -7,8 +7,11 @@ permalink: /pub/
 |---
 | Date | Venue | Title | DL | Notes
 |-|-|-|-|:-:
-|June 2012 | AI Communications | An Empirical Study of Learning and Forgetting Constraints | [PDF](/resources/aicom.pdf)				
+|April 2012 | US Patent Application US20130291051 A1 | System call interception | [PDF](/resources/US20130291051.pdf)	
+|June 2012 | AI Communications | An Empirical Study of Learning and Forgetting Constraints | [PDF](/resources/aicom.pdf)
 |December 2011 | TrustCom 2011 | Intelligent Assistant for Context Aware Policies | [PDF](/resources/trustcom.pdf) | [^1]
+|November 2011 | US Patent Application US20130124567 A1 | Automatic prioritization of policies | [PDF](/resources/US20130124567.pdf)	
+|October 2011 | US Patent US8689281 B2 | Management of context-aware policies | [PDF](/resources/US8689281.pdf)				
 |September 2011 | Workshop on Parallel Methods for Constraint Solving | A Preliminary Review of Literature on Parallel Constraint Solving | [PDF](/resources/multicore-cp-review-wshop.pdf)				
 |August 2011 | PhD thesis | Improving the efficiency of learning CSP solvers | [PDF](/resources/thesis_gold_master.pdf)				
 |July 2011 | RCRA 2011 | An Empirical Study of Learning and Forgetting Constraints | [PDF](/resources/learnforget.pdf)				
