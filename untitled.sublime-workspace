@@ -1,0 +1,1338 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"attr",
+				"attributes"
+			],
+			[
+				"game",
+				"gameState"
+			],
+			[
+				"gma",
+				"gameStateView"
+			],
+			[
+				"Gam",
+				"gameState"
+			],
+			[
+				"I",
+				"LastIndex	int ƒ"
+			],
+			[
+				"Ty",
+				"TypeOf	reflect.Type ƒ"
+			],
+			[
+				"Post",
+				"PostGridScorerResponse	struct ʈ"
+			],
+			[
+				"StatusRes",
+				"StatusBadRequest	 Ɩ"
+			],
+			[
+				"Li",
+				"Lifespan	int ƒ"
+			],
+			[
+				"scoo",
+				"scoot-http"
+			],
+			[
+				"Print",
+				"Printf	n int, err error ƒ"
+			],
+			[
+				"Statu",
+				"StatusInternalServerError	 Ɩ"
+			],
+			[
+				"Parse",
+				"ParseInt	i int64, err error ƒ"
+			],
+			[
+				"StatusBad",
+				"StatusBadRequest	 Ɩ"
+			],
+			[
+				"Maxint",
+				"MaxInt32	 Ɩ"
+			],
+			[
+				"max",
+				"MaxInt32	 Ɩ"
+			],
+			[
+				"Life",
+				"LifespanVal	int ν"
+			],
+			[
+				"MaxInt",
+				"MaxInt32	 Ɩ"
+			],
+			[
+				"Is",
+				"IsModify	bool ƒ"
+			],
+			[
+				"FS",
+				"FSEvent	struct ʈ"
+			],
+			[
+				"New",
+				"NewQueueChecker	*QueueChecker ƒ"
+			],
+			[
+				"Update",
+				"UpdateError	struct ʈ"
+			],
+			[
+				"P",
+				"Println	n int, err error ƒ"
+			],
+			[
+				"main",
+				"func main	func main {...} ʂ"
+			],
+			[
+				"imp",
+				"import	import (...) ʂ"
+			],
+			[
+				"rem",
+				"remaining_dice"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "_config.yml",
+			"settings":
+			{
+				"buffer_size": 384,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "README",
+			"settings":
+			{
+				"buffer_size": 92,
+				"line_ending": "Unix",
+				"name": "http://kramdown.gettalong.org/syntax.html"
+			}
+		},
+		{
+			"file": "about.md",
+			"settings":
+			{
+				"buffer_size": 392,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "publications.md",
+			"settings":
+			{
+				"buffer_size": 3565,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "_posts/2014-11-19-vector-append.markdown",
+			"settings":
+			{
+				"buffer_size": 3861,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "---\nlayout: post\ntitle:  \"Objects and pointers\"\ndate:   2015-1-3 21:29:19\ncategories: c++\n---\n\n<!--\nOutline:\n\n- C++ polymorphism\n- slicing\n- use of pointers for polymorphism (forcing use of pointers for polymorphism, leading to pointer hell)\n- CRTP as a workaround for getting polymorphism in a non-pointer\n- other workarounds\n- not using polymorphism\n- different pointer types available\n- I have never seen slicing be deliberate\n- comparison with go\n-->\n\nA comparison of pointers and objects in C++ and go. More detail on the C++, go mainly for comparison.\n\nPolymorphism and pointers in C++\n================================\n\nA variable for an object can be used for most things. You can reassign it, call non-virtual functions, access member variables, etc. However there are a few gotchas in this area.\n\nSuppose you have a virtual function in your object:\n\n{% highlight c++ linenos %}\nclass StupidAdder {\npublic:\n	virtual unsigned add(unsigned a, unsigned b) {\n		unsigned retval = 0;\n		while(a--) {\n			retval++;\n		}\n		while(b--) {\n			retval++;\n		}\n		return retval;\n	}\n};\n\nclass SmartAdder : public Base {\n	virtual unsigned add(unsigned a, unsigned b) {\n		return a + b;\n	}\n};\n\nvoid objectStuff() {\n	StupidAdder stupid;\n	SmartAdder smart;\n\n	stupid.add(4, 5); //(A)\n\n	smart.add(4, 5); //(B)\n}\n{% endhighlight %}\n\nThis program should be understandable under any possible interpretation: line (A) uses StupidAdder's version of add() and line (B) uses SmartAdder's version.\n\nHowever only a little change using subtyping makes things a little confusing:\n\n{% highlight c++ linenos %}\nvoid objectStuff2() {\n	StupidAdder stupid;\n	SmartAdder smart;\n\n	StupidAdder reallyStupid = smart;\n	reallyStupid.add(6, 7); //(C)\n}\n{% endhighlight %}\n\nLine (C) will use StupidAdder's version of add(), rather than SmartAdder's version as the same Java program would do.\n\nWhy is that? It's because dynamic dispatch of functions can only be achieved via pointers or references to objects. A non-pointer, non-reference object variable will dispatch functions based on the *static type* of an object, i.e. the type of the variable (there is also a *dynamic type* that is the type of the object, sometimes different.) \n\nBecause there is no dynamic dispatch there is no need for runtime function lookup. I think this is down to the C++ design principle that there should be no performance penalty for language features that are not being used. In this case it is polymorphism that is not being used. But it's beginning to make things a little confusing for programmers.\n\nThere are no instance variables in StupidAdder or SmartAdder, but if there were then slicing would also have happened at line (C). That would have meant that any member variables added in SmartAdder would be lost in the assignment. Also the true dynamic type of smart has been lost, there is no runtime information to say that reallyStupid was ever a SmartAdder at all.\n\nI don't think I have ever seen a deliberate use of slicing in a C++ program.\n\nGetting back to the main point, if you want dynamic dispatch of virtual functions you have to use a pointer or a reference:\n\n{% highlight c++ linenos %}\nvoid objectStuff3() {\n	StupidAdder stupid;\n	SmartAdder smart;\n\n	StupidAdder& reallyStupid = smart;\n	reallyStupid.add(6, 7); //(D)\n\n	StupidAdder* reallyReallyStupid = &smart;\n	reallyReallyStupid.add(6, 7); //(E)\n}\n{% endhighlight %}\n\nLines (D) and (E) use SmartAdder's version of add(). This is very unfortunate as it encourages use of raw pointers and references which are both a source of many programming errors. I think this is quite an important point. Pointers are one of the most difficult features to use correctly in C++ and polymorphism one of the most useful features (used judiciously). In C++ they come as a package. A radioactive cake that you both want and don't want.\n\nSafe technique 1: safe use of pointers\n======================================\n\nThis topic has been covered so many times before and I don't want to go into too much detail. Basically by using safe pointer types like shared_ptr, scoped_ptr, unique_ptr, etc. you can get safe (and sometimes efficient) access to polymorphic behaviours without passing around raw pointers and references. It is a good solution, but what always rankles with me is that the syntax is verbose and inflexible, and you have to pick which pointer types to use and you cannot easily change your mind.\n\n{% highlight c++ linenos %}\nvoid objectStuff4() {\n	StupidAdder stupid;\n	SmartAdder smart;\n\n	boost::scoped_ptr<StupidAdder> notStupid = smart;\n	notStupid.add(6, 7);\n}\n{% endhighlight %}\n\nYou could use typedefs, wrapping, auto keyword and various other techniques to get short and easily changed pointer types, but it doesn't quite reach the convenience of a built in language feature.\n\nSafe technique 2: Curiously recurring template pattern (CRTP)\n=============================================================\n\nThis one is not a silver bullet. It's kind of hard and laborious to use, but you can achieve some subtype polymorphism without using dynamic dispatch (meaning a pointer is not needed). Here's some code:\n\n{% highlight c++ linenos %}\ntemplate<class T>\nclass BaseAdder {\npublic:	\n	unsigned add(unsigned a, unsigned b) {\n		unsigned retval = 0;\n		while(a--) {\n			retval = increment(retval); //(F)\n		}\n		while(b--) {\n			retval = increment(retval);\n		}\n		return retval;\n	};\n\n	unsigned increment(unsigned a) { \n		return derived()->increment(a); //(G)\n	} \n\nprivate:\n	T& derived()\n    {\n        return *static_cast<T*>(this);\n    }\n};\n\nclass DerivedAdder : public BaseAdder<DerivedAdder> {\npublic:\n	unsigned increment(unsigned a) {\n		return a + 1;\n	} \n};\n\nvoid objectStuff5() {\n	DerivedAdder staticDispatchAdder;\n	staticDispatchAdder.add(6, 7); //(H)\n}\n{% endhighlight %}\n\nAs you can see, it's a bit less convenient to use than dynamic polymorphism, though that could probably be mitigated by code generation. What this does is gets you some kind of inheritance, provided that the type of the object is known at compile time. In this example the add() function from BaseAdder is inherited by DerivedAdder, but won't use dynamic dispatch since it's non-virtual. The increment() function is special because a version of it is provided in both BaseAdder and DerivedAdder. Line (F) uses BaseAdder::increment(). However at line (G) the call is delegated statically to DerivedAdder::increment(). Hence this behaves a little like code inheritance, but without any virtual functions.\n\nThis is not really a technique for every day use. But it does allow you to use code inheritance of sorts without using pointers or references.\n\nSafe technique 3: don't use code inheritance at all\n===================================================\n\nThis is a great tip that is quite an eye opener when you get used to it. The idea is simply not to use direct code inheritance at all, to avoid having to deal with pointers at all. That way you don't need to worry about freeing the pointers or being so careful with ownership. Use of inheritance is frequently held up as a quality goal in object oriented languages when it is often not necessary to use it at all. It is perfectly possible to design an object oriented language that does not have inheritance, and instead relies on interfaces and inclusion of other classes to share functionality.\n\nHere's a C++ example that doesn't use inheritance at all:\n\n{% highlight c++ linenos %}\nclass Incrementer {\npublic:\n	unsigned increment(unsigned a) {\n		return a + 1;\n	} \n};\n\nclass DumbAdder {\npublic:	\n	unsigned add(unsigned a, unsigned b) {\n		unsigned retval = 0;\n		while(a--) {\n			retval = i.increment(retval); //(J)\n		}\n		while(b--) {\n			retval = i.increment(retval);\n		}\n		return retval;\n	};\n\nprivate:\n	Incrementer i;\n};\n\nvoid objectStuff5() {\n	DumbAdder dumbAdder;\n	staticDispatchAdder.add(6, 7); \n}\n{% endhighlight %}\n\nAt line (J), the instance of incrementer embedded inside DumbAdder is used to provide increment functionality. In common with CRTP, this doesn't use subtyping, but then again, it's not really needed.\n\nThe frustration with this technique is not being able to create a GoodAdder class and have them both be instances of an Adder interface. For that you do need dynamic dispatch, and that means pointers.\n\nC++ conclusion\n==============\n\nI can't think of any other ways beside these right now off the top of my head. Leave a comment if you know another and I may add it.\n\nNow I'm going to look at polymorphic functions in go, to see the difference.\n\nComparison with another language: go\n====================================\n\nAlthough I haven't used it for a big project yet, I like the look of go. It is a much simpler language than C++, and lets you do dynamic dispatch very naturally. I hope I don't make any mistakes here, but I might because I'm not so familiar with the language.\n\nGo doesn't have subtyping. Hence to use code from another object type you cannot inherit it, you must invoke a different object to access that functionality. However it does have interface types, a variable of an interface type can store any object that conforms to the interface. So there is polymorphism but between on objects that share the same interface. Also the fear factor with using pointers is slightly milder, because go has garbage collection.\n\n{% highlight go linenos %}\npackage main\n\nimport \"fmt\"\n\ntype Incrementer struct{}\n\nfunc (i Incrementer) increment(x uint) uint {\n	return x + 1\n}\n\ntype Adder interface {\n	add(x uint, y uint) uint\n}\n\ntype DumbAdder struct {\n	incr Incrementer\n}\n\nfunc (a DumbAdder) add(x uint, y uint) uint {\n	var retval uint = 0\n	var i uint\n	for i = 1; i <= x; i++ {\n		retval = a.incr.increment(retval)\n	}\n	for i = 1; i <= y; i++ {\n		retval = a.incr.increment(retval)\n	}\n	return retval\n}\n\nfunc main() {\n	var dumb DumbAdder = DumbAdder{}\n	var poly Adder = dumb\n	var polyPointer Adder = &dumb //N.B. don't even need to say Adder*\n\n	fmt.Println(dumb.add(5, 6))\n	fmt.Println(poly.add(5, 6))\n	fmt.Println(polyPointer.add(5, 6))\n}\n{% endhighlight %}\n\nThis example shows polymorphism using interfaces, using both pointers and non-pointers. There is no need to resort to anything complex.\n\nReferences\n==========\n[The Curiously Recurring Template Pattern in C++](http://eli.thegreenplace.net/2011/05/17/the-curiously-recurring-template-pattern-in-c)\n[Polymorphism - Wikipedia](http://en.wikipedia.org/wiki/Polymorphism_(computer_science))\nC++ in a nutshell - O'Reilly\n\n\n\n\n\n",
+			"file": "_drafts/2014-11-30-objects-and-pointers.markdown",
+			"file_size": -1,
+			"file_write_time": -1,
+			"settings":
+			{
+				"buffer_size": 10433,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "_posts/2014-11-13-dinner.markdown",
+			"settings":
+			{
+				"buffer_size": 245,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "index.html",
+			"settings":
+			{
+				"buffer_size": 539,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "_layouts/default.html",
+			"settings":
+			{
+				"buffer_size": 248,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "_includes/analytics.html",
+			"settings":
+			{
+				"buffer_size": 408,
+				"line_ending": "Unix",
+				"name": "<script>"
+			}
+		},
+		{
+			"file": "_includes/mailchimp.html",
+			"settings":
+			{
+				"buffer_size": 616,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "_layouts/post.html",
+			"settings":
+			{
+				"buffer_size": 1220,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "_includes/head.html",
+			"settings":
+			{
+				"buffer_size": 802,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "_includes/footer.html",
+			"settings":
+			{
+				"buffer_size": 3100,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "Searching 41 files for \"site-footer\"\n\n~/Work/personal-homepage/.sass-cache/ab29c69f31c5ee58a420e5d8d1fac56b782c1302/_layout.scssc:\n    <binary>\n\n/Users/neilmoore67/Work/personal-homepage/_includes/footer.html:\n    1: <footer class=\"site-footer\">\n    2  \n    3    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_sass/_layout.scss:\n   92   * Site footer\n   93   */\n   94: .site-footer {\n   95      border-top: 1px solid $grey-color-light;\n   96      padding: $spacing-unit 0;\n\n/Users/neilmoore67/Work/personal-homepage/_site/index.html:\n  113      </div>\n  114  \n  115:     <footer class=\"site-footer\">\n  116  \n  117    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_site/about/index.html:\n   96      </div>\n   97  \n   98:     <footer class=\"site-footer\">\n   99  \n  100    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_site/c++/2014/11/19/2014-11-19-vector-append.html:\n  186      </div>\n  187  \n  188:     <footer class=\"site-footer\">\n  189  \n  190    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_site/css/main.css:\n  206   * Site footer\n  207   */\n  208: .site-footer {\n  209    border-top: 1px solid #e8e8e8;\n  210    padding: 30px 0; }\n\n/Users/neilmoore67/Work/personal-homepage/_site/food/2014/11/13/dinner.html:\n  124      </div>\n  125  \n  126:     <footer class=\"site-footer\">\n  127  \n  128    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_site/pub/index.html:\n  236      </div>\n  237  \n  238:     <footer class=\"site-footer\">\n  239  \n  240    <div class=\"wrapper\">\n\n11 matches across 9 files\n\n\nSearching 41 files for \"site-headers\"\n\n0 matches across 0 files\n\n\nSearching 41 files for \"site-header\"\n\n~/Work/personal-homepage/.sass-cache/ab29c69f31c5ee58a420e5d8d1fac56b782c1302/_layout.scssc:\n    <binary>\n\n/Users/neilmoore67/Work/personal-homepage/_includes/header.html:\n    1: <header class=\"site-header\">\n    2  \n    3    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_sass/_layout.scss:\n    2   * Site header\n    3   */\n    4: .site-header {\n    5      border-top: 5px solid $grey-color-dark;\n    6      border-bottom: 1px solid $grey-color-light;\n\n/Users/neilmoore67/Work/personal-homepage/_site/index.html:\n   30    <body>\n   31  \n   32:     <header class=\"site-header\">\n   33  \n   34    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_site/about/index.html:\n   30    <body>\n   31  \n   32:     <header class=\"site-header\">\n   33  \n   34    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_site/c++/2014/11/19/2014-11-19-vector-append.html:\n   29    <body>\n   30  \n   31:     <header class=\"site-header\">\n   32  \n   33    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_site/css/main.css:\n  146   * Site header\n  147   */\n  148: .site-header {\n  149    border-top: 5px solid #424242;\n  150    border-bottom: 1px solid #e8e8e8;\n\n/Users/neilmoore67/Work/personal-homepage/_site/food/2014/11/13/dinner.html:\n   29    <body>\n   30  \n   31:     <header class=\"site-header\">\n   32  \n   33    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_site/pub/index.html:\n   30    <body>\n   31  \n   32:     <header class=\"site-header\">\n   33  \n   34    <div class=\"wrapper\">\n\n11 matches across 9 files\n",
+			"settings":
+			{
+				"buffer_size": 3282,
+				"line_ending": "Unix",
+				"name": "Find Results",
+				"scratch": true
+			}
+		},
+		{
+			"file": "_sass/_layout.scss",
+			"settings":
+			{
+				"buffer_size": 4374,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "untitled.sublime-project",
+			"settings":
+			{
+				"buffer_size": 73,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "_sass/_syntax-highlighting.scss",
+			"settings":
+			{
+				"buffer_size": 3946,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "CNAME",
+			"settings":
+			{
+				"buffer_size": 15,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 287.0,
+		"selected_items":
+		[
+			[
+				"Package Control: ",
+				"Package Control: Install Package"
+			],
+			[
+				"gofm",
+				"GoSublime: Fmt and save"
+			],
+			[
+				"gofmt",
+				"GoSublime: Fmt and save"
+			],
+			[
+				"fmt",
+				"GoSublime: Fmt the current file (without saving it)"
+			],
+			[
+				"Package Control: instal",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: install",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: insta",
+				"Package Control: Install Package"
+			],
+			[
+				"test",
+				"Snippet: test"
+			]
+		],
+		"width": 568.0
+	},
+	"console":
+	{
+		"height": 126.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '7183a2d3e96f11eeadd761d777e62404e330c659d4bb41d3bdf022e94cab3cd0'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/Users/neilmoore67/Work/personal-homepage",
+		"/Users/neilmoore67/Work/personal-homepage/_drafts",
+		"/Users/neilmoore67/Work/personal-homepage/_includes",
+		"/Users/neilmoore67/Work/personal-homepage/_layouts",
+		"/Users/neilmoore67/Work/personal-homepage/_posts",
+		"/Users/neilmoore67/Work/personal-homepage/_sass",
+		"/Users/neilmoore67/Work/personal-homepage/css"
+	],
+	"file_history":
+	[
+		"/Users/neilmoore67/Library/Application Support/Sublime Text 3/Packages/GoSublime/CHANGELOG.md",
+		"/Users/neilmoore67/Work/personal-homepage/_drafts/2014-11-19-vector-append.markdown",
+		"/Users/neilmoore67/Work/personal-homepage/_posts/2014-11-13-dinner.markdown",
+		"/Users/neilmoore67/Work/personal-homepage/_drafts/2014-11-19-dynamic-dispatch-thoughts.markdown",
+		"/Users/neilmoore67/Work/personal-homepage/_posts/2014-11-19-dynamic-dispatch-thoughts.markdown",
+		"/Users/neilmoore67/Work/personal-homepage/_posts/2014-11-13-welcome-to-jekyll.markdown",
+		"/Users/neilmoore67/Work/personal-homepage/trustcom_note.md",
+		"/Users/neilmoore67/Work/go/src/github.com/codegangsta/gin/main.go",
+		"/Users/neilmoore67/Work/go/src/github.com/codegangsta/gin/lib/test_fixtures/config.json",
+		"/Users/neilmoore67/Work/go/src/bigoh.co.uk/scoot/http/static/css/jquery-ui.structure.min.css",
+		"/Users/neilmoore67/Work/go/src/bigoh.co.uk/scoot/http/static/css/jquery-ui.structure.css",
+		"/Users/neilmoore67/Work/go/src/bigoh.co.uk/scoot/http/static/css/jquery-ui.css",
+		"/Users/neilmoore67/Work/go/src/code.google.com/p/go.exp/locale/search/search.go",
+		"/Users/neilmoore67/Work/go/src/bigoh.co.uk/scoot/http/static/js/lib/handlebars-v1.3.0.js",
+		"/Users/neilmoore67/Work/go/src/github.com/qrtz/livedev/config.go",
+		"/Users/neilmoore67/Work/go/src/bigoh.co.uk/scoot/http/static/index.html",
+		"/Users/neilmoore67/Work/go/src/bigoh.co.uk/scoot/http/scoot-http.go",
+		"/Users/neilmoore67/Work/go/src/bigoh.co.uk/scoot/http/http",
+		"/Users/neilmoore67/Work/go/bin/http",
+		"/Users/neilmoore67/Work/go/src/github.com/codegangsta/cli/helpers_test.go",
+		"/Users/neilmoore67/Work/go/bin/hello",
+		"/Users/neilmoore67/Library/Application Support/Sublime Text 3/Packages/User/Distraction Free.sublime-settings",
+		"/Users/neilmoore67/Work/go/src/github.com/codegangsta/cli/app.go",
+		"/Users/neilmoore67/Work/go/src/code.google.com/p/go.exp/AUTHORS",
+		"/Users/neilmoore67/Work/go/src/code.google.com/p/go.exp/inotify/inotify_linux_test.go",
+		"/Users/neilmoore67/Work/go/src/github.com/andreaskoch/go-fswatch/.travis.yml",
+		"/Users/neilmoore67/Work/go/src/github.com/codegangsta/envy/.gitignore",
+		"/Users/neilmoore67/Work/go/src/github.com/gorilla/mux/regexp.go",
+		"/Users/neilmoore67/Work/go/src/bigoh.co.uk/scoot/http/static/js/app.js",
+		"/Users/neilmoore67/Work/go/src/bigoh.co.uk/scoot/http/static/js/views/gamestateview.js",
+		"/Users/neilmoore67/Work/go/src/bigoh.co.uk/scoot/http/static/templates/templates.js",
+		"/Users/neilmoore67/Work/go/src/bigoh.co.uk/scoot/Makefile",
+		"/Users/neilmoore67/Work/go/bin/gin",
+		"/Users/neilmoore67/Work/go/src/bigoh.co.uk/scoot/http/static/js/models/prototypeitem.js",
+		"/Users/neilmoore67/Work/go/src/bigoh.co.uk/scoot/http/static/js/models/GameState.js",
+		"/Users/neilmoore67/Work/go/src/bigoh.co.uk/scoot/http/fresh.conf",
+		"/Users/neilmoore67/Work/go/src/bigoh.co.uk/scoot/http/livedev.json",
+		"/Users/neilmoore67/Work/go/src/bigoh.co.uk/scoot/http.go",
+		"/Users/neilmoore67/Work/go/src/bigoh.co.uk/filesync/core.go",
+		"/Users/neilmoore67/Work/go/src/bigoh.co.uk/newmath/sqrt.go",
+		"/Users/neilmoore67/Work/go/src/code.google.com/p/go.exp/fsnotify/example_test.go",
+		"/Users/neilmoore67/Work/go/src/code.google.com/p/go.exp/ebnf/ebnf_test.go",
+		"/Users/neilmoore67/Work/go/src/code.google.com/p/go.exp/ebnf/ebnf.go",
+		"/Users/neilmoore67/Work/go/src/bigoh.co.uk/filesync/TODO",
+		"/Users/neilmoore67/Work/go/src/bigoh.co.uk/sync/TODO",
+		"/Users/neilmoore67/Work/go/src/bigoh.co.uk/filesync/runners/core_run.go",
+		"/Users/neilmoore67/Work/go/src/bigoh.co.uk/sync/core.go",
+		"/Users/neilmoore67/Work/go/src/bigoh.co.uk/sync/core_run.go",
+		"/Users/neilmoore67/Work/go/src/bigoh.co.uk/newmath/sqrt_test.go",
+		"/Users/neilmoore67/Work/go/src/bigoh.co.uk/hello/hello.go",
+		"/Users/neilmoore67/Library/Application Support/Sublime Text 3/Packages/DashDoc/DashDoc.sublime-settings",
+		"/Users/neilmoore67/Work/go/src/bigoh.co.uk/user/hello/hello.go",
+		"/Users/neilmoore67/Library/Application Support/Sublime Text 3/Packages/GoSublime/USAGE.md",
+		"/Users/neilmoore67/Library/Application Support/Sublime Text 3/Packages/GoSublime/9o.md",
+		"/Users/neilmoore67/Work/rust/dice/TODO",
+		"/Users/neilmoore67/Work/rust/dice/dice_louis.rs",
+		"/Users/neilmoore67/Work/rust/dice/dice.rs",
+		"/Users/neilmoore67/Downloads/mooreacc.mooo.com.bat",
+		"/Users/neilmoore67/Work/rust/dice/hello.rs"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 93.0,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"site-header",
+			"site-headers",
+			"site-footer",
+			"~~~",
+			"~~~ cplusplus",
+			"5",
+			"PDF",
+			"UpdateChan",
+			"BibTeX",
+			"food.svg",
+			"getTemplateAjax",
+			"home",
+			"registerHelper",
+			"expression",
+			"Passable",
+			"fmt",
+			"\"\n",
+			"LocalFS",
+			"updateChan",
+			"(\n",
+			"strconv",
+			"count",
+			"needle",
+			", sorted : false",
+			"Die",
+			"1500",
+			"tuple"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"{% endhighlight %}",
+			"{% highlight c++ %}",
+			"[PDF](/resources/aicom.pdf)",
+			"",
+			"UpdateChan"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 5,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "_config.yml",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 384,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								384,
+								384
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/YAML/YAML.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "README",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 92,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								42
+							]
+						],
+						"settings":
+						{
+							"auto_name": "http://kramdown.gettalong.org/syntax.html",
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "about.md",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 392,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								392,
+								392
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Markdown/Markdown.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 10,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "publications.md",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3565,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								205,
+								205
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Markdown/Markdown.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "_posts/2014-11-19-vector-append.markdown",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3861,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3368,
+								3424
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Markdown/Markdown.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "_drafts/2014-11-30-objects-and-pointers.markdown",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 10433,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								70,
+								70
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Markdown/Markdown.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "_posts/2014-11-13-dinner.markdown",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 245,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Markdown/Markdown.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "index.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 539,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								190,
+								222
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 16,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "_layouts/default.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 248,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								144,
+								144
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 15,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "_includes/analytics.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 408,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								408,
+								408
+							]
+						],
+						"settings":
+						{
+							"auto_name": "<script>",
+							"syntax": "Packages/HTML/HTML.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "_includes/mailchimp.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 616,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								616,
+								616
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 17,
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "_layouts/post.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1220,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								407,
+								407
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 14,
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "_includes/head.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 802,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								802,
+								802
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 11,
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"file": "_includes/footer.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3100,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3063,
+								3063
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 14,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3282,
+						"regions":
+						{
+							"match":
+							{
+								"flags": 112,
+								"regions":
+								[
+									[
+										232,
+										243
+									],
+									[
+										389,
+										400
+									],
+									[
+										605,
+										616
+									],
+									[
+										777,
+										788
+									],
+									[
+										977,
+										988
+									],
+									[
+										1134,
+										1145
+									],
+									[
+										1346,
+										1357
+									],
+									[
+										1516,
+										1527
+									],
+									[
+										1896,
+										1907
+									],
+									[
+										2053,
+										2064
+									],
+									[
+										2284,
+										2295
+									],
+									[
+										2454,
+										2465
+									],
+									[
+										2652,
+										2663
+									],
+									[
+										2809,
+										2820
+									],
+									[
+										3034,
+										3045
+									],
+									[
+										3202,
+										3213
+									]
+								],
+								"scope": ""
+							}
+						},
+						"selection":
+						[
+							[
+								2061,
+								2061
+							]
+						],
+						"settings":
+						{
+							"detect_indentation": false,
+							"line_numbers": false,
+							"output_tag": 3,
+							"result_base_dir": "",
+							"result_file_regex": "^([A-Za-z\\\\/<].*):$",
+							"result_line_regex": "^ +([0-9]+):",
+							"scroll_past_end": true,
+							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 990.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 15,
+					"file": "_sass/_layout.scss",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4374,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								193,
+								193
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 16,
+					"file": "untitled.sublime-project",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 73,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 12,
+					"type": "text"
+				},
+				{
+					"buffer": 17,
+					"file": "_sass/_syntax-highlighting.scss",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3946,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3944,
+								3944
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 256.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 13,
+					"type": "text"
+				},
+				{
+					"buffer": 18,
+					"file": "CNAME",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 15,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								15,
+								15
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 18,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 23.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.9o:///Users/neilmoore67/Work/go/src/bigoh.co.uk/filesync":
+	{
+		"height": 240.0
+	},
+	"output.9o:///Users/neilmoore67/Work/go/src/bigoh.co.uk/filesync/benchmark":
+	{
+		"height": 244.0
+	},
+	"output.9o:///Users/neilmoore67/Work/go/src/bigoh.co.uk/filesync/example":
+	{
+		"height": 336.0
+	},
+	"output.9o:///Users/neilmoore67/Work/go/src/bigoh.co.uk/filesync/runners":
+	{
+		"height": 100.0
+	},
+	"output.9o:///Users/neilmoore67/Work/go/src/bigoh.co.uk/filesync/test":
+	{
+		"height": 229.0
+	},
+	"output.9o:///Users/neilmoore67/Work/go/src/bigoh.co.uk/hello":
+	{
+		"height": 216.0
+	},
+	"output.9o:///Users/neilmoore67/Work/go/src/bigoh.co.uk/newmath":
+	{
+		"height": 195.0
+	},
+	"output.9o:///Users/neilmoore67/Work/go/src/bigoh.co.uk/scoot":
+	{
+		"height": 300.0
+	},
+	"output.9o:///Users/neilmoore67/Work/go/src/bigoh.co.uk/scoot/http":
+	{
+		"height": 402.0
+	},
+	"output.9o:///Users/neilmoore67/Work/go/src/bigoh.co.uk/scoot/test":
+	{
+		"height": 297.0
+	},
+	"output.9o:///Users/neilmoore67/Work/go/src/bigoh.co.uk/sync":
+	{
+		"height": 222.0
+	},
+	"output.9o:///Users/neilmoore67/Work/go/src/bigoh.co.uk/user/hello":
+	{
+		"height": 124.0
+	},
+	"output.9o:///Users/neilmoore67/Work/go/src/code.google.com/p/go.example/hello":
+	{
+		"height": 100.0
+	},
+	"output.GoSublime-main-output":
+	{
+		"height": 100.0
+	},
+	"output.MarGo-output":
+	{
+		"height": 100.0
+	},
+	"output.exec":
+	{
+		"height": 240.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.git":
+	{
+		"height": 317.0
+	},
+	"project": "untitled.sublime-project",
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+			[
+				"app",
+				"src/bigoh.co.uk/scoot/http/static/js/app.js"
+			],
+			[
+				"game",
+				"src/bigoh.co.uk/scoot/http/static/js/views/gamestateview.js"
+			],
+			[
+				"gmae",
+				"src/bigoh.co.uk/scoot/http/static/js/models/gamestate.js"
+			],
+			[
+				"gamestate",
+				"src/bigoh.co.uk/scoot/http/static/js/views/gamestateview.js"
+			],
+			[
+				"css",
+				"src/bigoh.co.uk/scoot/http/static/css/style.css"
+			],
+			[
+				"handlebars",
+				"src/bigoh.co.uk/scoot/http/static/templates/gameview.handlebars"
+			],
+			[
+				"hane",
+				"src/bigoh.co.uk/scoot/http/static/js/lib/handlebars-v1.3.0.js"
+			],
+			[
+				"http",
+				"src/bigoh.co.uk/scoot/http/scoot-http.go"
+			],
+			[
+				"squ",
+				"src/bigoh.co.uk/scoot/squares.go"
+			],
+			[
+				"handle",
+				"src/bigoh.co.uk/scoot/http/static/templates/gameview.handlebars"
+			],
+			[
+				"square",
+				"src/bigoh.co.uk/scoot/squares.go"
+			],
+			[
+				"gamest",
+				"src/bigoh.co.uk/scoot/http/static/js/models/gamestate.js"
+			],
+			[
+				"",
+				"src/bigoh.co.uk/scoot/http/static/css/style.css"
+			],
+			[
+				"scoo",
+				"src/bigoh.co.uk/scoot/http/scoot-http.go"
+			],
+			[
+				"app.js",
+				"src/bigoh.co.uk/scoot/http/static/js/app.js"
+			],
+			[
+				"make",
+				"src/bigoh.co.uk/scoot/Makefile"
+			],
+			[
+				"gmaestate",
+				"src/bigoh.co.uk/scoot/http/static/js/models/gamestate.js"
+			],
+			[
+				"die",
+				"~/Work/rust/dice/dice.rs"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 127.0,
+		"selected_items":
+		[
+			[
+				"register",
+				"registerHelper"
+			],
+			[
+				"Game",
+				"Game"
+			],
+			[
+				"Score",
+				"Score"
+			],
+			[
+				"move",
+				"Moves"
+			],
+			[
+				"Coord",
+				"Coord"
+			]
+		],
+		"width": 392.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 283.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
