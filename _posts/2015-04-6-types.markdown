@@ -1,0 +1,150 @@
+---
+layout: post
+title:  "Type systems, proofs, properties and safety"
+date:   2015-4-6 20:24:53
+categories: types C++
+---
+
+<!--
+Outline:
+- what does a type system do?
+ - statically types
+ - dynamically typed (still avoids unsafety, but doesn't guarantee it before your code ships)
+- what is wrong with reusing types
+ - forenames, surnames
+ - different types of paths
+ - never want to compare those
+- what sort of things can we prove using the C++ static type system
+ - semantically different types must have different types in a program
+ - what is the theorem that the compiler will prove for you?
+ - what other things are there?
+- more advanced research type safety like
+ - dependent types
+  
+-->
+
+I am going to share some thoughts I've had about using types to prove things about what your programs are doing.
+
+Motivating example
+==================
+
+Let's say that we have a program that does some processing of filesystem paths. On the Mac platform you might expect to see all the following types of paths, in different parts of the same program:
+
+- Normal Unix paths like /Applications/Adobe Photoshop CC 2014.app
+- File URIs such as file:///Applications/Adobe Photoshop CC 2014.app, there are myriad variations of these, e.g. file://localhost/Applications/Adobe Photoshop CC 2014.app is equivalent [wikipedia](http://en.wikipedia.org/wiki/File_URI_scheme)
+
+There are variations of encoding within those types of paths like:
+
+- Paths containing relative components, like "." or "..".
+- Paths containing environment variables.
+- Different types of string encoding of strings containing non-Latin characters, e.g. é can be either a single [Unicode 00e9](http://unicode.org/cldr/utility/character.jsp?a=00e9) or two Unicode characters [0065](http://unicode.org/cldr/utility/character.jsp?a=0065) (e) and [0301](http://unicode.org/cldr/utility/character.jsp?a=0301) (combining acute accent) in sequence. Different system calls on the same OS can produce different forms of string [more details](http://en.wikipedia.org/wiki/Unicode_equivalence).
+
+OK. So we've established that there are a lot of variations of data in path strings. But at the end of the day they can all be encoded by UTF-8 strings (or whatever your preferred encoding is). Hence we can always use a string type for them.
+
+I've seen plenty of programs that will use a string type for all string data. But I think it's a bad idea. Why?
+
+{% highlight c++ linenos %}
+bool samePath(const std::string& aPath, const std::string& anotherPath) {
+	return aName == anotherName;
+}
+{% endhighlight %}
+
+That looks OK'ish. But there may be a problem in the calling code.
+
+{% highlight c++ linenos %}
+const auto& oldPath = settings.oldPath; //This is a NFD-normalised Unix path.
+const auto& newPath = defaultPath;      //This is a file URI, or an NFC-normalised Unix path, or ...
+auto pathChanged = samePath(oldPath, newPath);
+{% endhighlight %}
+
+Now if at any point we forget whether oldPath is an NFD-normalised Unix path and that defaultPath is something else, our comparison makes no sense any longer. If will be false whether the data is semantically different or not.
+
+There are other examples:
+
+- ``std::string`` can be a first name, a surname, a path, an HTML document
+- ``int`` can be a football score, a financial quantity, a count of people
+- ``std::pair<bool, std::string>`` can be an error status and an error message; or a flag indicating whether a light is on, plus who last flicked the switch.
+
+At least 99 times out of 100, you don't want to compare/overwrite or apply almost any operation to a first name and a second name[^1]. Similarly you don't ever want to do an operation on two different types of path. Even with the best documentation and the best memory, doing it in your head is hard. Moreover it's not necessary because the compiler or runtime is great at stopping this type of this from happening, if you give it the chance...
+
+[^1]: Actually you probably shouldn't ever separate a first name and a surname into separate strings, just let people type their names in however they like (including any characters they like). The ordering and separation into first and second name many people traditionally use is not a worldwide phenonenon.
+
+The solution
+============
+
+The solution is pretty simple: 
+
+	never ever ever use the same type for semantically different data
+
+So don't do:
+
+{% highlight c++ linenos %}
+std::string name;
+{% endhighlight %}
+
+Don't even do:
+
+{% highlight c++ linenos %}
+typedef std::string Name;
+
+Name name;
+{% endhighlight %}
+
+because as far as the compiler is concerned that's exactly the same thing!
+
+I think this is the thing to do:
+
+{% highlight c++ linenos %}
+class Name {
+public:
+	std::string str() {
+		return name;
+	}
+
+	bool operator==(const Name& other) const {
+		return name == other.name;
+	}
+
+	bool operator<<(std)
+private:
+	std::string name;
+};
+{% endhighlight %}
+
+It's quite verbose, but usually we don't need so many new data structures once a project is established. The advantages are myriad though:
+
+1. You cannot easily assign, compare or otherwise improperly mix multiple types that are incompatible. 
+2. If you are mixing types the code looks different and you are doing it deliberately, i.e. you need ``name.str()`` and you know you're doing something dangerous.
+3. If you decide to change the meaning of a function later, the signature will probably change and the compiler/interpreter will re-check that you're not misusing types.
+4. It's a form of documentation in your function signatures (assuming the language requires function types to be declared.)
+
+Compilers as theorem provers
+============================
+
+I am a big fan of statically typed languages and this type of thing is exactly why. When a program in a statically compiled language like C++, Haskell or go is compiled, the compiler has just proved that types cannot be used in a way they were not designed to be used _anyhere_ in your program (unless you've been sneaky, and you usually know you have been).
+
+Interpreters for many dynamically typed languages will stop you from doing it but not until the code path runs and that might conceivably not happen until it's running on a user's computer in a galaxy far far away.
+
+By using strings for everything, we have essentially defeated the type system because it cannot distinguish different types of data and help us to use them properly.
+
+The idea of compilers as theorem provers is pretty fundamental to programming languages but easy to forget about when it usually manifests as pesky compiler errors.
+
+If you manage to encode a desirable property into the type system, the compiler will prove it for you each and every time the program runs.
+
+By creating distinct types for name, Unix path, Unix path normalised, etc. the compiler will statically prove that the program doesn't improperly mix them together at any time. That's a theorem, you proved it!!! This is a significantly more useful property than the compiler just saying that you don't ever mix an integer and a string, so let the compiler do the hard work.
+
+More advanced languages, more advanced theorems
+===============================================
+
+Programming languages are advancing in many ways: towards improved usability, expressiveness, library usability, built-in features like concurrency, etc. But one of the main directions in statically typed languages is towards more powerful type systems. Haskell encodes the possiblility of side-effects in its type system. Ada[^2] has the facility to create arbitrary integer subtypes. Rust lets you encode details of ownership of data in the type system, so that it is hard to have leaks or use after free.
+
+[^2]: OK, that's not new.
+
+However a new breed of languages are just beginning to reach my consciousness. I hear a lot about [Idris](http://www.idris-lang.org/), the dependently typed language[^3]. Dependent typing takes types beyond verifying the inputs and outputs of a function. Instead dependent types can describe the relation between the inputs and outputs at a value level. It's worth checking out to see what the future holds, but so far I can't find a pithy way to explain it, so I'll leave it to you to read the [Wikipedia](http://en.wikipedia.org/wiki/Dependent_type) and [Idris tutorial](http://docs.idris-lang.org/en/latest/tutorial/).
+
+Cutting edge programming language features take a while to make it into mainstream languages. Computerised theorem provers are improving all the time and this will enable compilers to catch more errors and prove more desirable properties in the future.
+
+[^3]: Though I know the creator Edwin Brady, I have heard about it from independent sources.
+
+
+
