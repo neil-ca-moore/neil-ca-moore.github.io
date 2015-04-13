@@ -57,7 +57,7 @@ const auto& newPath = defaultPath;      //This is a file URI, or an NFC-normalis
 auto pathChanged = samePath(oldPath, newPath);
 {% endhighlight %}
 
-Now if at any point we forget whether oldPath is an NFD-normalised Unix path and that defaultPath is something else, our comparison makes no sense any longer. If will be false whether the data is semantically different or not.
+Now if at any point we forget whether oldPath is an NFD-normalised Unix path and that defaultPath is something else, our comparison makes no sense any longer. It will be false whether the data is semantically different or not.
 
 There are other examples:
 
@@ -121,7 +121,7 @@ It's quite verbose, but usually we don't need so many new data structures once a
 Compilers as theorem provers
 ============================
 
-I am a big fan of statically typed languages and this type of thing is exactly why. When a program in a statically compiled language like C++, Haskell or go is compiled, the compiler has just proved that types cannot be used in a way they were not designed to be used _anyhere_ in your program (unless you've been sneaky, and you usually know you have been).
+I am a big fan of statically typed languages and this type of thing is exactly why. When a program in a statically compiled language like C++, Haskell or Go is compiled, the compiler has just proved that types cannot be used in a way they were not designed to be used _anyhere_ in your program (unless you've been sneaky, and you usually know you have been).
 
 Interpreters for many dynamically typed languages will stop you from doing it but not until the code path runs and that might conceivably not happen until it's running on a user's computer in a galaxy far far away.
 
