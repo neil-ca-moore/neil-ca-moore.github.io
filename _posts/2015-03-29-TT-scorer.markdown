@@ -61,7 +61,8 @@ The text is green tells you what the light or button does, it's not really there
 
 Here's a short video of how it works:
 
-<iframe width="854" height="510" src="https://www.youtube.com/embed/CZWHE2sn9uw" frameborder="0" allowfullscreen></iframe>
+<a class="embedly-card" href="https://www.youtube.com/watch?v=CZWHE2sn9uw">TT Scorer</a>
+<script async src="//cdn.embedly.com/widgets/platform.js" charset="UTF-8"></script>
 
 I'm particularly proud of the little blink that happens after you register a score. Without a little feedback it would be too easy to
 inadvertently register the same point twice. This is so true of complex GUIs as well. Clear visual feedback is important. Having the
