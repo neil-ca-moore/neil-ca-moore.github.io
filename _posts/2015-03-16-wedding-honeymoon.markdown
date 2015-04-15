@@ -134,7 +134,8 @@ presented by my fave mad hatter Michael Portillo.
 The night before we played Jenga which this fantastic video came from. Lynsey cried with laughted about my shifty eyes
 near the end:
 
-<iframe width="854" height="510" src="https://www.youtube.com/embed/zECLKgFhXQw" frameborder="0" allowfullscreen></iframe><br/>
+<a class="embedly-card" href="https://youtu.be/zECLKgFhXQw">Jenga</a>
+<script async src="//cdn.embedly.com/widgets/platform.js" charset="UTF-8"></script>
 
 I really wanted to see the [Falls of Clyde](http://scottishwildlifetrust.org.uk/visit/visitor-centres/falls-of-clyde/).
 On this one occasion we
