@@ -183,7 +183,7 @@
 			"file": "_posts/2015-04-6-types.markdown",
 			"settings":
 			{
-				"buffer_size": 8236,
+				"buffer_size": 8672,
 				"line_ending": "Unix"
 			}
 		},
@@ -742,7 +742,8 @@
 						],
 						"settings":
 						{
-							"syntax": "Packages/Markdown/Markdown.tmLanguage"
+							"syntax": "Packages/Markdown/Markdown.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
 						"translation.y": 1583.0,
@@ -757,15 +758,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 8236,
+						"buffer_size": 8672,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								6638,
-								6638
+								8668,
+								8668
 							]
 						],
 						"settings":
@@ -774,7 +775,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1816.0,
+						"translation.y": 802.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,

@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Objects and pointers"
-date:   2015-1-3 21:29:19
+date:   2014-11-30 21:29:19
 categories: c++
 ---
 
@@ -199,7 +199,7 @@ private:
 
 void objectStuff5() {
 	DumbAdder dumbAdder;
-	staticDispatchAdder.add(6, 7); 
+	dumbAdder.add(6, 7); 
 }
 {% endhighlight %}
 
@@ -268,7 +268,9 @@ This example shows polymorphism using interfaces, using both pointers and non-po
 References
 ==========
 [The Curiously Recurring Template Pattern in C++](http://eli.thegreenplace.net/2011/05/17/the-curiously-recurring-template-pattern-in-c)
+
 [Polymorphism - Wikipedia](http://en.wikipedia.org/wiki/Polymorphism_(computer_science))
+
 C++ in a nutshell - O'Reilly
 
 
