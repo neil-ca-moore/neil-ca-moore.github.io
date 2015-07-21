@@ -41,7 +41,7 @@ I said in my earlier post that in C++ polymorphism is only available via a point
 
 unique_ptr
 ===========
-The simplest way to get close to value semantics with pointers is definitely std::unique_ptr. An area of memory is guaranteed to be uniquely owned. 
+The simplest way to get closer to value semantics with pointers is definitely std::unique_ptr. An area of memory is guaranteed to be uniquely owned. 
 
 {% highlight c++ linenos %}
 {% include_relative unique.hpp %}
@@ -60,13 +60,15 @@ That's two fairly big gotchas, let's look for a better solution.
 Hand rolled value semantics with polymorphism
 =============================================
 
-Lets make a type for a type using value semantics that can take anything with a Print() method:
+Lets make a type with value semantics that can take anything with a Print() method:
 
 {% highlight c++ linenos %}
 {% include_relative wrapper.hpp %}
 {% endhighlight %}
 
-This is great. In the code example at the bottom there is no pointers or inheritance, yet we are able to make heterogeneous containers of objects each with their own behaviour. We get value semantics too.
+There is no such thing as a free lunch though. Polymorphism is still achieved using a pointer, but it is hidden away so that it doesn't contaminate client code.
+
+We get value semantics. There is no inheritance in the printable objects. We can also make heterogeneous containers.
 
 boost type_erasure
 ==================
@@ -78,6 +80,7 @@ Let's check out boost::type_erasure to make it short and sweet.
 {% highlight c++ linenos %}
 {% include_relative type_erasure.hpp %}
 {% endhighlight %}
+
 
 
 References
