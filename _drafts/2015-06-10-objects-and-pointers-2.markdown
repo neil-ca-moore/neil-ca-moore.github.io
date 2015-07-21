@@ -29,25 +29,10 @@ Lets say that I want the following properties of a variable for an object:
 
 We can achieve combinations of those properties using the techniques I described last time: i.e. use of safe pointers (dynamic dispatch + memory safety), CRTP (memory safety and inheritance but dispatch done statically) or inclusion (memory safety but static dispatch and no inheritance).
 
-However my eyes have been opened a bit after watching Sean Parent's talk called ["C++ seasoning"](http://channel9.msdn.com/Events/GoingNative/2013/Cpp-Seasoning). Now I also want to achieve /value semantics/. Value semantics means that assigning a value to a different variable copies it. The opposite is reference semantics meaning that only the pointer is copied. With value semantics a value is guaranteed to be the sole way to access the corresponding area of memory.
+However my eyes have been opened a bit after watching Sean Parent's talk called ["C++ seasoning"](http://channel9.msdn.com/Events/GoingNative/2013/Cpp-Seasoning). Now I also want to achieve *value semantics*. Value semantics means that assigning a value to a different variable copies it. The opposite is reference semantics meaning that only the pointer is copied. With value semantics a value is guaranteed to be the sole way to access the corresponding area of memory.
 
 {% highlight c++ linenos %}
-int main()
-{
-	int a = 1;
-	int b = a; //value semantics...
-	b += 1;    //a is unchanged
-	
-	std::cout << "a=" << a << ",b=" << b << std::endl;
-	//prints: a=1,b=2
-
-	int& ptrA = a;
-	int& ptrB = ptrA; //reference semantics
-	ptrB += 1;        //ptrA is changed
-	
-	std::cout << "a=" << a << ",ptrA=" << ptrA << ",ptrB=" << ptrB << std::endl;
-	//prints: a=2,ptrA=2,ptrB=2
-}
+{% include_relative value.hpp %}
 {% endhighlight %}
 
 Using value semantics helps to make code easy to understand, since you don't need to check what other variables (possibly on other threads) might be sharing the same data.
@@ -59,31 +44,7 @@ unique_ptr
 The simplest way to get close to value semantics with pointers is definitely std::unique_ptr. An area of memory is guaranteed to be uniquely owned. 
 
 {% highlight c++ linenos %}
-#include <iostream>
-#include <memory>
-
-class Printer {
-public:
-	virtual void Print() { std::cout << "Printer" << std::endl; }		
-};
-
-class ConcretePrinter {
-public:
-	virtual void Print() { std::cout << "ConcretePrinter" << std::endl; }		
-};
-
-int main()
-{
-	std::unique_ptr<ConcretePrinter> cp(new ConcretePrinter());
-	cp->Print(); //prints: ConcretePrinter
-	
-	//std::unique_ptr<ConcretePrinter> notACopy = cp; //doesn't work
-	
-	std::unique_ptr<ConcretePrinter> notACopy2 = std::move(cp);
-	notACopy2->Print(); //prints: ConcretePrinter
-	
-	cp->Print(); //dangerous, cp isn't there any more
-}
+{% include_relative unique.hpp %}
 {% endhighlight %}
 
 However we haven't really achieved proper value semantics, because assigning a value doesn't work and we have to move it around explicitly.
@@ -91,33 +52,7 @@ However we haven't really achieved proper value semantics, because assigning a v
 The other problem with this code is that you cannot use homogeneous containers properly to process unique_ptrs:
 
 {% highlight c++ linenos %}
-#include <iostream>
-#include <memory>
-#include <vector>
-
-class Printer {
-...	
-};
-
-class ConcretePrinter : public Printer {
-...	
-};
-
-class StonePrinter : public Printer {
-public:
-	virtual void Print() { std::cout << "StonePrinter" << std::endl; }		
-};
-
-int main()
-{
-	std::unique_ptr<ConcretePrinter> cp(new ConcretePrinter());
-	
-	std::unique_ptr<StonePrinter> sp(new StonePrinter());
-
-	std::vector<std::unique_ptr<Printer>> doesntWork;
-	//doesntWork.push_back(cp); //won't compile
-	//doesntWork.push_back(sp); //won't compile
-}
+{% include_relative unique_hetero.hpp %}
 {% endhighlight %}
 
 That's two fairly big gotchas, let's look for a better solution.
@@ -125,9 +60,24 @@ That's two fairly big gotchas, let's look for a better solution.
 Hand rolled value semantics with polymorphism
 =============================================
 
+Lets make a type for a type using value semantics that can take anything with a Print() method:
+
+{% highlight c++ linenos %}
+{% include_relative wrapper.hpp %}
+{% endhighlight %}
+
+This is great. In the code example at the bottom there is no pointers or inheritance, yet we are able to make heterogeneous containers of objects each with their own behaviour. We get value semantics too.
+
 boost type_erasure
 ==================
 
+The only problem is that the code is rather long and laborious, every time we have a different concept, we would have to define 3 new classes for it.
+
+Let's check out boost::type_erasure to make it short and sweet.
+
+{% highlight c++ linenos %}
+{% include_relative type_erasure.hpp %}
+{% endhighlight %}
 
 
 References
@@ -145,3 +95,5 @@ C++ in a nutshell - O'Reilly
 [Value semantics](https://akrzemi1.wordpress.com/2012/02/03/value-semantics/)
 
 [What is value semantics?](https://isocpp.org/wiki/faq/value-vs-ref-semantics#val-vs-ref-semantics)
+
+[Minion AnyVarRef](https://bitbucket.org/stacs_cp/minion/src/c64e2526b4b0156b9881e3ebe0fc9d55709335aa/minion/variables/AnyVarRef.h?at=default)
