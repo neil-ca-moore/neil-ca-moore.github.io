@@ -29,34 +29,11 @@ A variable for an object can be used for most things. You can reassign it, call 
 Suppose you have a virtual function in your object:
 
 {% highlight c++ linenos %}
-class StupidAdder {
-public:
-	virtual unsigned add(unsigned a, unsigned b) {
-		unsigned retval = 0;
-		while(a--) {
-			retval++;
-		}
-		while(b--) {
-			retval++;
-		}
-		return retval;
-	}
-};
+{% include_relative obj_ptrs_1_code/earlydefs.hpp %}
+{% endhighlight %}
 
-class SmartAdder : public Base {
-	virtual unsigned add(unsigned a, unsigned b) {
-		return a + b;
-	}
-};
-
-void objectStuff() {
-	StupidAdder stupid;
-	SmartAdder smart;
-
-	stupid.add(4, 5); //(A)
-
-	smart.add(4, 5); //(B)
-}
+{% highlight c++ linenos %}
+{% include_relative obj_ptrs_1_code/first.cpp %}
 {% endhighlight %}
 
 This program should be understandable under any possible interpretation: line (A) uses StupidAdder's version of add() and line (B) uses SmartAdder's version.
@@ -64,16 +41,10 @@ This program should be understandable under any possible interpretation: line (A
 However only a little change using subtyping makes things a little confusing:
 
 {% highlight c++ linenos %}
-void objectStuff2() {
-	StupidAdder stupid;
-	SmartAdder smart;
-
-	StupidAdder reallyStupid = smart;
-	reallyStupid.add(6, 7); //(C)
-}
+{% include_relative obj_ptrs_1_code/second.cpp %}
 {% endhighlight %}
 
-Line (C) will use StupidAdder's version of add(), rather than SmartAdder's version as the same Java program would do.
+Line (C) will use StupidAdder's version of add(), rather than SmartAdder's version as the identical Java program would do.
 
 Why is that? It's because dynamic dispatch of functions can only be achieved via pointers or references to objects. A non-pointer, non-reference object variable will dispatch functions based on the *static type* of an object, i.e. the type of the variable (there is also a *dynamic type* that is the type of the object, sometimes different.) 
 
@@ -86,16 +57,7 @@ I don't think I have ever seen a deliberate use of slicing in a C++ program.
 Getting back to the main point, if you want dynamic dispatch of virtual functions you have to use a pointer or a reference:
 
 {% highlight c++ linenos %}
-void objectStuff3() {
-	StupidAdder stupid;
-	SmartAdder smart;
-
-	StupidAdder& reallyStupid = smart;
-	reallyStupid.add(6, 7); //(D)
-
-	StupidAdder* reallyReallyStupid = &smart;
-	reallyReallyStupid.add(6, 7); //(E)
-}
+{% include_relative obj_ptrs_1_code/third.cpp %}
 {% endhighlight %}
 
 Lines (D) and (E) use SmartAdder's version of add(). This is very unfortunate as it encourages use of raw pointers and references which are both a source of many programming errors. I think this is quite an important point. Pointers are one of the most difficult features to use correctly in C++ and polymorphism one of the most useful features (used judiciously). In C++ they come as a package. A radioactive cake that you both want and don't want.
@@ -106,13 +68,7 @@ Safe technique 1: safe use of pointers
 This topic has been covered so many times before and I don't want to go into too much detail. Basically by using safe pointer types like shared_ptr, scoped_ptr, unique_ptr, etc. you can get safe (and sometimes efficient) access to polymorphic behaviours without passing around raw pointers and references. It is a good solution, but what always rankles with me is that the syntax is verbose and inflexible, and you have to pick which pointer types to use and you cannot easily change your mind.
 
 {% highlight c++ linenos %}
-void objectStuff4() {
-	StupidAdder stupid;
-	SmartAdder smart;
-
-	boost::scoped_ptr<StupidAdder> notStupid = smart;
-	notStupid.add(6, 7);
-}
+{% include_relative obj_ptrs_1_code/fourth.cpp %}
 {% endhighlight %}
 
 You could use typedefs, wrapping, auto keyword and various other techniques to get short and easily changed pointer types, but it doesn't quite reach the convenience of a built in language feature.
@@ -123,42 +79,7 @@ Safe technique 2: Curiously recurring template pattern (CRTP)
 This one is not a silver bullet. It's kind of hard and laborious to use, but you can achieve some subtype polymorphism without using dynamic dispatch (meaning a pointer is not needed). Here's some code:
 
 {% highlight c++ linenos %}
-template<class T>
-class BaseAdder {
-public:	
-	unsigned add(unsigned a, unsigned b) {
-		unsigned retval = 0;
-		while(a--) {
-			retval = increment(retval); //(F)
-		}
-		while(b--) {
-			retval = increment(retval);
-		}
-		return retval;
-	};
-
-	unsigned increment(unsigned a) { 
-		return derived()->increment(a); //(G)
-	} 
-
-private:
-	T& derived()
-    {
-        return *static_cast<T*>(this);
-    }
-};
-
-class DerivedAdder : public BaseAdder<DerivedAdder> {
-public:
-	unsigned increment(unsigned a) {
-		return a + 1;
-	} 
-};
-
-void objectStuff5() {
-	DerivedAdder staticDispatchAdder;
-	staticDispatchAdder.add(6, 7); //(H)
-}
+{% include_relative obj_ptrs_1_code/fifth.cpp %}
 {% endhighlight %}
 
 As you can see, it's a bit less convenient to use than dynamic polymorphism, though that could probably be mitigated by code generation. What this does is gets you some kind of inheritance, provided that the type of the object is known at compile time. In this example the add() function from BaseAdder is inherited by DerivedAdder, but won't use dynamic dispatch since it's non-virtual. The increment() function is special because a version of it is provided in both BaseAdder and DerivedAdder. Line (F) uses BaseAdder::increment(). However at line (G) the call is delegated statically to DerivedAdder::increment(). Hence this behaves a little like code inheritance, but without any virtual functions.
@@ -173,34 +94,7 @@ This is a great tip that is quite an eye opener when you get used to it. The ide
 Here's a C++ example that doesn't use inheritance at all:
 
 {% highlight c++ linenos %}
-class Incrementer {
-public:
-	unsigned increment(unsigned a) {
-		return a + 1;
-	} 
-};
-
-class DumbAdder {
-public:	
-	unsigned add(unsigned a, unsigned b) {
-		unsigned retval = 0;
-		while(a--) {
-			retval = i.increment(retval); //(J)
-		}
-		while(b--) {
-			retval = i.increment(retval);
-		}
-		return retval;
-	};
-
-private:
-	Incrementer i;
-};
-
-void objectStuff5() {
-	DumbAdder dumbAdder;
-	dumbAdder.add(6, 7); 
-}
+{% include_relative obj_ptrs_1_code/sixth.cpp %}
 {% endhighlight %}
 
 At line (J), the instance of incrementer embedded inside DumbAdder is used to provide increment functionality. In common with CRTP, this doesn't use subtyping, but then again, it's not really needed.
