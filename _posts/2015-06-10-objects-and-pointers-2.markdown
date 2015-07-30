@@ -32,7 +32,7 @@ We can achieve combinations of those properties using the techniques I described
 However my eyes have been opened a bit after watching Sean Parent's talk called ["C++ seasoning"](http://channel9.msdn.com/Events/GoingNative/2013/Cpp-Seasoning). Now I also want to achieve *value semantics*. Value semantics means that assigning a value to a different variable copies it (or, with std::move, moves it without copying). The opposite is reference semantics meaning that only the pointer is copied. With value semantics a value is guaranteed to be the sole way to access the corresponding area of memory.
 
 {% highlight c++ linenos %}
-{% include_relative obj_ptrs_2_code/value.hpp %}
+{% include_relative obj_ptrs_2_code/value.cpp %}
 {% endhighlight %}
 
 Using value semantics helps to make code easy to understand, since you don't need to check what other variables (possibly on other threads) might be sharing the same data. There is no sharing.
@@ -46,7 +46,7 @@ unique_ptr
 The simplest way to get closer to value semantics with pointers is definitely std::unique_ptr. An area of memory is guaranteed to be uniquely owned. 
 
 {% highlight c++ linenos %}
-{% include_relative obj_ptrs_2_code/unique.hpp %}
+{% include_relative obj_ptrs_2_code/unique.cpp %}
 {% endhighlight %}
 
 However we haven't really achieved proper value semantics, because assigning a value doesn't work and we have to move it around explicitly.
@@ -59,7 +59,7 @@ Hand rolled value semantics with polymorphism
 Lets make a type with value semantics that can take anything with a Print() method:
 
 {% highlight c++ linenos %}
-{% include_relative obj_ptrs_2_code/wrapper.hpp %}
+{% include_relative obj_ptrs_2_code/wrapper.cpp %}
 {% endhighlight %}
 
 There is no such thing as a free lunch though. Polymorphism is still achieved using a pointer, but it is hidden away so that it doesn't contaminate client code.
@@ -74,7 +74,7 @@ The only problem is that the code is rather long and laborious, every time we ha
 Let's check out boost::type_erasure to make it short and sweet.
 
 {% highlight c++ linenos %}
-{% include_relative obj_ptrs_2_code/type_erasure.hpp %}
+{% include_relative obj_ptrs_2_code/type_erasure.cpp %}
 {% endhighlight %}
 
 Conclusion
