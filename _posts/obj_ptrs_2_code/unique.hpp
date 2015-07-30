@@ -3,17 +3,17 @@
 
 class Printer {
 public:
-	virtual void Print() const { std::cout << "Printer" << std::endl; }		
+	virtual void Print() const { std::cout << "Printer" << std::endl; }	
 };
 
-class ConcretePrinter {
+class ConcretePrinter : public Printer {
 public:
 	virtual void Print() const { std::cout << "ConcretePrinter" << std::endl; }		
 };
 
 int main()
 {
-	std::unique_ptr<ConcretePrinter> cp(new ConcretePrinter());
+	std::unique_ptr<ConcretePrinter> cp(std::make_unique<ConcretePrinter>());
 	cp->Print(); //prints: ConcretePrinter
 	
 	//std::unique_ptr<ConcretePrinter> notACopy = cp; //doesn't work

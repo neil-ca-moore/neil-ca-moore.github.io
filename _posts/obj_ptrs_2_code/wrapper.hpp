@@ -1,7 +1,7 @@
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
 #include <iostream>
+#include <memory>
 #include <utility>
+#include <vector>
 
 class ConcretePrinter {
 public:
@@ -16,7 +16,7 @@ public:
 class AnyPrinter {
 public:
     template <typename T>
-    AnyPrinter(T x) : self_(boost::make_shared<model<T>>(std::move(x))) {}
+    AnyPrinter(T x) : self_(std::make_shared<model<T>>(std::move(x))) {}
  
     void Print() const
     { self_->Print_(); }
@@ -35,7 +35,7 @@ private:
         T data_;
     };
    
-    boost::shared_ptr<const concept_t> self_;
+    std::shared_ptr<const concept_t> self_;
 };
 
 int main()

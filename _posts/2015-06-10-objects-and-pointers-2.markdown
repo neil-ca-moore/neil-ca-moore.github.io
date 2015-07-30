@@ -29,13 +29,15 @@ Lets say that I want the following properties of a variable for an object:
 
 We can achieve combinations of those properties using the techniques I described last time: i.e. use of safe pointers (dynamic dispatch + memory safety), CRTP (memory safety and inheritance but dispatch done statically) or inclusion (memory safety but static dispatch and no inheritance).
 
-However my eyes have been opened a bit after watching Sean Parent's talk called ["C++ seasoning"](http://channel9.msdn.com/Events/GoingNative/2013/Cpp-Seasoning). Now I also want to achieve *value semantics*. Value semantics means that assigning a value to a different variable copies it. The opposite is reference semantics meaning that only the pointer is copied. With value semantics a value is guaranteed to be the sole way to access the corresponding area of memory.
+However my eyes have been opened a bit after watching Sean Parent's talk called ["C++ seasoning"](http://channel9.msdn.com/Events/GoingNative/2013/Cpp-Seasoning). Now I also want to achieve *value semantics*. Value semantics means that assigning a value to a different variable copies it (or, with std::move, moves it without copying). The opposite is reference semantics meaning that only the pointer is copied. With value semantics a value is guaranteed to be the sole way to access the corresponding area of memory.
 
 {% highlight c++ linenos %}
 {% include_relative obj_ptrs_2_code/value.hpp %}
 {% endhighlight %}
 
-Using value semantics helps to make code easy to understand, since you don't need to check what other variables (possibly on other threads) might be sharing the same data.
+Using value semantics helps to make code easy to understand, since you don't need to check what other variables (possibly on other threads) might be sharing the same data. There is no sharing.
+
+Also you don't have to worry about cleaning up pointers any longer, because there are none. 
 
 I said in my earlier post that in C++ polymorphism is only available via a pointer/reference variable. That is true, but there are a variety of techniques to maintain value semantics without losing polymorphism, and the purpose of this post is to describe those.
 
@@ -49,13 +51,7 @@ The simplest way to get closer to value semantics with pointers is definitely st
 
 However we haven't really achieved proper value semantics, because assigning a value doesn't work and we have to move it around explicitly.
 
-The other problem with this code is that you cannot use homogeneous containers properly to process unique_ptrs:
-
-{% highlight c++ linenos %}
-{% include_relative obj_ptrs_2_code/unique_hetero.hpp %}
-{% endhighlight %}
-
-That's two fairly big gotchas, let's look for a better solution.
+Let's look for a better solution.
 
 Hand rolled value semantics with polymorphism
 =============================================
@@ -81,6 +77,10 @@ Let's check out boost::type_erasure to make it short and sweet.
 {% include_relative obj_ptrs_2_code/type_erasure.hpp %}
 {% endhighlight %}
 
+Conclusion
+========
+
+Normally in C++, polymorphism brings an unwelcome friend along with it - pointers. But I've described a couple of ways to get polymorphism without pointers being in view (at least in the client code).
 
 
 References
