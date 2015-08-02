@@ -3,7 +3,7 @@
 
 class Printer {
 public:
-	virtual void Print() const { std::cout << "Printer" << std::endl; }	
+	virtual void Print() const = 0;	
 };
 
 class ConcretePrinter : public Printer {
@@ -21,5 +21,5 @@ int main()
 	std::unique_ptr<ConcretePrinter> notACopy2 = std::move(cp);
 	notACopy2->Print(); //prints: ConcretePrinter
 	
-	cp->Print(); //dangerous, cp isn't there any more
+	cp->Print(); //dangerous, cp isn't there any more (segfault for me)
 }
