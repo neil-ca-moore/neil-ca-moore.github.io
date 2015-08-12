@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Objects and pointers part II"
-date:   2015-7-21 21:29:19
+date:   2015-6-10 21:29:19
 categories: c++
 ---
 
