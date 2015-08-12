@@ -153,10 +153,26 @@
 			}
 		},
 		{
+			"file": "_posts/2014-11-30-objects-and-pointers.markdown",
+			"settings":
+			{
+				"buffer_size": 10427,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "_posts/2014-11-13-dinner.markdown",
+			"settings":
+			{
+				"buffer_size": 245,
+				"line_ending": "Unix"
+			}
+		},
+		{
 			"contents": "---\nlayout: post\ntitle:  \"Objects and pointers\"\ndate:   2015-1-3 21:29:19\ncategories: c++\n---\n\n<!--\nOutline:\n\n- C++ polymorphism\n- slicing\n- use of pointers for polymorphism (forcing use of pointers for polymorphism, leading to pointer hell)\n- CRTP as a workaround for getting polymorphism in a non-pointer\n- other workarounds\n- not using polymorphism\n- different pointer types available\n- I have never seen slicing be deliberate\n- comparison with go\n-->\n\nA comparison of pointers and objects in C++ and go. More detail on the C++, go mainly for comparison.\n\nPolymorphism and pointers in C++\n================================\n\nA variable for an object can be used for most things. You can reassign it, call non-virtual functions, access member variables, etc. However there are a few gotchas in this area.\n\nSuppose you have a virtual function in your object:\n\n{% highlight c++ linenos %}\nclass StupidAdder {\npublic:\n	virtual unsigned add(unsigned a, unsigned b) {\n		unsigned retval = 0;\n		while(a--) {\n			retval++;\n		}\n		while(b--) {\n			retval++;\n		}\n		return retval;\n	}\n};\n\nclass SmartAdder : public Base {\n	virtual unsigned add(unsigned a, unsigned b) {\n		return a + b;\n	}\n};\n\nvoid objectStuff() {\n	StupidAdder stupid;\n	SmartAdder smart;\n\n	stupid.add(4, 5); //(A)\n\n	smart.add(4, 5); //(B)\n}\n{% endhighlight %}\n\nThis program should be understandable under any possible interpretation: line (A) uses StupidAdder's version of add() and line (B) uses SmartAdder's version.\n\nHowever only a little change using subtyping makes things a little confusing:\n\n{% highlight c++ linenos %}\nvoid objectStuff2() {\n	StupidAdder stupid;\n	SmartAdder smart;\n\n	StupidAdder reallyStupid = smart;\n	reallyStupid.add(6, 7); //(C)\n}\n{% endhighlight %}\n\nLine (C) will use StupidAdder's version of add(), rather than SmartAdder's version as the same Java program would do.\n\nWhy is that? It's because dynamic dispatch of functions can only be achieved via pointers or references to objects. A non-pointer, non-reference object variable will dispatch functions based on the *static type* of an object, i.e. the type of the variable (there is also a *dynamic type* that is the type of the object, sometimes different.) \n\nBecause there is no dynamic dispatch there is no need for runtime function lookup. I think this is down to the C++ design principle that there should be no performance penalty for language features that are not being used. In this case it is polymorphism that is not being used. But it's beginning to make things a little confusing for programmers.\n\nThere are no instance variables in StupidAdder or SmartAdder, but if there were then slicing would also have happened at line (C). That would have meant that any member variables added in SmartAdder would be lost in the assignment. Also the true dynamic type of smart has been lost, there is no runtime information to say that reallyStupid was ever a SmartAdder at all.\n\nI don't think I have ever seen a deliberate use of slicing in a C++ program.\n\nGetting back to the main point, if you want dynamic dispatch of virtual functions you have to use a pointer or a reference:\n\n{% highlight c++ linenos %}\nvoid objectStuff3() {\n	StupidAdder stupid;\n	SmartAdder smart;\n\n	StupidAdder& reallyStupid = smart;\n	reallyStupid.add(6, 7); //(D)\n\n	StupidAdder* reallyReallyStupid = &smart;\n	reallyReallyStupid.add(6, 7); //(E)\n}\n{% endhighlight %}\n\nLines (D) and (E) use SmartAdder's version of add(). This is very unfortunate as it encourages use of raw pointers and references which are both a source of many programming errors. I think this is quite an important point. Pointers are one of the most difficult features to use correctly in C++ and polymorphism one of the most useful features (used judiciously). In C++ they come as a package. A radioactive cake that you both want and don't want.\n\nSafe technique 1: safe use of pointers\n======================================\n\nThis topic has been covered so many times before and I don't want to go into too much detail. Basically by using safe pointer types like shared_ptr, scoped_ptr, unique_ptr, etc. you can get safe (and sometimes efficient) access to polymorphic behaviours without passing around raw pointers and references. It is a good solution, but what always rankles with me is that the syntax is verbose and inflexible, and you have to pick which pointer types to use and you cannot easily change your mind.\n\n{% highlight c++ linenos %}\nvoid objectStuff4() {\n	StupidAdder stupid;\n	SmartAdder smart;\n\n	boost::scoped_ptr<StupidAdder> notStupid = smart;\n	notStupid.add(6, 7);\n}\n{% endhighlight %}\n\nYou could use typedefs, wrapping, auto keyword and various other techniques to get short and easily changed pointer types, but it doesn't quite reach the convenience of a built in language feature.\n\nSafe technique 2: Curiously recurring template pattern (CRTP)\n=============================================================\n\nThis one is not a silver bullet. It's kind of hard and laborious to use, but you can achieve some subtype polymorphism without using dynamic dispatch (meaning a pointer is not needed). Here's some code:\n\n{% highlight c++ linenos %}\ntemplate<class T>\nclass BaseAdder {\npublic:	\n	unsigned add(unsigned a, unsigned b) {\n		unsigned retval = 0;\n		while(a--) {\n			retval = increment(retval); //(F)\n		}\n		while(b--) {\n			retval = increment(retval);\n		}\n		return retval;\n	};\n\n	unsigned increment(unsigned a) { \n		return derived()->increment(a); //(G)\n	} \n\nprivate:\n	T& derived()\n    {\n        return *static_cast<T*>(this);\n    }\n};\n\nclass DerivedAdder : public BaseAdder<DerivedAdder> {\npublic:\n	unsigned increment(unsigned a) {\n		return a + 1;\n	} \n};\n\nvoid objectStuff5() {\n	DerivedAdder staticDispatchAdder;\n	staticDispatchAdder.add(6, 7); //(H)\n}\n{% endhighlight %}\n\nAs you can see, it's a bit less convenient to use than dynamic polymorphism, though that could probably be mitigated by code generation. What this does is gets you some kind of inheritance, provided that the type of the object is known at compile time. In this example the add() function from BaseAdder is inherited by DerivedAdder, but won't use dynamic dispatch since it's non-virtual. The increment() function is special because a version of it is provided in both BaseAdder and DerivedAdder. Line (F) uses BaseAdder::increment(). However at line (G) the call is delegated statically to DerivedAdder::increment(). Hence this behaves a little like code inheritance, but without any virtual functions.\n\nThis is not really a technique for every day use. But it does allow you to use code inheritance of sorts without using pointers or references.\n\nSafe technique 3: don't use code inheritance at all\n===================================================\n\nThis is a great tip that is quite an eye opener when you get used to it. The idea is simply not to use direct code inheritance at all, to avoid having to deal with pointers at all. That way you don't need to worry about freeing the pointers or being so careful with ownership. Use of inheritance is frequently held up as a quality goal in object oriented languages when it is often not necessary to use it at all. It is perfectly possible to design an object oriented language that does not have inheritance, and instead relies on interfaces and inclusion of other classes to share functionality.\n\nHere's a C++ example that doesn't use inheritance at all:\n\n{% highlight c++ linenos %}\nclass Incrementer {\npublic:\n	unsigned increment(unsigned a) {\n		return a + 1;\n	} \n};\n\nclass DumbAdder {\npublic:	\n	unsigned add(unsigned a, unsigned b) {\n		unsigned retval = 0;\n		while(a--) {\n			retval = i.increment(retval); //(J)\n		}\n		while(b--) {\n			retval = i.increment(retval);\n		}\n		return retval;\n	};\n\nprivate:\n	Incrementer i;\n};\n\nvoid objectStuff5() {\n	DumbAdder dumbAdder;\n	staticDispatchAdder.add(6, 7); \n}\n{% endhighlight %}\n\nAt line (J), the instance of incrementer embedded inside DumbAdder is used to provide increment functionality. In common with CRTP, this doesn't use subtyping, but then again, it's not really needed.\n\nThe frustration with this technique is not being able to create a GoodAdder class and have them both be instances of an Adder interface. For that you do need dynamic dispatch, and that means pointers.\n\nC++ conclusion\n==============\n\nI can't think of any other ways beside these right now off the top of my head. Leave a comment if you know another and I may add it.\n\nNow I'm going to look at polymorphic functions in go, to see the difference.\n\nComparison with another language: go\n====================================\n\nAlthough I haven't used it for a big project yet, I like the look of go. It is a much simpler language than C++, and lets you do dynamic dispatch very naturally. I hope I don't make any mistakes here, but I might because I'm not so familiar with the language.\n\nGo doesn't have subtyping. Hence to use code from another object type you cannot inherit it, you must invoke a different object to access that functionality. However it does have interface types, a variable of an interface type can store any object that conforms to the interface. So there is polymorphism but between on objects that share the same interface. Also the fear factor with using pointers is slightly milder, because go has garbage collection.\n\n{% highlight go linenos %}\npackage main\n\nimport \"fmt\"\n\ntype Incrementer struct{}\n\nfunc (i Incrementer) increment(x uint) uint {\n	return x + 1\n}\n\ntype Adder interface {\n	add(x uint, y uint) uint\n}\n\ntype DumbAdder struct {\n	incr Incrementer\n}\n\nfunc (a DumbAdder) add(x uint, y uint) uint {\n	var retval uint = 0\n	var i uint\n	for i = 1; i <= x; i++ {\n		retval = a.incr.increment(retval)\n	}\n	for i = 1; i <= y; i++ {\n		retval = a.incr.increment(retval)\n	}\n	return retval\n}\n\nfunc main() {\n	var dumb DumbAdder = DumbAdder{}\n	var poly Adder = dumb\n	var polyPointer Adder = &dumb //N.B. don't even need to say Adder*\n\n	fmt.Println(dumb.add(5, 6))\n	fmt.Println(poly.add(5, 6))\n	fmt.Println(polyPointer.add(5, 6))\n}\n{% endhighlight %}\n\nThis example shows polymorphism using interfaces, using both pointers and non-pointers. There is no need to resort to anything complex.\n\nReferences\n==========\n[The Curiously Recurring Template Pattern in C++](http://eli.thegreenplace.net/2011/05/17/the-curiously-recurring-template-pattern-in-c)\n[Polymorphism - Wikipedia](http://en.wikipedia.org/wiki/Polymorphism_(computer_science))\nC++ in a nutshell - O'Reilly\n\n\n\n\n\n",
 			"file": "_drafts/2014-11-30-objects-and-pointers.markdown",
-			"file_size": -1,
-			"file_write_time": -1,
+			"file_size": 10433,
+			"file_write_time": 130784379330000000,
 			"settings":
 			{
 				"buffer_size": 10433,
@@ -167,7 +183,7 @@
 			"file": "_posts/2015-03-16-wedding-honeymoon.markdown",
 			"settings":
 			{
-				"buffer_size": 7787,
+				"buffer_size": 7813,
 				"line_ending": "Unix"
 			}
 		},
@@ -175,7 +191,7 @@
 			"file": "_posts/2015-03-29-TT-scorer.markdown",
 			"settings":
 			{
-				"buffer_size": 8687,
+				"buffer_size": 8737,
 				"line_ending": "Unix"
 			}
 		},
@@ -188,10 +204,13 @@
 			}
 		},
 		{
-			"file": "_includes/header.html",
+			"contents": "---\nlayout: post\ntitle:  \"Objects and pointers part II\"\ndate:   2015-6-10 21:29:19\ncategories: c++\n---\n\n<!--\nOutline:\n\n- static polymorphism\n - set the scene\n  - value semantics\n  - polymorphism\n  - not polymorphism\n - unique_ptr\n  - cannot go into homogeneous container\n  - assignment doesn't work as expected\n - hand rolled\n - boost any\n-->\n\nI described in a [previous post]({% post_url 2014-11-30-objects-and-pointers %}) how difficult it is to work with dynamic dispatch in c++. I described various ways to deal with it. However I've been reading about an even more powerful and easy to use way to do things.\n\nLets say that I want the following properties of a variable for an object:\n\n* dynamic dispatch of its methods\n* memory safety\n\nWe can achieve combinations of those properties using the techniques I described last time: i.e. use of safe pointers (dynamic dispatch + memory safety), CRTP (memory safety and inheritance but dispatch done statically) or inclusion (memory safety but static dispatch and no inheritance).\n\nHowever my eyes have been opened a bit after watching Sean Parent's talk called [\"C++ seasoning\"](http://channel9.msdn.com/Events/GoingNative/2013/Cpp-Seasoning). Now I also want to achieve /value semantics/. Value semantics means that assigning a value to a different variable copies it. The opposite is reference semantics meaning that only the pointer is copied. With value semantics a value is guaranteed to be the sole way to access the corresponding area of memory.\n\n{% highlight c++ linenos %}\nint main()\n{\n	int a = 1;\n	int b = a; //value semantics...\n	b += 1;    //a is unchanged\n	\n	std::cout << \"a=\" << a << \",b=\" << b << std::endl;\n	//prints: a=1,b=2\n\n	int& ptrA = a;\n	int& ptrB = ptrA; //reference semantics\n	ptrB += 1;        //ptrA is changed\n	\n	std::cout << \"a=\" << a << \",ptrA=\" << ptrA << \",ptrB=\" << ptrB << std::endl;\n	//prints: a=2,ptrA=2,ptrB=2\n}\n{% endhighlight %}\n\nUsing value semantics helps to make code easy to understand, since you don't need to check what other variables (possibly on other threads) might be sharing the same data.\n\nI said in my earlier post that in C++ polymorphism is only available via a pointer/reference variable. That is true, but there are a variety of techniques to maintain value semantics without losing polymorphism, and the purpose of this post is to describe those.\n\nunique_ptr\n===========\nThe simplest way to get close to value semantics with pointers is definitely std::unique_ptr. An area of memory is guaranteed to be uniquely owned. \n\n{% highlight c++ linenos %}\n#include <iostream>\n#include <memory>\n\nclass Printer {\npublic:\n	virtual void Print() { std::cout << \"Printer\" << std::endl; }		\n};\n\nclass ConcretePrinter {\npublic:\n	virtual void Print() { std::cout << \"ConcretePrinter\" << std::endl; }		\n};\n\nint main()\n{\n	std::unique_ptr<ConcretePrinter> cp(new ConcretePrinter());\n	cp->Print(); //prints: ConcretePrinter\n	\n	//std::unique_ptr<ConcretePrinter> notACopy = cp; //doesn't work\n	\n	std::unique_ptr<ConcretePrinter> notACopy2 = std::move(cp);\n	notACopy2->Print(); //prints: ConcretePrinter\n	\n	cp->Print(); //dangerous, cp isn't there any more\n}\n{% endhighlight %}\n\nHowever we haven't really achieved proper value semantics, because assigning a value doesn't work and we have to move it around explicitly.\n\nThe other problem with this code is that you cannot use homogeneous containers properly to process unique_ptrs:\n\n{% highlight c++ linenos %}\n#include <iostream>\n#include <memory>\n#include <vector>\n\nclass Printer {\n...	\n};\n\nclass ConcretePrinter : public Printer {\n...	\n};\n\nclass StonePrinter : public Printer {\npublic:\n	virtual void Print() { std::cout << \"StonePrinter\" << std::endl; }		\n};\n\nint main()\n{\n	std::unique_ptr<ConcretePrinter> cp(new ConcretePrinter());\n	\n	std::unique_ptr<StonePrinter> sp(new StonePrinter());\n\n	std::vector<std::unique_ptr<Printer>> doesntWork;\n	//doesntWork.push_back(cp); //won't compile\n	//doesntWork.push_back(sp); //won't compile\n}\n{% endhighlight %}\n\nThat's two fairly big gotchas, let's look for a better solution.\n\nHand rolled value semantics with polymorphism\n=============================================\n\nboost type_erasure\n==================\n\n\n\nReferences\n==========\n[Boost.TypeErasure](http://www.boost.org/doc/libs/1_58_0/doc/html/boost_typeerasure.html)\n\n[C++ Seasoning](http://channel9.msdn.com/Events/GoingNative/2013/Cpp-Seasoning)\n\nC++ in a nutshell - O'Reilly\n\n[Inheritance is the Base Class of Evil code sample](https://gist.github.com/berkus/7041546)\n\n[Intrusive value semantic polymorphism example.](https://gist.github.com/sean-parent/6798797)\n\n[Value semantics](https://akrzemi1.wordpress.com/2012/02/03/value-semantics/)\n\n[What is value semantics?](https://isocpp.org/wiki/faq/value-vs-ref-semantics#val-vs-ref-semantics)\n",
+			"file": "_posts/2015-06-10-objects-and-pointers-2.markdown",
+			"file_size": 4784,
+			"file_write_time": 130784438490000000,
 			"settings":
 			{
-				"buffer_size": 1108,
+				"buffer_size": 4784,
 				"line_ending": "Unix"
 			}
 		},
@@ -215,7 +234,7 @@
 			"file": "_site/personal/2015/03/16/wedding-honeymoon.html",
 			"settings":
 			{
-				"buffer_size": 15915,
+				"buffer_size": 15913,
 				"line_ending": "Unix"
 			}
 		},
@@ -472,6 +491,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"objectStuff5",
 			"site-header",
 			"site-headers",
 			"site-footer",
@@ -521,7 +541,7 @@
 	"groups":
 	[
 		{
-			"selected": 8,
+			"selected": 3,
 			"sheets":
 			[
 				{
@@ -549,7 +569,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 11,
+					"stack_index": 14,
 					"type": "text"
 				},
 				{
@@ -578,7 +598,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 9,
+					"stack_index": 12,
 					"type": "text"
 				},
 				{
@@ -606,7 +626,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 12,
+					"stack_index": 15,
 					"type": "text"
 				},
 				{
@@ -628,13 +648,14 @@
 						],
 						"settings":
 						{
+							"sorttabs_lastactivated": 1437321567.81,
 							"syntax": "Packages/Markdown/Markdown.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 8,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
@@ -650,16 +671,17 @@
 						"selection":
 						[
 							[
-								609,
-								345
+								3281,
+								3281
 							]
 						],
 						"settings":
 						{
+							"sorttabs_lastactivated": 1433968746.7,
 							"syntax": "Packages/Markdown/Markdown.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 691.0,
+						"translation.y": 1095.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 3,
@@ -667,6 +689,65 @@
 				},
 				{
 					"buffer": 5,
+					"file": "_posts/2014-11-30-objects-and-pointers.markdown",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 10427,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								10392,
+								10392
+							]
+						],
+						"settings":
+						{
+							"sorttabs_lastactivated": 1433968748.9,
+							"syntax": "Packages/Markdown/Markdown.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 443.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "_posts/2014-11-13-dinner.markdown",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 245,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"sorttabs_lastactivated": 1433966155.4,
+							"syntax": "Packages/Markdown/Markdown.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
 					"file": "_drafts/2014-11-30-objects-and-pointers.markdown",
 					"semi_transient": false,
 					"settings":
@@ -678,29 +759,30 @@
 						"selection":
 						[
 							[
-								70,
-								70
+								1310,
+								859
 							]
 						],
 						"settings":
 						{
+							"sorttabs_lastactivated": 1433965676.01,
 							"syntax": "Packages/Markdown/Markdown.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 430.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 16,
+					"stack_index": 8,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
+					"buffer": 8,
 					"file": "_posts/2015-03-16-wedding-honeymoon.markdown",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 7787,
+						"buffer_size": 7813,
 						"regions":
 						{
 						},
@@ -713,23 +795,24 @@
 						],
 						"settings":
 						{
+							"sorttabs_lastactivated": 1433966146.67,
 							"syntax": "Packages/Markdown/Markdown.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 2535.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 5,
 					"type": "text"
 				},
 				{
-					"buffer": 7,
+					"buffer": 9,
 					"file": "_posts/2015-03-29-TT-scorer.markdown",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 8687,
+						"buffer_size": 8737,
 						"regions":
 						{
 						},
@@ -742,18 +825,19 @@
 						],
 						"settings":
 						{
+							"sorttabs_lastactivated": 1433966143.84,
 							"syntax": "Packages/Markdown/Markdown.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1583.0,
+						"translation.y": 3867.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
-					"buffer": 8,
+					"buffer": 10,
 					"file": "_posts/2015-04-6-types.markdown",
 					"semi_transient": false,
 					"settings":
@@ -771,48 +855,49 @@
 						],
 						"settings":
 						{
+							"sorttabs_lastactivated": 1433966141.86,
 							"syntax": "Packages/Markdown/Markdown.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 802.0,
+						"translation.y": 2769.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 7,
 					"type": "text"
 				},
 				{
-					"buffer": 9,
-					"file": "_includes/header.html",
-					"semi_transient": true,
+					"buffer": 11,
+					"file": "_posts/2015-06-10-objects-and-pointers-2.markdown",
+					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1108,
+						"buffer_size": 4784,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								4057,
+								4057
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/HTML/HTML.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
+							"sorttabs_lastactivated": 1436719291.31,
+							"syntax": "Packages/Markdown/Markdown.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 1221.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
-					"buffer": 10,
+					"buffer": 12,
 					"file": "/Users/neilmoore67/Work/scala-cource/doodle-develop/README.md",
 					"semi_transient": false,
 					"settings":
@@ -838,11 +923,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 13,
+					"stack_index": 16,
 					"type": "text"
 				},
 				{
-					"buffer": 11,
+					"buffer": 13,
 					"file": "Gemfile",
 					"semi_transient": false,
 					"settings":
@@ -866,16 +951,16 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 10,
+					"stack_index": 13,
 					"type": "text"
 				},
 				{
-					"buffer": 12,
+					"buffer": 14,
 					"file": "_site/personal/2015/03/16/wedding-honeymoon.html",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 15915,
+						"buffer_size": 15913,
 						"regions":
 						{
 						},
@@ -896,11 +981,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 14,
+					"stack_index": 17,
 					"type": "text"
 				},
 				{
-					"buffer": 13,
+					"buffer": 15,
 					"file": "index.html",
 					"semi_transient": false,
 					"settings":
@@ -926,11 +1011,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 23,
+					"stack_index": 25,
 					"type": "text"
 				},
 				{
-					"buffer": 14,
+					"buffer": 16,
 					"file": "_layouts/default.html",
 					"semi_transient": false,
 					"settings":
@@ -956,11 +1041,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 15,
+					"stack_index": 18,
 					"type": "text"
 				},
 				{
-					"buffer": 15,
+					"buffer": 17,
 					"file": "_includes/analytics.html",
 					"semi_transient": false,
 					"settings":
@@ -985,11 +1070,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 20,
+					"stack_index": 22,
 					"type": "text"
 				},
 				{
-					"buffer": 16,
+					"buffer": 18,
 					"file": "_includes/mailchimp.html",
 					"semi_transient": false,
 					"settings":
@@ -1013,11 +1098,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 24,
+					"stack_index": 26,
 					"type": "text"
 				},
 				{
-					"buffer": 17,
+					"buffer": 19,
 					"file": "_layouts/post.html",
 					"semi_transient": false,
 					"settings":
@@ -1043,11 +1128,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 22,
+					"stack_index": 24,
 					"type": "text"
 				},
 				{
-					"buffer": 18,
+					"buffer": 20,
 					"file": "_includes/head.html",
 					"semi_transient": false,
 					"settings":
@@ -1073,11 +1158,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 9,
 					"type": "text"
 				},
 				{
-					"buffer": 19,
+					"buffer": 21,
 					"file": "_includes/footer.html",
 					"semi_transient": false,
 					"settings":
@@ -1103,11 +1188,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 19,
+					"stack_index": 21,
 					"type": "text"
 				},
 				{
-					"buffer": 20,
+					"buffer": 22,
 					"semi_transient": false,
 					"settings":
 					{
@@ -1206,14 +1291,14 @@
 							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 990.0,
+						"translation.y": 805.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 18,
+					"stack_index": 20,
 					"type": "text"
 				},
 				{
-					"buffer": 21,
+					"buffer": 23,
 					"file": "_sass/_layout.scss",
 					"semi_transient": false,
 					"settings":
@@ -1239,11 +1324,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 17,
+					"stack_index": 19,
 					"type": "text"
 				},
 				{
-					"buffer": 22,
+					"buffer": 24,
 					"file": "untitled.sublime-project",
 					"semi_transient": false,
 					"settings":
@@ -1267,11 +1352,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 21,
+					"stack_index": 23,
 					"type": "text"
 				},
 				{
-					"buffer": 23,
+					"buffer": 25,
 					"file": "_sass/_syntax-highlighting.scss",
 					"semi_transient": false,
 					"settings":
@@ -1297,11 +1382,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 10,
 					"type": "text"
 				},
 				{
-					"buffer": 24,
+					"buffer": 26,
 					"file": "CNAME",
 					"semi_transient": false,
 					"settings":
@@ -1325,7 +1410,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 11,
 					"type": "text"
 				}
 			]
