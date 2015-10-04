@@ -123,7 +123,7 @@
 			"file": "README",
 			"settings":
 			{
-				"buffer_size": 92,
+				"buffer_size": 94,
 				"line_ending": "Unix",
 				"name": "http://kramdown.gettalong.org/syntax.html"
 			}
@@ -156,26 +156,120 @@
 			"file": "_posts/2014-11-30-objects-and-pointers.markdown",
 			"settings":
 			{
-				"buffer_size": 10427,
+				"buffer_size": 8925,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "_posts/2014-11-13-dinner.markdown",
+			"file": "_posts/obj_ptrs_1_code/sixth.cpp",
 			"settings":
 			{
-				"buffer_size": 245,
+				"buffer_size": 443,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"contents": "---\nlayout: post\ntitle:  \"Objects and pointers\"\ndate:   2015-1-3 21:29:19\ncategories: c++\n---\n\n<!--\nOutline:\n\n- C++ polymorphism\n- slicing\n- use of pointers for polymorphism (forcing use of pointers for polymorphism, leading to pointer hell)\n- CRTP as a workaround for getting polymorphism in a non-pointer\n- other workarounds\n- not using polymorphism\n- different pointer types available\n- I have never seen slicing be deliberate\n- comparison with go\n-->\n\nA comparison of pointers and objects in C++ and go. More detail on the C++, go mainly for comparison.\n\nPolymorphism and pointers in C++\n================================\n\nA variable for an object can be used for most things. You can reassign it, call non-virtual functions, access member variables, etc. However there are a few gotchas in this area.\n\nSuppose you have a virtual function in your object:\n\n{% highlight c++ linenos %}\nclass StupidAdder {\npublic:\n	virtual unsigned add(unsigned a, unsigned b) {\n		unsigned retval = 0;\n		while(a--) {\n			retval++;\n		}\n		while(b--) {\n			retval++;\n		}\n		return retval;\n	}\n};\n\nclass SmartAdder : public Base {\n	virtual unsigned add(unsigned a, unsigned b) {\n		return a + b;\n	}\n};\n\nvoid objectStuff() {\n	StupidAdder stupid;\n	SmartAdder smart;\n\n	stupid.add(4, 5); //(A)\n\n	smart.add(4, 5); //(B)\n}\n{% endhighlight %}\n\nThis program should be understandable under any possible interpretation: line (A) uses StupidAdder's version of add() and line (B) uses SmartAdder's version.\n\nHowever only a little change using subtyping makes things a little confusing:\n\n{% highlight c++ linenos %}\nvoid objectStuff2() {\n	StupidAdder stupid;\n	SmartAdder smart;\n\n	StupidAdder reallyStupid = smart;\n	reallyStupid.add(6, 7); //(C)\n}\n{% endhighlight %}\n\nLine (C) will use StupidAdder's version of add(), rather than SmartAdder's version as the same Java program would do.\n\nWhy is that? It's because dynamic dispatch of functions can only be achieved via pointers or references to objects. A non-pointer, non-reference object variable will dispatch functions based on the *static type* of an object, i.e. the type of the variable (there is also a *dynamic type* that is the type of the object, sometimes different.) \n\nBecause there is no dynamic dispatch there is no need for runtime function lookup. I think this is down to the C++ design principle that there should be no performance penalty for language features that are not being used. In this case it is polymorphism that is not being used. But it's beginning to make things a little confusing for programmers.\n\nThere are no instance variables in StupidAdder or SmartAdder, but if there were then slicing would also have happened at line (C). That would have meant that any member variables added in SmartAdder would be lost in the assignment. Also the true dynamic type of smart has been lost, there is no runtime information to say that reallyStupid was ever a SmartAdder at all.\n\nI don't think I have ever seen a deliberate use of slicing in a C++ program.\n\nGetting back to the main point, if you want dynamic dispatch of virtual functions you have to use a pointer or a reference:\n\n{% highlight c++ linenos %}\nvoid objectStuff3() {\n	StupidAdder stupid;\n	SmartAdder smart;\n\n	StupidAdder& reallyStupid = smart;\n	reallyStupid.add(6, 7); //(D)\n\n	StupidAdder* reallyReallyStupid = &smart;\n	reallyReallyStupid.add(6, 7); //(E)\n}\n{% endhighlight %}\n\nLines (D) and (E) use SmartAdder's version of add(). This is very unfortunate as it encourages use of raw pointers and references which are both a source of many programming errors. I think this is quite an important point. Pointers are one of the most difficult features to use correctly in C++ and polymorphism one of the most useful features (used judiciously). In C++ they come as a package. A radioactive cake that you both want and don't want.\n\nSafe technique 1: safe use of pointers\n======================================\n\nThis topic has been covered so many times before and I don't want to go into too much detail. Basically by using safe pointer types like shared_ptr, scoped_ptr, unique_ptr, etc. you can get safe (and sometimes efficient) access to polymorphic behaviours without passing around raw pointers and references. It is a good solution, but what always rankles with me is that the syntax is verbose and inflexible, and you have to pick which pointer types to use and you cannot easily change your mind.\n\n{% highlight c++ linenos %}\nvoid objectStuff4() {\n	StupidAdder stupid;\n	SmartAdder smart;\n\n	boost::scoped_ptr<StupidAdder> notStupid = smart;\n	notStupid.add(6, 7);\n}\n{% endhighlight %}\n\nYou could use typedefs, wrapping, auto keyword and various other techniques to get short and easily changed pointer types, but it doesn't quite reach the convenience of a built in language feature.\n\nSafe technique 2: Curiously recurring template pattern (CRTP)\n=============================================================\n\nThis one is not a silver bullet. It's kind of hard and laborious to use, but you can achieve some subtype polymorphism without using dynamic dispatch (meaning a pointer is not needed). Here's some code:\n\n{% highlight c++ linenos %}\ntemplate<class T>\nclass BaseAdder {\npublic:	\n	unsigned add(unsigned a, unsigned b) {\n		unsigned retval = 0;\n		while(a--) {\n			retval = increment(retval); //(F)\n		}\n		while(b--) {\n			retval = increment(retval);\n		}\n		return retval;\n	};\n\n	unsigned increment(unsigned a) { \n		return derived()->increment(a); //(G)\n	} \n\nprivate:\n	T& derived()\n    {\n        return *static_cast<T*>(this);\n    }\n};\n\nclass DerivedAdder : public BaseAdder<DerivedAdder> {\npublic:\n	unsigned increment(unsigned a) {\n		return a + 1;\n	} \n};\n\nvoid objectStuff5() {\n	DerivedAdder staticDispatchAdder;\n	staticDispatchAdder.add(6, 7); //(H)\n}\n{% endhighlight %}\n\nAs you can see, it's a bit less convenient to use than dynamic polymorphism, though that could probably be mitigated by code generation. What this does is gets you some kind of inheritance, provided that the type of the object is known at compile time. In this example the add() function from BaseAdder is inherited by DerivedAdder, but won't use dynamic dispatch since it's non-virtual. The increment() function is special because a version of it is provided in both BaseAdder and DerivedAdder. Line (F) uses BaseAdder::increment(). However at line (G) the call is delegated statically to DerivedAdder::increment(). Hence this behaves a little like code inheritance, but without any virtual functions.\n\nThis is not really a technique for every day use. But it does allow you to use code inheritance of sorts without using pointers or references.\n\nSafe technique 3: don't use code inheritance at all\n===================================================\n\nThis is a great tip that is quite an eye opener when you get used to it. The idea is simply not to use direct code inheritance at all, to avoid having to deal with pointers at all. That way you don't need to worry about freeing the pointers or being so careful with ownership. Use of inheritance is frequently held up as a quality goal in object oriented languages when it is often not necessary to use it at all. It is perfectly possible to design an object oriented language that does not have inheritance, and instead relies on interfaces and inclusion of other classes to share functionality.\n\nHere's a C++ example that doesn't use inheritance at all:\n\n{% highlight c++ linenos %}\nclass Incrementer {\npublic:\n	unsigned increment(unsigned a) {\n		return a + 1;\n	} \n};\n\nclass DumbAdder {\npublic:	\n	unsigned add(unsigned a, unsigned b) {\n		unsigned retval = 0;\n		while(a--) {\n			retval = i.increment(retval); //(J)\n		}\n		while(b--) {\n			retval = i.increment(retval);\n		}\n		return retval;\n	};\n\nprivate:\n	Incrementer i;\n};\n\nvoid objectStuff5() {\n	DumbAdder dumbAdder;\n	staticDispatchAdder.add(6, 7); \n}\n{% endhighlight %}\n\nAt line (J), the instance of incrementer embedded inside DumbAdder is used to provide increment functionality. In common with CRTP, this doesn't use subtyping, but then again, it's not really needed.\n\nThe frustration with this technique is not being able to create a GoodAdder class and have them both be instances of an Adder interface. For that you do need dynamic dispatch, and that means pointers.\n\nC++ conclusion\n==============\n\nI can't think of any other ways beside these right now off the top of my head. Leave a comment if you know another and I may add it.\n\nNow I'm going to look at polymorphic functions in go, to see the difference.\n\nComparison with another language: go\n====================================\n\nAlthough I haven't used it for a big project yet, I like the look of go. It is a much simpler language than C++, and lets you do dynamic dispatch very naturally. I hope I don't make any mistakes here, but I might because I'm not so familiar with the language.\n\nGo doesn't have subtyping. Hence to use code from another object type you cannot inherit it, you must invoke a different object to access that functionality. However it does have interface types, a variable of an interface type can store any object that conforms to the interface. So there is polymorphism but between on objects that share the same interface. Also the fear factor with using pointers is slightly milder, because go has garbage collection.\n\n{% highlight go linenos %}\npackage main\n\nimport \"fmt\"\n\ntype Incrementer struct{}\n\nfunc (i Incrementer) increment(x uint) uint {\n	return x + 1\n}\n\ntype Adder interface {\n	add(x uint, y uint) uint\n}\n\ntype DumbAdder struct {\n	incr Incrementer\n}\n\nfunc (a DumbAdder) add(x uint, y uint) uint {\n	var retval uint = 0\n	var i uint\n	for i = 1; i <= x; i++ {\n		retval = a.incr.increment(retval)\n	}\n	for i = 1; i <= y; i++ {\n		retval = a.incr.increment(retval)\n	}\n	return retval\n}\n\nfunc main() {\n	var dumb DumbAdder = DumbAdder{}\n	var poly Adder = dumb\n	var polyPointer Adder = &dumb //N.B. don't even need to say Adder*\n\n	fmt.Println(dumb.add(5, 6))\n	fmt.Println(poly.add(5, 6))\n	fmt.Println(polyPointer.add(5, 6))\n}\n{% endhighlight %}\n\nThis example shows polymorphism using interfaces, using both pointers and non-pointers. There is no need to resort to anything complex.\n\nReferences\n==========\n[The Curiously Recurring Template Pattern in C++](http://eli.thegreenplace.net/2011/05/17/the-curiously-recurring-template-pattern-in-c)\n[Polymorphism - Wikipedia](http://en.wikipedia.org/wiki/Polymorphism_(computer_science))\nC++ in a nutshell - O'Reilly\n\n\n\n\n\n",
-			"file": "_drafts/2014-11-30-objects-and-pointers.markdown",
-			"file_size": 10433,
-			"file_write_time": 130784379330000000,
+			"file": "_posts/obj_ptrs_2_code/unique.cpp",
 			"settings":
 			{
-				"buffer_size": 10433,
+				"buffer_size": 588,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "_posts/obj_ptrs_2_code/type_erasure_with_inherit.cpp",
+			"settings":
+			{
+				"buffer_size": 1213,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "_posts/obj_ptrs_2_code/type_erasure.cpp",
+			"settings":
+			{
+				"buffer_size": 798,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "_posts/obj_ptrs_1_code/fifth.cpp",
+			"settings":
+			{
+				"buffer_size": 628,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "_posts/obj_ptrs_1_code/fourth.cpp",
+			"settings":
+			{
+				"buffer_size": 176,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "_posts/obj_ptrs_1_code/third.cpp",
+			"settings":
+			{
+				"buffer_size": 261,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "_posts/obj_ptrs_1_code/second.cpp",
+			"settings":
+			{
+				"buffer_size": 163,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "_posts/obj_ptrs_1_code/first.cpp",
+			"settings":
+			{
+				"buffer_size": 162,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "_posts/obj_ptrs_1_code/earlydefs.hpp",
+			"settings":
+			{
+				"buffer_size": 388,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "#include <iostream>\n#include <memory>\n#include <utility>\n#include <vector>\n\nclass ConcretePrinter {\npublic:\n     void Print() const { std::cout << \"ConcretePrinter\" << std::endl; }   \n};\n\nclass StonePrinter {\npublic:\n     void Print() const { std::cout << \"StonePrinter\" << std::endl; }     \n};\n\nclass AnyPrinter {\npublic:\n    template <typename T>\n    AnyPrinter(T x) : self_(std::make_shared<model<T>>(std::move(x))) {}\n \n    void Print() const\n    { self_->Print_(); }\n \nprivate:\n    struct concept_t {\n        virtual ~concept_t() = default;\n        virtual void Print_() const = 0;\n    };\n    template <typename T>\n    struct model : concept_t {\n        model(T x) : data_(std::move(x)) {}\n        void Print_() const override\n        { data_.Print(); }\n \n        T data_;\n    };\n   \n    std::shared_ptr<const concept_t> self_;\n};\n\nint main()\n{\n    ConcretePrinter cp;\n    \n    StonePrinter sp;\n\n    std::vector<AnyPrinter> printables;\n    printables.push_back(cp); //pushing copies\n    printables.push_back(sp);\n\n    for(const auto& p : printables) {\n        p.Print();\n    }\n}",
+			"file": "_posts/obj_ptrs_2_code/wrapper.hpp",
+			"file_size": 1083,
+			"file_write_time": 130827594650000000,
+			"settings":
+			{
+				"buffer_size": 1083,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "#include <boost/type_erasure/any.hpp>\n#include <boost/type_erasure/member.hpp>\n#include <iostream>\n#include <vector>\n\nusing namespace boost::type_erasure;\n\nclass ConcretePrinter {\npublic:\n	 void Print() const { std::cout << \"ConcretePrinter\" << std::endl; }		\n};\n\nclass StonePrinter {\npublic:\n	 void Print() const { std::cout << \"StonePrinter\" << std::endl; }		\n};\n\nBOOST_TYPE_ERASURE_MEMBER((has_print), Print, 0)\n\ntypedef any<has_print<void()>, _self&> AnyPrinter;\n\nint main()\n{\n	ConcretePrinter cp;\n	\n	StonePrinter sp;\n\n	std::vector<AnyPrinter> printables;\n	printables.push_back(cp); //pushing copies\n	printables.push_back(sp);\n\n	for(const auto& p : printables) {\n		p.Print();\n	}\n}\n",
+			"file": "_posts/obj_ptrs_2_code/type_erasure.hpp",
+			"file_size": 685,
+			"file_write_time": 130827579380000000,
+			"settings":
+			{
+				"buffer_size": 685,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "\n#include <iostream>\n#include <memory>\n#include <vector>\n\nclass Printer {\npublic:\n	virtual void Print() const { std::cout << \"Printer\" << std::endl; }		\n};\n\nclass ConcretePrinter {\npublic:\n	virtual void Print() const { std::cout << \"ConcretePrinter\" << std::endl; }		\n};\n\nclass StonePrinter {\npublic:\n	virtual void Print() const { std::cout << \"StonePrinter\" << std::endl; }		\n};\n\nint main()\n{\n	std::unique_ptr<ConcretePrinter> cp(std::make_unique<ConcretePrinter>());\n	\n	std::unique_ptr<StonePrinter> sp(std::make_unique<StonePrinter>());\n\n	std::vector<std::unique_ptr<Printer>> doesntWork;\n	//doesntWork.push_back(cp); //won't compile\n	//doesntWork.push_back(sp); //won't compile\n}",
+			"file": "_posts/obj_ptrs_2_code/unique_hetero.hpp",
+			"file_size": 683,
+			"file_write_time": 130827581210000000,
+			"settings":
+			{
+				"buffer_size": 683,
 				"line_ending": "Unix"
 			}
 		},
@@ -204,13 +298,40 @@
 			}
 		},
 		{
-			"contents": "---\nlayout: post\ntitle:  \"Objects and pointers part II\"\ndate:   2015-6-10 21:29:19\ncategories: c++\n---\n\n<!--\nOutline:\n\n- static polymorphism\n - set the scene\n  - value semantics\n  - polymorphism\n  - not polymorphism\n - unique_ptr\n  - cannot go into homogeneous container\n  - assignment doesn't work as expected\n - hand rolled\n - boost any\n-->\n\nI described in a [previous post]({% post_url 2014-11-30-objects-and-pointers %}) how difficult it is to work with dynamic dispatch in c++. I described various ways to deal with it. However I've been reading about an even more powerful and easy to use way to do things.\n\nLets say that I want the following properties of a variable for an object:\n\n* dynamic dispatch of its methods\n* memory safety\n\nWe can achieve combinations of those properties using the techniques I described last time: i.e. use of safe pointers (dynamic dispatch + memory safety), CRTP (memory safety and inheritance but dispatch done statically) or inclusion (memory safety but static dispatch and no inheritance).\n\nHowever my eyes have been opened a bit after watching Sean Parent's talk called [\"C++ seasoning\"](http://channel9.msdn.com/Events/GoingNative/2013/Cpp-Seasoning). Now I also want to achieve /value semantics/. Value semantics means that assigning a value to a different variable copies it. The opposite is reference semantics meaning that only the pointer is copied. With value semantics a value is guaranteed to be the sole way to access the corresponding area of memory.\n\n{% highlight c++ linenos %}\nint main()\n{\n	int a = 1;\n	int b = a; //value semantics...\n	b += 1;    //a is unchanged\n	\n	std::cout << \"a=\" << a << \",b=\" << b << std::endl;\n	//prints: a=1,b=2\n\n	int& ptrA = a;\n	int& ptrB = ptrA; //reference semantics\n	ptrB += 1;        //ptrA is changed\n	\n	std::cout << \"a=\" << a << \",ptrA=\" << ptrA << \",ptrB=\" << ptrB << std::endl;\n	//prints: a=2,ptrA=2,ptrB=2\n}\n{% endhighlight %}\n\nUsing value semantics helps to make code easy to understand, since you don't need to check what other variables (possibly on other threads) might be sharing the same data.\n\nI said in my earlier post that in C++ polymorphism is only available via a pointer/reference variable. That is true, but there are a variety of techniques to maintain value semantics without losing polymorphism, and the purpose of this post is to describe those.\n\nunique_ptr\n===========\nThe simplest way to get close to value semantics with pointers is definitely std::unique_ptr. An area of memory is guaranteed to be uniquely owned. \n\n{% highlight c++ linenos %}\n#include <iostream>\n#include <memory>\n\nclass Printer {\npublic:\n	virtual void Print() { std::cout << \"Printer\" << std::endl; }		\n};\n\nclass ConcretePrinter {\npublic:\n	virtual void Print() { std::cout << \"ConcretePrinter\" << std::endl; }		\n};\n\nint main()\n{\n	std::unique_ptr<ConcretePrinter> cp(new ConcretePrinter());\n	cp->Print(); //prints: ConcretePrinter\n	\n	//std::unique_ptr<ConcretePrinter> notACopy = cp; //doesn't work\n	\n	std::unique_ptr<ConcretePrinter> notACopy2 = std::move(cp);\n	notACopy2->Print(); //prints: ConcretePrinter\n	\n	cp->Print(); //dangerous, cp isn't there any more\n}\n{% endhighlight %}\n\nHowever we haven't really achieved proper value semantics, because assigning a value doesn't work and we have to move it around explicitly.\n\nThe other problem with this code is that you cannot use homogeneous containers properly to process unique_ptrs:\n\n{% highlight c++ linenos %}\n#include <iostream>\n#include <memory>\n#include <vector>\n\nclass Printer {\n...	\n};\n\nclass ConcretePrinter : public Printer {\n...	\n};\n\nclass StonePrinter : public Printer {\npublic:\n	virtual void Print() { std::cout << \"StonePrinter\" << std::endl; }		\n};\n\nint main()\n{\n	std::unique_ptr<ConcretePrinter> cp(new ConcretePrinter());\n	\n	std::unique_ptr<StonePrinter> sp(new StonePrinter());\n\n	std::vector<std::unique_ptr<Printer>> doesntWork;\n	//doesntWork.push_back(cp); //won't compile\n	//doesntWork.push_back(sp); //won't compile\n}\n{% endhighlight %}\n\nThat's two fairly big gotchas, let's look for a better solution.\n\nHand rolled value semantics with polymorphism\n=============================================\n\nboost type_erasure\n==================\n\n\n\nReferences\n==========\n[Boost.TypeErasure](http://www.boost.org/doc/libs/1_58_0/doc/html/boost_typeerasure.html)\n\n[C++ Seasoning](http://channel9.msdn.com/Events/GoingNative/2013/Cpp-Seasoning)\n\nC++ in a nutshell - O'Reilly\n\n[Inheritance is the Base Class of Evil code sample](https://gist.github.com/berkus/7041546)\n\n[Intrusive value semantic polymorphism example.](https://gist.github.com/sean-parent/6798797)\n\n[Value semantics](https://akrzemi1.wordpress.com/2012/02/03/value-semantics/)\n\n[What is value semantics?](https://isocpp.org/wiki/faq/value-vs-ref-semantics#val-vs-ref-semantics)\n",
 			"file": "_posts/2015-06-10-objects-and-pointers-2.markdown",
-			"file_size": 4784,
-			"file_write_time": 130784438490000000,
 			"settings":
 			{
-				"buffer_size": 4784,
+				"buffer_size": 4523,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "_posts/2015-08-10-talk-slides.markdown",
+			"settings":
+			{
+				"buffer_size": 479,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "---\nlayout: post\ntitle:  \"Objects and pointers part II\"\ndate:   2015-7-21 21:29:19\ncategories: c++\n---\n\n<!--\nOutline:\n\n- static polymorphism\n - set the scene\n  - value semantics\n  - polymorphism\n  - not polymorphism\n - unique_ptr\n  - cannot go into homogeneous container\n  - assignment doesn't work as expected\n - hand rolled\n - boost any\n-->\n\nI described in a [previous post]({% post_url 2014-11-30-objects-and-pointers %}) how difficult it is to work with dynamic dispatch in c++. I described various ways to deal with it. However I've been reading about an even more powerful and easy to use way to do things.\n\nLets say that I want the following properties of a variable for an object:\n\n* dynamic dispatch of its methods\n* memory safety\n\nWe can achieve combinations of those properties using the techniques I described last time: i.e. use of safe pointers (dynamic dispatch + memory safety), CRTP (memory safety and inheritance but dispatch done statically) or inclusion (memory safety but static dispatch and no inheritance).\n\nHowever my eyes have been opened a bit after watching Sean Parent's talk called [\"C++ seasoning\"](http://channel9.msdn.com/Events/GoingNative/2013/Cpp-Seasoning). Now I also want to achieve *value semantics*. Value semantics means that assigning a value to a different variable copies it (or, with std::move, moves it without copying). The opposite is reference semantics meaning that only the pointer is copied. With value semantics a value is guaranteed to be the sole way to access the corresponding area of memory.\n\n{% highlight c++ linenos %}\n{% include_relative obj_ptrs_2_code/value.cpp %}\n{% endhighlight %}\n\nUsing value semantics helps to make code easy to understand, since you don't need to check what other variables (possibly on other threads) might be sharing the same data. There is no sharing.\n\nAlso you don't have to worry about cleaning up pointers any longer, because there are none. \n\nI said in my earlier post that in C++ polymorphism is only available via a pointer/reference variable. That is true, but there are a variety of techniques to maintain value semantics without losing polymorphism, and the purpose of this post is to describe those.\n\nunique_ptr\n===========\nThe simplest way to get closer to value semantics with pointers is definitely std::unique_ptr. An area of memory is guaranteed to be uniquely owned. \n\n{% highlight c++ linenos %}\n{% include_relative obj_ptrs_2_code/unique.cpp %}\n{% endhighlight %}\n\nHowever we haven't really achieved proper value semantics, because assigning a value doesn't work and we have to move it around explicitly.\n\nLet's look for a better solution.\n\nHand rolled value semantics with polymorphism\n=============================================\n\nLets make a type with value semantics that can take anything with a Print() method:\n\n{% highlight c++ linenos %}\n{% include_relative obj_ptrs_2_code/wrapper.cpp %}\n{% endhighlight %}\n\nThere is no such thing as a free lunch though. Polymorphism is still achieved using a pointer, but it is hidden away so that it doesn't contaminate client code.\n\nWe get value semantics. There is no inheritance in the printable objects. We can also make heterogeneous containers.\n\nboost type_erasure\n==================\n\nThe only problem is that the code is rather long and laborious, every time we have a different concept, we would have to define 3 new classes for it.\n\nLet's check out boost::type_erasure to make it short and sweet.\n\n{% highlight c++ linenos %}\n{% include_relative obj_ptrs_2_code/type_erasure.cpp %}\n{% endhighlight %}\n\nConclusion\n========\n\nNormally in C++, polymorphism brings an unwelcome friend along with it - pointers. But I've described a couple of ways to get polymorphism without pointers being in view (at least in the client code).\n\n\nReferences\n==========\n[Boost.TypeErasure](http://www.boost.org/doc/libs/1_58_0/doc/html/boost_typeerasure.html)\n\n[C++ Seasoning](http://channel9.msdn.com/Events/GoingNative/2013/Cpp-Seasoning)\n\nC++ in a nutshell - O'Reilly\n\n[Inheritance is the Base Class of Evil code sample](https://gist.github.com/berkus/7041546)\n\n[Intrusive value semantic polymorphism example.](https://gist.github.com/sean-parent/6798797)\n\n[Value semantics](https://akrzemi1.wordpress.com/2012/02/03/value-semantics/)\n\n[What is value semantics?](https://isocpp.org/wiki/faq/value-vs-ref-semantics#val-vs-ref-semantics)\n\n[Minion AnyVarRef](https://bitbucket.org/stacs_cp/minion/src/c64e2526b4b0156b9881e3ebe0fc9d55709335aa/minion/variables/AnyVarRef.h?at=default)\n",
+			"file": "_posts/2015-06-10-objects-and-pointers-2 copy.markdown",
+			"file_size": 4523,
+			"file_write_time": 130830012750000000,
+			"settings":
+			{
+				"buffer_size": 4523,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "#include <iostream>\n#include <memory>\n\nclass Printer {\npublic:\n	virtual void Print() const { std::cout << \"Printer\" << std::endl; }	\n};\n\nclass ConcretePrinter : public Printer {\npublic:\n	virtual void Print() const { std::cout << \"ConcretePrinter\" << std::endl; }		\n};\n\nint main()\n{\n	std::unique_ptr<ConcretePrinter> cp(std::make_unique<ConcretePrinter>());\n	cp->Print(); //prints: ConcretePrinter\n	\n	//std::unique_ptr<ConcretePrinter> notACopy = cp; //doesn't work\n	\n	std::unique_ptr<ConcretePrinter> notACopy2 = std::move(cp);\n	notACopy2->Print(); //prints: ConcretePrinter\n	\n	cp->Print(); //dangerous, cp isn't there any more\n}\n",
+			"file": "_posts/obj_ptrs_2_code/unique.hpp",
+			"file_size": 630,
+			"file_write_time": 130827592820000000,
+			"settings":
+			{
+				"buffer_size": 630,
 				"line_ending": "Unix"
 			}
 		},
@@ -234,7 +355,7 @@
 			"file": "_site/personal/2015/03/16/wedding-honeymoon.html",
 			"settings":
 			{
-				"buffer_size": 15913,
+				"buffer_size": 15937,
 				"line_ending": "Unix"
 			}
 		},
@@ -296,10 +417,10 @@
 			}
 		},
 		{
-			"contents": "Searching 41 files for \"site-footer\"\n\n~/Work/personal-homepage/.sass-cache/ab29c69f31c5ee58a420e5d8d1fac56b782c1302/_layout.scssc:\n    <binary>\n\n/Users/neilmoore67/Work/personal-homepage/_includes/footer.html:\n    1: <footer class=\"site-footer\">\n    2  \n    3    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_sass/_layout.scss:\n   92   * Site footer\n   93   */\n   94: .site-footer {\n   95      border-top: 1px solid $grey-color-light;\n   96      padding: $spacing-unit 0;\n\n/Users/neilmoore67/Work/personal-homepage/_site/index.html:\n  113      </div>\n  114  \n  115:     <footer class=\"site-footer\">\n  116  \n  117    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_site/about/index.html:\n   96      </div>\n   97  \n   98:     <footer class=\"site-footer\">\n   99  \n  100    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_site/c++/2014/11/19/2014-11-19-vector-append.html:\n  186      </div>\n  187  \n  188:     <footer class=\"site-footer\">\n  189  \n  190    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_site/css/main.css:\n  206   * Site footer\n  207   */\n  208: .site-footer {\n  209    border-top: 1px solid #e8e8e8;\n  210    padding: 30px 0; }\n\n/Users/neilmoore67/Work/personal-homepage/_site/food/2014/11/13/dinner.html:\n  124      </div>\n  125  \n  126:     <footer class=\"site-footer\">\n  127  \n  128    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_site/pub/index.html:\n  236      </div>\n  237  \n  238:     <footer class=\"site-footer\">\n  239  \n  240    <div class=\"wrapper\">\n\n11 matches across 9 files\n\n\nSearching 41 files for \"site-headers\"\n\n0 matches across 0 files\n\n\nSearching 41 files for \"site-header\"\n\n~/Work/personal-homepage/.sass-cache/ab29c69f31c5ee58a420e5d8d1fac56b782c1302/_layout.scssc:\n    <binary>\n\n/Users/neilmoore67/Work/personal-homepage/_includes/header.html:\n    1: <header class=\"site-header\">\n    2  \n    3    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_sass/_layout.scss:\n    2   * Site header\n    3   */\n    4: .site-header {\n    5      border-top: 5px solid $grey-color-dark;\n    6      border-bottom: 1px solid $grey-color-light;\n\n/Users/neilmoore67/Work/personal-homepage/_site/index.html:\n   30    <body>\n   31  \n   32:     <header class=\"site-header\">\n   33  \n   34    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_site/about/index.html:\n   30    <body>\n   31  \n   32:     <header class=\"site-header\">\n   33  \n   34    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_site/c++/2014/11/19/2014-11-19-vector-append.html:\n   29    <body>\n   30  \n   31:     <header class=\"site-header\">\n   32  \n   33    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_site/css/main.css:\n  146   * Site header\n  147   */\n  148: .site-header {\n  149    border-top: 5px solid #424242;\n  150    border-bottom: 1px solid #e8e8e8;\n\n/Users/neilmoore67/Work/personal-homepage/_site/food/2014/11/13/dinner.html:\n   29    <body>\n   30  \n   31:     <header class=\"site-header\">\n   32  \n   33    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_site/pub/index.html:\n   30    <body>\n   31  \n   32:     <header class=\"site-header\">\n   33  \n   34    <div class=\"wrapper\">\n\n11 matches across 9 files\n",
+			"contents": "Searching 41 files for \"site-footer\"\n\n~/Work/personal-homepage/.sass-cache/ab29c69f31c5ee58a420e5d8d1fac56b782c1302/_layout.scssc:\n    <binary>\n\n/Users/neilmoore67/Work/personal-homepage/_includes/footer.html:\n    1: <footer class=\"site-footer\">\n    2  \n    3    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_sass/_layout.scss:\n   92   * Site footer\n   93   */\n   94: .site-footer {\n   95      border-top: 1px solid $grey-color-light;\n   96      padding: $spacing-unit 0;\n\n/Users/neilmoore67/Work/personal-homepage/_site/index.html:\n  113      </div>\n  114  \n  115:     <footer class=\"site-footer\">\n  116  \n  117    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_site/about/index.html:\n   96      </div>\n   97  \n   98:     <footer class=\"site-footer\">\n   99  \n  100    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_site/c++/2014/11/19/2014-11-19-vector-append.html:\n  186      </div>\n  187  \n  188:     <footer class=\"site-footer\">\n  189  \n  190    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_site/css/main.css:\n  206   * Site footer\n  207   */\n  208: .site-footer {\n  209    border-top: 1px solid #e8e8e8;\n  210    padding: 30px 0; }\n\n/Users/neilmoore67/Work/personal-homepage/_site/food/2014/11/13/dinner.html:\n  124      </div>\n  125  \n  126:     <footer class=\"site-footer\">\n  127  \n  128    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_site/pub/index.html:\n  236      </div>\n  237  \n  238:     <footer class=\"site-footer\">\n  239  \n  240    <div class=\"wrapper\">\n\n11 matches across 9 files\n\n\nSearching 41 files for \"site-headers\"\n\n0 matches across 0 files\n\n\nSearching 41 files for \"site-header\"\n\n~/Work/personal-homepage/.sass-cache/ab29c69f31c5ee58a420e5d8d1fac56b782c1302/_layout.scssc:\n    <binary>\n\n/Users/neilmoore67/Work/personal-homepage/_includes/header.html:\n    1: <header class=\"site-header\">\n    2  \n    3    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_sass/_layout.scss:\n    2   * Site header\n    3   */\n    4: .site-header {\n    5      border-top: 5px solid $grey-color-dark;\n    6      border-bottom: 1px solid $grey-color-light;\n\n/Users/neilmoore67/Work/personal-homepage/_site/index.html:\n   30    <body>\n   31  \n   32:     <header class=\"site-header\">\n   33  \n   34    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_site/about/index.html:\n   30    <body>\n   31  \n   32:     <header class=\"site-header\">\n   33  \n   34    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_site/c++/2014/11/19/2014-11-19-vector-append.html:\n   29    <body>\n   30  \n   31:     <header class=\"site-header\">\n   32  \n   33    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_site/css/main.css:\n  146   * Site header\n  147   */\n  148: .site-header {\n  149    border-top: 5px solid #424242;\n  150    border-bottom: 1px solid #e8e8e8;\n\n/Users/neilmoore67/Work/personal-homepage/_site/food/2014/11/13/dinner.html:\n   29    <body>\n   30  \n   31:     <header class=\"site-header\">\n   32  \n   33    <div class=\"wrapper\">\n\n/Users/neilmoore67/Work/personal-homepage/_site/pub/index.html:\n   30    <body>\n   31  \n   32:     <header class=\"site-header\">\n   33  \n   34    <div class=\"wrapper\">\n\n11 matches across 9 files\n\n\nSearching 92 files for \"post_url\"\n\n/Users/neilmoore67/Work/personal-homepage/_posts/2015-06-10-objects-and-pointers-2.markdown:\n   21  -->\n   22  \n   23: I described in a [previous post]({% post_url 2014-11-30-objects-and-pointers %}) how difficult it is to work with dynamic dispatch in c++. I described various ways to deal with it. However I've been reading about an even more powerful and easy to use way to do things.\n   24  \n   25  Lets say that I want the following properties of a variable for an object:\n\n/Users/neilmoore67/Work/personal-homepage/_drafts/2015-06-10-objects-and-pointers-2.markdown:\n   21  -->\n   22  \n   23: I described in a [previous post]({% post_url 2014-11-30-objects-and-pointers %}) how difficult it is to work with dynamic dispatch in c++. I described various ways to deal with it. However I've been reading about an even more powerful and easy to use way to do things.\n   24  \n   25  Lets say that I want the following properties of a variable for an object:\n\n2 matches across 2 files\n\n\nSearching 86 files for \"std::unique_ptr\"\n\n/Users/neilmoore67/Work/personal-homepage/_posts/2015-06-10-objects-and-pointers-2.markdown:\n   44  unique_ptr\n   45  ===========\n   46: The simplest way to get closer to value semantics with pointers is definitely std::unique_ptr. An area of memory is guaranteed to be uniquely owned. \n   47  \n   48  {% highlight c++ linenos %}\n\n/Users/neilmoore67/Work/personal-homepage/_posts/obj_ptrs_2_code/unique.hpp:\n   14  int main()\n   15  {\n   16: 	std::unique_ptr<ConcretePrinter> cp(std::make_unique<ConcretePrinter>());\n   17  	cp->Print(); //prints: ConcretePrinter\n   18  	\n   19: 	//std::unique_ptr<ConcretePrinter> notACopy = cp; //doesn't work\n   20  	\n   21: 	std::unique_ptr<ConcretePrinter> notACopy2 = std::move(cp);\n   22  	notACopy2->Print(); //prints: ConcretePrinter\n   23  	\n\n/Users/neilmoore67/Work/personal-homepage/_posts/obj_ptrs_2_code/unique_hetero.hpp:\n   21  int main()\n   22  {\n   23: 	std::unique_ptr<ConcretePrinter> cp(std::make_unique<ConcretePrinter>());\n   24  	\n   25: 	std::unique_ptr<StonePrinter> sp(std::make_unique<StonePrinter>());\n   26  \n   27: 	std::vector<std::unique_ptr<Printer>> doesntWork;\n   28  	//doesntWork.push_back(cp); //won't compile\n   29  	//doesntWork.push_back(sp); //won't compile\n\n/Users/neilmoore67/Work/personal-homepage/_site/feed.xml:\n   67  \n   68  &lt;h1 id=&quot;uniqueptr&quot;&gt;unique_ptr&lt;/h1&gt;\n   69: &lt;p&gt;The simplest way to get closer to value semantics with pointers is definitely std::unique_ptr. An area of memory is guaranteed to be uniquely owned.&lt;/p&gt;\n   70  \n   71  &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c--&quot; data-lang=&quot;c++&quot;&gt;&lt;span class=&quot;lineno&quot;&gt; 1&lt;/span&gt; &lt;span class=&quot;cp&quot;&gt;#include &amp;lt;iostream&amp;gt;&lt;/span&gt;\n   ..\n   87  &lt;span class=&quot;lineno&quot;&gt;17&lt;/span&gt; 	&lt;span class=&quot;n&quot;&gt;cp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//prints: ConcretePrinter&lt;/span&gt;\n   88  &lt;span class=&quot;lineno&quot;&gt;18&lt;/span&gt; 	\n   89: &lt;span class=&quot;lineno&quot;&gt;19&lt;/span&gt; 	&lt;span class=&quot;c1&quot;&gt;//std::unique_ptr&amp;lt;ConcretePrinter&amp;gt; notACopy = cp; //doesn&amp;#39;t work&lt;/span&gt;\n   90  &lt;span class=&quot;lineno&quot;&gt;20&lt;/span&gt; 	\n   91  &lt;span class=&quot;lineno&quot;&gt;21&lt;/span&gt; 	&lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;unique_ptr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ConcretePrinter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;notACopy2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;move&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;\n\n/Users/neilmoore67/Work/personal-homepage/_site/c++/2015/07/21/objects-and-pointers-2.html:\n  146  \n  147  <h1 id=\"uniqueptr\">unique_ptr</h1>\n  148: <p>The simplest way to get closer to value semantics with pointers is definitely std::unique_ptr. An area of memory is guaranteed to be uniquely owned.</p>\n  149  \n  150  <div class=\"highlight\"><pre><code class=\"language-c--\" data-lang=\"c++\"><span class=\"lineno\"> 1</span> <span class=\"cp\">#include &lt;iostream&gt;</span>\n  ...\n  166  <span class=\"lineno\">17</span> 	<span class=\"n\">cp</span><span class=\"o\">-&gt;</span><span class=\"n\">Print</span><span class=\"p\">();</span> <span class=\"c1\">//prints: ConcretePrinter</span>\n  167  <span class=\"lineno\">18</span> 	\n  168: <span class=\"lineno\">19</span> 	<span class=\"c1\">//std::unique_ptr&lt;ConcretePrinter&gt; notACopy = cp; //doesn&#39;t work</span>\n  169  <span class=\"lineno\">20</span> 	\n  170  <span class=\"lineno\">21</span> 	<span class=\"n\">std</span><span class=\"o\">::</span><span class=\"n\">unique_ptr</span><span class=\"o\">&lt;</span><span class=\"n\">ConcretePrinter</span><span class=\"o\">&gt;</span> <span class=\"n\">notACopy2</span> <span class=\"o\">=</span> <span class=\"n\">std</span><span class=\"o\">::</span><span class=\"n\">move</span><span class=\"p\">(</span><span class=\"n\">cp</span><span class=\"p\">);</span>\n\n/Users/neilmoore67/Work/personal-homepage/_drafts/unique_hetero.hpp:\n   21  int main()\n   22  {\n   23: 	std::unique_ptr<ConcretePrinter> cp(new ConcretePrinter());\n   24  	\n   25: 	std::unique_ptr<StonePrinter> sp(new StonePrinter());\n   26  \n   27: 	std::vector<std::unique_ptr<Printer>> doesntWork;\n   28  	//doesntWork.push_back(cp); //won't compile\n   29  	//doesntWork.push_back(sp); //won't compile\n\n14 matches across 6 files\n\n\nSearching 82 files for \"std::unique_ptr\"\n\n/Users/neilmoore67/Work/personal-homepage/_posts/2015-06-10-objects-and-pointers-2.markdown:\n   44  unique_ptr\n   45  ===========\n   46: The simplest way to get closer to value semantics with pointers is definitely std::unique_ptr. An area of memory is guaranteed to be uniquely owned. \n   47  \n   48  {% highlight c++ linenos %}\n\n/Users/neilmoore67/Work/personal-homepage/_posts/obj_ptrs_2_code/unique.hpp:\n   14  int main()\n   15  {\n   16: 	std::unique_ptr<ConcretePrinter> cp(std::make_unique<ConcretePrinter>());\n   17  	cp->Print(); //prints: ConcretePrinter\n   18  	\n   19: 	//std::unique_ptr<ConcretePrinter> notACopy = cp; //doesn't work\n   20  	\n   21: 	std::unique_ptr<ConcretePrinter> notACopy2 = std::move(cp);\n   22  	notACopy2->Print(); //prints: ConcretePrinter\n   23  	\n\n/Users/neilmoore67/Work/personal-homepage/_posts/obj_ptrs_2_code/unique_hetero.hpp:\n   21  int main()\n   22  {\n   23: 	std::unique_ptr<ConcretePrinter> cp(std::make_unique<ConcretePrinter>());\n   24  	\n   25: 	std::unique_ptr<StonePrinter> sp(std::make_unique<StonePrinter>());\n   26  \n   27: 	std::vector<std::unique_ptr<Printer>> doesntWork;\n   28  	//doesntWork.push_back(cp); //won't compile\n   29  	//doesntWork.push_back(sp); //won't compile\n\n/Users/neilmoore67/Work/personal-homepage/_site/feed.xml:\n   67  \n   68  &lt;h1 id=&quot;uniqueptr&quot;&gt;unique_ptr&lt;/h1&gt;\n   69: &lt;p&gt;The simplest way to get closer to value semantics with pointers is definitely std::unique_ptr. An area of memory is guaranteed to be uniquely owned.&lt;/p&gt;\n   70  \n   71  &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c--&quot; data-lang=&quot;c++&quot;&gt;&lt;span class=&quot;lineno&quot;&gt; 1&lt;/span&gt; &lt;span class=&quot;cp&quot;&gt;#include &amp;lt;iostream&amp;gt;&lt;/span&gt;\n   ..\n   87  &lt;span class=&quot;lineno&quot;&gt;17&lt;/span&gt; 	&lt;span class=&quot;n&quot;&gt;cp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//prints: ConcretePrinter&lt;/span&gt;\n   88  &lt;span class=&quot;lineno&quot;&gt;18&lt;/span&gt; 	\n   89: &lt;span class=&quot;lineno&quot;&gt;19&lt;/span&gt; 	&lt;span class=&quot;c1&quot;&gt;//std::unique_ptr&amp;lt;ConcretePrinter&amp;gt; notACopy = cp; //doesn&amp;#39;t work&lt;/span&gt;\n   90  &lt;span class=&quot;lineno&quot;&gt;20&lt;/span&gt; 	\n   91  &lt;span class=&quot;lineno&quot;&gt;21&lt;/span&gt; 	&lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;unique_ptr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ConcretePrinter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;notACopy2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;move&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;\n\n/Users/neilmoore67/Work/personal-homepage/_site/c++/2015/07/21/objects-and-pointers-2.html:\n  146  \n  147  <h1 id=\"uniqueptr\">unique_ptr</h1>\n  148: <p>The simplest way to get closer to value semantics with pointers is definitely std::unique_ptr. An area of memory is guaranteed to be uniquely owned.</p>\n  149  \n  150  <div class=\"highlight\"><pre><code class=\"language-c--\" data-lang=\"c++\"><span class=\"lineno\"> 1</span> <span class=\"cp\">#include &lt;iostream&gt;</span>\n  ...\n  166  <span class=\"lineno\">17</span> 	<span class=\"n\">cp</span><span class=\"o\">-&gt;</span><span class=\"n\">Print</span><span class=\"p\">();</span> <span class=\"c1\">//prints: ConcretePrinter</span>\n  167  <span class=\"lineno\">18</span> 	\n  168: <span class=\"lineno\">19</span> 	<span class=\"c1\">//std::unique_ptr&lt;ConcretePrinter&gt; notACopy = cp; //doesn&#39;t work</span>\n  169  <span class=\"lineno\">20</span> 	\n  170  <span class=\"lineno\">21</span> 	<span class=\"n\">std</span><span class=\"o\">::</span><span class=\"n\">unique_ptr</span><span class=\"o\">&lt;</span><span class=\"n\">ConcretePrinter</span><span class=\"o\">&gt;</span> <span class=\"n\">notACopy2</span> <span class=\"o\">=</span> <span class=\"n\">std</span><span class=\"o\">::</span><span class=\"n\">move</span><span class=\"p\">(</span><span class=\"n\">cp</span><span class=\"p\">);</span>\n\n11 matches across 5 files\n\n\nSearching 82 files for \"std::unique_ptr\"\n\n/Users/neilmoore67/Work/personal-homepage/_posts/2015-06-10-objects-and-pointers-2.markdown:\n   44  unique_ptr\n   45  ===========\n   46: The simplest way to get closer to value semantics with pointers is definitely std::unique_ptr. An area of memory is guaranteed to be uniquely owned. \n   47  \n   48  {% highlight c++ linenos %}\n\n/Users/neilmoore67/Work/personal-homepage/_posts/obj_ptrs_2_code/unique.hpp:\n   14  int main()\n   15  {\n   16: 	std::unique_ptr<ConcretePrinter> cp(std::make_unique<ConcretePrinter>());\n   17  	cp->Print(); //prints: ConcretePrinter\n   18  	\n   19: 	//std::unique_ptr<ConcretePrinter> notACopy = cp; //doesn't work\n   20  	\n   21: 	std::unique_ptr<ConcretePrinter> notACopy2 = std::move(cp);\n   22  	notACopy2->Print(); //prints: ConcretePrinter\n   23  	\n\n/Users/neilmoore67/Work/personal-homepage/_posts/obj_ptrs_2_code/unique_hetero.hpp:\n   21  int main()\n   22  {\n   23: 	std::unique_ptr<ConcretePrinter> cp(std::make_unique<ConcretePrinter>());\n   24  	\n   25: 	std::unique_ptr<StonePrinter> sp(std::make_unique<StonePrinter>());\n   26  \n   27: 	std::vector<std::unique_ptr<Printer>> doesntWork;\n   28  	//doesntWork.push_back(cp); //won't compile\n   29  	//doesntWork.push_back(sp); //won't compile\n\n/Users/neilmoore67/Work/personal-homepage/_site/feed.xml:\n   67  \n   68  &lt;h1 id=&quot;uniqueptr&quot;&gt;unique_ptr&lt;/h1&gt;\n   69: &lt;p&gt;The simplest way to get closer to value semantics with pointers is definitely std::unique_ptr. An area of memory is guaranteed to be uniquely owned.&lt;/p&gt;\n   70  \n   71  &lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c--&quot; data-lang=&quot;c++&quot;&gt;&lt;span class=&quot;lineno&quot;&gt; 1&lt;/span&gt; &lt;span class=&quot;cp&quot;&gt;#include &amp;lt;iostream&amp;gt;&lt;/span&gt;\n   ..\n   87  &lt;span class=&quot;lineno&quot;&gt;17&lt;/span&gt; 	&lt;span class=&quot;n&quot;&gt;cp&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//prints: ConcretePrinter&lt;/span&gt;\n   88  &lt;span class=&quot;lineno&quot;&gt;18&lt;/span&gt; 	\n   89: &lt;span class=&quot;lineno&quot;&gt;19&lt;/span&gt; 	&lt;span class=&quot;c1&quot;&gt;//std::unique_ptr&amp;lt;ConcretePrinter&amp;gt; notACopy = cp; //doesn&amp;#39;t work&lt;/span&gt;\n   90  &lt;span class=&quot;lineno&quot;&gt;20&lt;/span&gt; 	\n   91  &lt;span class=&quot;lineno&quot;&gt;21&lt;/span&gt; 	&lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;unique_ptr&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ConcretePrinter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;notACopy2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;move&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;\n\n/Users/neilmoore67/Work/personal-homepage/_site/c++/2015/07/21/objects-and-pointers-2.html:\n  146  \n  147  <h1 id=\"uniqueptr\">unique_ptr</h1>\n  148: <p>The simplest way to get closer to value semantics with pointers is definitely std::unique_ptr. An area of memory is guaranteed to be uniquely owned.</p>\n  149  \n  150  <div class=\"highlight\"><pre><code class=\"language-c--\" data-lang=\"c++\"><span class=\"lineno\"> 1</span> <span class=\"cp\">#include &lt;iostream&gt;</span>\n  ...\n  166  <span class=\"lineno\">17</span> 	<span class=\"n\">cp</span><span class=\"o\">-&gt;</span><span class=\"n\">Print</span><span class=\"p\">();</span> <span class=\"c1\">//prints: ConcretePrinter</span>\n  167  <span class=\"lineno\">18</span> 	\n  168: <span class=\"lineno\">19</span> 	<span class=\"c1\">//std::unique_ptr&lt;ConcretePrinter&gt; notACopy = cp; //doesn&#39;t work</span>\n  169  <span class=\"lineno\">20</span> 	\n  170  <span class=\"lineno\">21</span> 	<span class=\"n\">std</span><span class=\"o\">::</span><span class=\"n\">unique_ptr</span><span class=\"o\">&lt;</span><span class=\"n\">ConcretePrinter</span><span class=\"o\">&gt;</span> <span class=\"n\">notACopy2</span> <span class=\"o\">=</span> <span class=\"n\">std</span><span class=\"o\">::</span><span class=\"n\">move</span><span class=\"p\">(</span><span class=\"n\">cp</span><span class=\"p\">);</span>\n\n11 matches across 5 files\n",
 			"settings":
 			{
-				"buffer_size": 3282,
+				"buffer_size": 18575,
 				"line_ending": "Unix",
 				"name": "Find Results",
 				"scratch": true
@@ -345,10 +466,14 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 287.0,
-		"last_filter": "",
+		"height": 187.0,
+		"last_filter": "markdown",
 		"selected_items":
 		[
+			[
+				"markdown",
+				"Markdown Preview: Preview in Browser"
+			],
 			[
 				"Package Control: ",
 				"Package Control: Install Package"
@@ -382,7 +507,7 @@
 				"Snippet: test"
 			]
 		],
-		"width": 568.0
+		"width": 593.0
 	},
 	"console":
 	{
@@ -412,6 +537,16 @@
 	],
 	"file_history":
 	[
+		"/Users/neilmoore67/Work/personal-homepage/_drafts/2014-11-30-objects-and-pointers.markdown",
+		"/Users/neilmoore67/Work/personal-homepage/_drafts/type_erasure.hpp",
+		"/Users/neilmoore67/Work/personal-homepage/_drafts/value.hpp",
+		"/Users/neilmoore67/Work/personal-homepage/_drafts/wrapper.hpp",
+		"/Users/neilmoore67/Work/personal-homepage/_drafts/unique_hetero.hpp",
+		"/Users/neilmoore67/Work/personal-homepage/_drafts/2015-06-10-objects-and-pointers-2.markdown",
+		"/Users/neilmoore67/Work/personal-homepage/_posts/2015-06-10-objects-and-pointers-2.markdown",
+		"/Users/neilmoore67/Work/personal-homepage/unique.hpp",
+		"/Users/neilmoore67/Work/personal-homepage/unique_hetero.hpp",
+		"/Users/neilmoore67/Work/personal-homepage/non-virtual-objects.hpp",
 		"/Users/neilmoore67/Work/personal-homepage/_plugins/thumbnail.rb",
 		"/Users/neilmoore67/Work/personal-homepage/css/lightbox.css",
 		"/Users/neilmoore67/Library/Application Support/Sublime Text 3/Packages/GoSublime/CHANGELOG.md",
@@ -491,6 +626,11 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"stone",
+			"std::unique_ptr",
+			"boost",
+			"post_url",
+			"unique_ptr",
 			"objectStuff5",
 			"site-header",
 			"site-headers",
@@ -541,7 +681,7 @@
 	"groups":
 	[
 		{
-			"selected": 3,
+			"selected": 19,
 			"sheets":
 			[
 				{
@@ -569,7 +709,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 14,
+					"stack_index": 29,
 					"type": "text"
 				},
 				{
@@ -578,7 +718,7 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 92,
+						"buffer_size": 94,
 						"regions":
 						{
 						},
@@ -586,7 +726,7 @@
 						[
 							[
 								0,
-								42
+								0
 							]
 						],
 						"settings":
@@ -598,7 +738,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 12,
+					"stack_index": 27,
 					"type": "text"
 				},
 				{
@@ -626,7 +766,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 15,
+					"stack_index": 30,
 					"type": "text"
 				},
 				{
@@ -648,14 +788,14 @@
 						],
 						"settings":
 						{
-							"sorttabs_lastactivated": 1437321567.81,
+							"sorttabs_lastactivated": 1438285754.56,
 							"syntax": "Packages/Markdown/Markdown.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 23,
 					"type": "text"
 				},
 				{
@@ -671,20 +811,23 @@
 						"selection":
 						[
 							[
-								3281,
-								3281
+								2135,
+								2135
 							]
 						],
 						"settings":
 						{
-							"sorttabs_lastactivated": 1433968746.7,
-							"syntax": "Packages/Markdown/Markdown.tmLanguage"
+							"function_name_status_row": 68,
+							"parser": "github",
+							"sorttabs_lastactivated": 1443865833.46,
+							"syntax": "Packages/Markdown/Markdown.tmLanguage",
+							"target": "browser"
 						},
 						"translation.x": 0.0,
-						"translation.y": 1095.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 1,
 					"type": "text"
 				},
 				{
@@ -693,51 +836,22 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 10427,
+						"buffer_size": 8925,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								10392,
-								10392
+								6312,
+								6312
 							]
 						],
 						"settings":
 						{
-							"sorttabs_lastactivated": 1433968748.9,
+							"sorttabs_lastactivated": 1439368938.04,
 							"syntax": "Packages/Markdown/Markdown.tmLanguage",
 							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 443.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "_posts/2014-11-13-dinner.markdown",
-					"semi_transient": true,
-					"settings":
-					{
-						"buffer_size": 245,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"sorttabs_lastactivated": 1433966155.4,
-							"syntax": "Packages/Markdown/Markdown.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -747,37 +861,401 @@
 					"type": "text"
 				},
 				{
-					"buffer": 7,
-					"file": "_drafts/2014-11-30-objects-and-pointers.markdown",
+					"buffer": 6,
+					"file": "_posts/obj_ptrs_1_code/sixth.cpp",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 10433,
+						"buffer_size": 443,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1310,
-								859
+								346,
+								346
 							]
 						],
 						"settings":
 						{
-							"sorttabs_lastactivated": 1433965676.01,
-							"syntax": "Packages/Markdown/Markdown.tmLanguage",
+							"open_with_edit": true,
+							"sorttabs_lastactivated": 1438526250.48,
+							"syntax": "Packages/C++/C++.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 430.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 16,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "_posts/obj_ptrs_2_code/unique.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 588,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								354,
+								354
+							]
+						],
+						"settings":
+						{
+							"sorttabs_lastactivated": 1438633789.65,
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 10,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "_posts/obj_ptrs_2_code/type_erasure_with_inherit.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1213,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1164,
+								1164
+							]
+						],
+						"settings":
+						{
+							"sorttabs_lastactivated": 1438634564.77,
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 316.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "_posts/obj_ptrs_2_code/type_erasure.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 798,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								475,
+								475
+							]
+						],
+						"settings":
+						{
+							"sorttabs_lastactivated": 1439190037.84,
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 8,
 					"type": "text"
 				},
 				{
-					"buffer": 8,
+					"buffer": 10,
+					"file": "_posts/obj_ptrs_1_code/fifth.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 628,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								181,
+								181
+							]
+						],
+						"settings":
+						{
+							"open_with_edit": true,
+							"sorttabs_lastactivated": 1438544344.38,
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 12,
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "_posts/obj_ptrs_1_code/fourth.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 176,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								176,
+								176
+							]
+						],
+						"settings":
+						{
+							"open_with_edit": true,
+							"sorttabs_lastactivated": 1438544594.63,
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 11,
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "_posts/obj_ptrs_1_code/third.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 261,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								261,
+								261
+							]
+						],
+						"settings":
+						{
+							"open_with_edit": true,
+							"sorttabs_lastactivated": 1438544342.29,
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 14,
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"file": "_posts/obj_ptrs_1_code/second.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 163,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								163,
+								163
+							]
+						],
+						"settings":
+						{
+							"open_with_edit": true,
+							"sorttabs_lastactivated": 1438544339.1,
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 15,
+					"type": "text"
+				},
+				{
+					"buffer": 14,
+					"file": "_posts/obj_ptrs_1_code/first.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 162,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								162,
+								162
+							]
+						],
+						"settings":
+						{
+							"open_with_edit": true,
+							"sorttabs_lastactivated": 1438544343.93,
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 13,
+					"type": "text"
+				},
+				{
+					"buffer": 15,
+					"file": "_posts/obj_ptrs_1_code/earlydefs.hpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 388,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								232,
+								232
+							]
+						],
+						"settings":
+						{
+							"open_with_edit": true,
+							"sorttabs_lastactivated": 1438523578.08,
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 17,
+					"type": "text"
+				},
+				{
+					"buffer": 16,
+					"file": "_posts/obj_ptrs_2_code/wrapper.hpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1083,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								340,
+								340
+							]
+						],
+						"settings":
+						{
+							"sorttabs_lastactivated": 1438286454.14,
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 18,
+					"type": "text"
+				},
+				{
+					"buffer": 17,
+					"file": "_posts/obj_ptrs_2_code/type_erasure.hpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 685,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								685,
+								685
+							]
+						],
+						"settings":
+						{
+							"sorttabs_lastactivated": 1438285859.8,
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 19,
+					"type": "text"
+				},
+				{
+					"buffer": 18,
+					"file": "_posts/obj_ptrs_2_code/unique_hetero.hpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 683,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								683,
+								683
+							]
+						],
+						"settings":
+						{
+							"sorttabs_lastactivated": 1438285766.28,
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 22,
+					"type": "text"
+				},
+				{
+					"buffer": 19,
 					"file": "_posts/2015-03-16-wedding-honeymoon.markdown",
 					"semi_transient": false,
 					"settings":
@@ -789,25 +1267,28 @@
 						"selection":
 						[
 							[
-								1144,
-								1144
+								6336,
+								6336
 							]
 						],
 						"settings":
 						{
-							"sorttabs_lastactivated": 1433966146.67,
+							"function_name_status_row": 118,
+							"parser": "github",
+							"sorttabs_lastactivated": 1443868739.67,
 							"syntax": "Packages/Markdown/Markdown.tmLanguage",
+							"target": "browser",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2535.0,
+						"translation.y": 2102.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 5,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 9,
+					"buffer": 20,
 					"file": "_posts/2015-03-29-TT-scorer.markdown",
 					"semi_transient": false,
 					"settings":
@@ -825,19 +1306,19 @@
 						],
 						"settings":
 						{
-							"sorttabs_lastactivated": 1433966143.84,
+							"sorttabs_lastactivated": 1439368935.96,
 							"syntax": "Packages/Markdown/Markdown.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 3867.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 5,
 					"type": "text"
 				},
 				{
-					"buffer": 10,
+					"buffer": 21,
 					"file": "_posts/2015-04-6-types.markdown",
 					"semi_transient": false,
 					"settings":
@@ -855,49 +1336,139 @@
 						],
 						"settings":
 						{
-							"sorttabs_lastactivated": 1433966141.86,
+							"sorttabs_lastactivated": 1439368934.18,
 							"syntax": "Packages/Markdown/Markdown.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 2769.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 6,
 					"type": "text"
 				},
 				{
-					"buffer": 11,
+					"buffer": 22,
 					"file": "_posts/2015-06-10-objects-and-pointers-2.markdown",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4784,
+						"buffer_size": 4523,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4057,
-								4057
+								73,
+								73
 							]
 						],
 						"settings":
 						{
-							"sorttabs_lastactivated": 1436719291.31,
-							"syntax": "Packages/Markdown/Markdown.tmLanguage",
-							"translate_tabs_to_spaces": false
+							"sorttabs_lastactivated": 1439368954.91,
+							"syntax": "Packages/Markdown/Markdown.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 1221.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
-					"buffer": 12,
+					"buffer": 23,
+					"file": "_posts/2015-08-10-talk-slides.markdown",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 479,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								335,
+								335
+							]
+						],
+						"settings":
+						{
+							"function_name_status_row": 7,
+							"parser": "github",
+							"sorttabs_lastactivated": 1443865511.5,
+							"syntax": "Packages/Markdown/Markdown.tmLanguage",
+							"target": "browser"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 24,
+					"file": "_posts/2015-06-10-objects-and-pointers-2 copy.markdown",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4523,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"sorttabs_lastactivated": 1439190455.23,
+							"syntax": "Packages/Markdown/Markdown.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 25,
+					"file": "_posts/obj_ptrs_2_code/unique.hpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 630,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								506,
+								506
+							]
+						],
+						"settings":
+						{
+							"sorttabs_lastactivated": 1438285857.83,
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 20,
+					"type": "text"
+				},
+				{
+					"buffer": 26,
 					"file": "/Users/neilmoore67/Work/scala-cource/doodle-develop/README.md",
 					"semi_transient": false,
 					"settings":
@@ -923,11 +1494,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 16,
+					"stack_index": 31,
 					"type": "text"
 				},
 				{
-					"buffer": 13,
+					"buffer": 27,
 					"file": "Gemfile",
 					"semi_transient": false,
 					"settings":
@@ -951,16 +1522,16 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 13,
+					"stack_index": 28,
 					"type": "text"
 				},
 				{
-					"buffer": 14,
+					"buffer": 28,
 					"file": "_site/personal/2015/03/16/wedding-honeymoon.html",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 15913,
+						"buffer_size": 15937,
 						"regions":
 						{
 						},
@@ -981,11 +1552,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 17,
+					"stack_index": 32,
 					"type": "text"
 				},
 				{
-					"buffer": 15,
+					"buffer": 29,
 					"file": "index.html",
 					"semi_transient": false,
 					"settings":
@@ -1011,11 +1582,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 25,
+					"stack_index": 39,
 					"type": "text"
 				},
 				{
-					"buffer": 16,
+					"buffer": 30,
 					"file": "_layouts/default.html",
 					"semi_transient": false,
 					"settings":
@@ -1041,11 +1612,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 18,
+					"stack_index": 33,
 					"type": "text"
 				},
 				{
-					"buffer": 17,
+					"buffer": 31,
 					"file": "_includes/analytics.html",
 					"semi_transient": false,
 					"settings":
@@ -1070,11 +1641,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 22,
+					"stack_index": 36,
 					"type": "text"
 				},
 				{
-					"buffer": 18,
+					"buffer": 32,
 					"file": "_includes/mailchimp.html",
 					"semi_transient": false,
 					"settings":
@@ -1098,11 +1669,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 26,
+					"stack_index": 40,
 					"type": "text"
 				},
 				{
-					"buffer": 19,
+					"buffer": 33,
 					"file": "_layouts/post.html",
 					"semi_transient": false,
 					"settings":
@@ -1128,11 +1699,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 24,
+					"stack_index": 38,
 					"type": "text"
 				},
 				{
-					"buffer": 20,
+					"buffer": 34,
 					"file": "_includes/head.html",
 					"semi_transient": false,
 					"settings":
@@ -1158,11 +1729,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 9,
+					"stack_index": 24,
 					"type": "text"
 				},
 				{
-					"buffer": 21,
+					"buffer": 35,
 					"file": "_includes/footer.html",
 					"semi_transient": false,
 					"settings":
@@ -1188,15 +1759,15 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 21,
+					"stack_index": 35,
 					"type": "text"
 				},
 				{
-					"buffer": 22,
+					"buffer": 36,
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3282,
+						"buffer_size": 18575,
 						"regions":
 						{
 							"match":
@@ -1267,6 +1838,158 @@
 									[
 										3202,
 										3213
+									],
+									[
+										3474,
+										3482
+									],
+									[
+										3954,
+										3962
+									],
+									[
+										4562,
+										4577
+									],
+									[
+										4790,
+										4805
+									],
+									[
+										4930,
+										4945
+									],
+									[
+										5010,
+										5025
+									],
+									[
+										5253,
+										5268
+									],
+									[
+										5344,
+										5359
+									],
+									[
+										5440,
+										5455
+									],
+									[
+										5807,
+										5822
+									],
+									[
+										6652,
+										6667
+									],
+									[
+										7808,
+										7823
+									],
+									[
+										8351,
+										8366
+									],
+									[
+										9003,
+										9018
+									],
+									[
+										9080,
+										9095
+									],
+									[
+										9162,
+										9177
+									],
+									[
+										9590,
+										9605
+									],
+									[
+										9818,
+										9833
+									],
+									[
+										9958,
+										9973
+									],
+									[
+										10038,
+										10053
+									],
+									[
+										10281,
+										10296
+									],
+									[
+										10372,
+										10387
+									],
+									[
+										10468,
+										10483
+									],
+									[
+										10835,
+										10850
+									],
+									[
+										11680,
+										11695
+									],
+									[
+										12836,
+										12851
+									],
+									[
+										13379,
+										13394
+									],
+									[
+										14212,
+										14227
+									],
+									[
+										14440,
+										14455
+									],
+									[
+										14580,
+										14595
+									],
+									[
+										14660,
+										14675
+									],
+									[
+										14903,
+										14918
+									],
+									[
+										14994,
+										15009
+									],
+									[
+										15090,
+										15105
+									],
+									[
+										15457,
+										15472
+									],
+									[
+										16302,
+										16317
+									],
+									[
+										17458,
+										17473
+									],
+									[
+										18001,
+										18016
 									]
 								],
 								"scope": ""
@@ -1275,30 +1998,31 @@
 						"selection":
 						[
 							[
-								2061,
-								2061
+								13955,
+								13955
 							]
 						],
 						"settings":
 						{
 							"detect_indentation": false,
 							"line_numbers": false,
-							"output_tag": 3,
+							"output_tag": 7,
 							"result_base_dir": "",
 							"result_file_regex": "^([A-Za-z\\\\/<].*):$",
 							"result_line_regex": "^ +([0-9]+):",
 							"scroll_past_end": true,
+							"sorttabs_lastactivated": 1438285852.87,
 							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 805.0,
+						"translation.y": 5610.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 20,
+					"stack_index": 21,
 					"type": "text"
 				},
 				{
-					"buffer": 23,
+					"buffer": 37,
 					"file": "_sass/_layout.scss",
 					"semi_transient": false,
 					"settings":
@@ -1324,11 +2048,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 19,
+					"stack_index": 34,
 					"type": "text"
 				},
 				{
-					"buffer": 24,
+					"buffer": 38,
 					"file": "untitled.sublime-project",
 					"semi_transient": false,
 					"settings":
@@ -1352,11 +2076,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 23,
+					"stack_index": 37,
 					"type": "text"
 				},
 				{
-					"buffer": 25,
+					"buffer": 39,
 					"file": "_sass/_syntax-highlighting.scss",
 					"semi_transient": false,
 					"settings":
@@ -1382,11 +2106,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 10,
+					"stack_index": 25,
 					"type": "text"
 				},
 				{
-					"buffer": 26,
+					"buffer": 40,
 					"file": "CNAME",
 					"semi_transient": false,
 					"settings":
@@ -1410,7 +2134,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 11,
+					"stack_index": 26,
 					"type": "text"
 				}
 			]
@@ -1418,7 +2142,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 23.0
+		"height": 24.0
 	},
 	"input":
 	{
@@ -1523,7 +2247,7 @@
 	"project": "untitled.sublime-project",
 	"replace":
 	{
-		"height": 64.0
+		"height": 44.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -1532,6 +2256,14 @@
 		"last_filter": "",
 		"selected_items":
 		[
+			[
+				"third",
+				"_posts/obj_ptrs_1_code/third.cpp"
+			],
+			[
+				"non",
+				"non-virtual-objects.hpp"
+			],
 			[
 				"honey",
 				"_posts/2015-03-16-wedding-honeymoon.markdown"
@@ -1665,7 +2397,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 283.0,
+	"side_bar_width": 379.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{
