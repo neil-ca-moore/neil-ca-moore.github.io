@@ -94,7 +94,7 @@ It was intended to be applied research with the potential of being sold to custo
 - quality demo's to enable to research to transition to a saleable product, and
 - patents.
 
-and to a lesser extent also published papers.
+Also to a lesser extent also published papers.
 
 I liked my work and the people at HP Labs but the location in Bristol was not ideal. I got used to having plenty of money unlike when I was a PhD student, which perhaps made it even less likely I'd go back to academia. Hence I interviewed with Adobe, liked the people and decided to see how that worked out.
 
@@ -106,6 +106,60 @@ I liked my work and the people at HP Labs but the location in Bristol was not id
 
 The work I have done at Adobe has not followed on from anything I have done previously. I could have got practically the same job straight after my undergraduate degree. However the research, engineering and pragmatism that I learned at St Andrews and HP Labs definitely gave me a head start.
 
+From the day I started at Adobe I have been extremely happy. From day one I have been shipping code to appreciative customers and working with great colleagues who have taught me how to work efficiently and achieve a high quality standard.
 
+I was lucky enough to have something I worked on from my second day at Adobe demonstrated at the [Adobe MAX](https://max.adobe.com/) keynote talk. From there I ended up working the strategically important file sync component of the Creative Cloud. File sync was demonstrated at Adobe MAX, along with [Typekit Desktop sync](https://typekit.com/fonts?licenses=deskto) which I was also tangentially involved with. I have also been lucky enough to give talks at two internal conferences, ship countless versions of our software to literally millions of machines (/usually/ without incident). I have volunteered to go to the USA so many times that I've lost count and seen great places like San Francisco, Los Angeles and Seattle in the process.
+
+This has made things varied, but the day to day process of specifying, writing and testing software has been what has captured my passion.
 
 <!-- Slides: screenshots of MAX keynotes, software, stock price -->
+
+## Future
+
+I don't know what the future holds, but I do know that I will be staying in industry and not returning to academia. I would probably enjoy a greater element of applied research in my work, but for the moment the 10 year project of becoming a great engineer is still underway.
+
+I am not sure if I would be able to return to return to academia if I wanted to. I have known people to do so, but I am not sure if I would be capable of it. I do know that if I was to do research again then I would be much more focussed on end product. This is what I have learned to do in industry where speed is essential.
+
+# High level characteristics of industry and academia
+
+I want to say what I think characterises each type of workplace.
+
+## Industry
+
+In industry everything is driven directly or indirectly by the need to make money sustainably. That may sound excessively cynical but I think it's true. It's a bit like how evolution of species is driven by brutality but can also have redeeming features.
+
+The positive side effects of this focus include
+
+- focus on customer experience,
+- focus on finding methods that deliver good results irrespective of their novelty, and
+- focus on teamwork.
+
+However some aspects of good software development become guidelines rather than strict requirements. Unit testing, good software design, documentation and code hygiene may be sacrified to achieve faster progress. Short term progress is traded off against maintainability.
+
+Engineers must justify the use of their time. Dogmatisms like 100% test coverage are not accepted automatically and must prove their worth.
+
+But enough tributes to capitalism. What about the friendly, cuddly world of academia?
+
+## Academia
+
+The aims of academia are more diverse. 
+
+Turning out well educated students is a primary aim. That is valuable for a variety of reasons only tangentially related to money. A well educated populace are well behaved and fertilise successful industry. Early career researchers have a supporting role but my feeling is that education is mostly left to more established academics. 
+
+Academic research is the other aim. Academic research is really what early stage researchers are spending their time doing. In my opinion such research is not for making money but rather to
+
+- take people's undergraduate education to the next level;
+- provide a vibrant background for teaching;
+- to satisfy the innate need to discover and communicate;
+- national vanity; and 
+- to provide ideas and people to industry.
+
+By stating my opinions on the value of academia I am seeking to lay bare why it has different characteristics than industry as a job.
+
+You see relaxed and self indulgent styles of work in academia that are seldom seen in industry. That is because the aim is not necessarily to be as productive as possible in terms of end product, but to maximise much more nebulous aims as novelty, engagement and elegance.
+
+## Vive la difference
+
+This is why academia is not exactly like industry. There is a lot of creativity in industry but directed towards business success. There is a lot of efficient working practices in academia but directed towards novelty. However the flavour is very different.
+
+
