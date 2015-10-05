@@ -113,6 +113,7 @@ I was lucky enough to have something I worked on from my second day at Adobe dem
 This has made things varied, but the day to day process of specifying, writing and testing software has been what has captured my passion.
 
 <!-- Slides: screenshots of MAX keynotes, software, stock price -->
+<!-- https://twitter.com/ehsankia_/status/651115066037633024 -->
 
 ## Future
 
@@ -161,5 +162,4 @@ You see relaxed and self indulgent styles of work in academia that are seldom se
 ## Vive la difference
 
 This is why academia is not exactly like industry. There is a lot of creativity in industry but directed towards business success. There is a lot of efficient working practices in academia but directed towards novelty. However the flavour is very different.
-
 
