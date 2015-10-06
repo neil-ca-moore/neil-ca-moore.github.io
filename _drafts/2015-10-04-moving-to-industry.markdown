@@ -33,11 +33,10 @@ Outline:
   - lots of people using my stuff
   - people love it and are deeply interested that it 
  - job availability, security, salary and flexibility of location etc.
+  - the problems are typically simpler, but have a high degree of complicating factors  ****got to here****
  - working within more stringent constraints
   - less individualistic
   - priorities are more frequently set externally
-  - the problems are typically simpler, but have a high degree of complicating factors 
-   - like time constraints, legacy code and the requirement for total perfection in usability, but also pragmatism
 - what frightened me before I took the plunge
  - abandoning career and feeling a failure
   - just because you can have an academic career doesn't mean you have to
@@ -162,4 +161,23 @@ You see relaxed and self indulgent styles of work in academia that are seldom se
 ## Vive la difference
 
 This is why academia is not exactly like industry. There is a lot of creativity in industry but directed towards business success. There is a lot of efficient working practices in academia but directed towards novelty. However the flavour is very different.
+
+# What I love about working in industry
+
+I've explained that I like working in industry, I'm going to go into a bit more detail on why.
+
+The main thing is that I like the engagement levels in industry. It's unusual for somebody not to care deeply about whatever you are working on and to be intensely interested in the results. There are frequent milestones around features, bug fixes, releases and so on. Hence there are frequent small milestones to give satisfaction every day. I felt academic research worked to longer time horizons of papers, grants and so on. Milestones in academia are much more difficult so they come along less often. You just cannot be finding novelty every day.
+
+The other side of engagement is that you are typically producing software that is important to customers (external or internal). Customers care whether it works as their own livelihood or free time depends on it. In academia often papers can develop very little interest, I'm sure everyone has had that experience of being ignored. Some papers have a great impact that changes the world, most do not. Papers may turn out to be relevant only a niche group. 
+
+I must mention that industry has been more financially lucrative for me. I think it is for most people. In academia you can aim for a permanent academic job, which is the closest thing to a job for life that exists today. However many people fail to achieve that goal. The computer industry has a high level of demand for qualified staff and I think that the chances of a hard working and qualified person ending up redundant is low compared to other industries. Over the course of a career computer scientists in industry will earn significantly more in most cases.
+
+The sorts of problems one is solving in industry are often conceptually simpler. There are people in industry doing advanced research, but novelty is generally not an aim. Novelty is valued if it can be patented or is something that customers will want, but is not valued for its own sake. Most business problems are not particularly new, and engineers are distinguished by their ability to solve these simple problems quickly and efficiently. Even Google engineers are mostly working on the programming equivalent of sweeping the floor.
+
+The type of perfection required in industry is different. Making code work on every conceivable platform, for every locale, for every possible input etc. is highly valued. My experience of academic software engineering is that the code is generally only used by its creator(s) hence it doesn't have to be bug free or simple to use. There is a learning curve and unique discipline to writing code that is outwardly perfect. I say outwardly perfect because the perfect interface can hide a lot of bad code underneath it.
+
+Picking a job at the right level of novelty and challenge is a difficult task. You may have to take a pay cut to work on what you want. Being able to tolerate boring work is a skill that is financially rewarded, and every engineer must decide her own priorities.
+
+Autonomy is one of the great attractions of academia. Freedom to 
+
 
