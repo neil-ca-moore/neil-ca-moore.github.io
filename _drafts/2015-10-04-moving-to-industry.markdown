@@ -170,13 +170,15 @@ The main thing is that I like the engagement levels in industry. It's unusual fo
 
 The other side of engagement is that you are typically producing software that is important to customers (external or internal). Customers care whether it works as their own livelihood or free time depends on it. In academia often papers can develop very little interest, I'm sure everyone has had that experience of being ignored. Some papers have a great impact that changes the world, most do not. Papers may turn out to be relevant only a niche group. 
 
-I must mention that industry has been more financially lucrative for me. I think it is for most people. In academia you can aim for a permanent academic job, which is the closest thing to a job for life that exists today. However many people fail to achieve that goal. The computer industry has a high level of demand for qualified staff and I think that the chances of a hard working and qualified person ending up redundant is low compared to other industries. Over the course of a career computer scientists in industry will earn significantly more in most cases.
-
-The sorts of problems one is solving in industry are often conceptually simpler. There are people in industry doing advanced research, but novelty is generally not an aim. Novelty is valued if it can be patented or is something that customers will want, but is not valued for its own sake. Most business problems are not particularly new, and engineers are distinguished by their ability to solve these simple problems quickly and efficiently. Even Google engineers are mostly working on the programming equivalent of sweeping the floor.
-
 The type of perfection required in industry is different. Making code work on every conceivable platform, for every locale, for every possible input etc. is highly valued. My experience of academic software engineering is that the code is generally only used by its creator(s) hence it doesn't have to be bug free or simple to use. There is a learning curve and unique discipline to writing code that is outwardly perfect. I say outwardly perfect because the perfect interface can hide a lot of bad code underneath it.
 
-Picking a job at the right level of novelty and challenge is a difficult task. You may have to take a pay cut to work on what you want. Being able to tolerate boring work is a skill that is financially rewarded, and every engineer must decide her own priorities.
+I must mention that industry has been more financially lucrative for me. I think it is for most people. In academia you can aim for a permanent academic job, which is the closest thing to a job for life that exists today. However many people fail to achieve that goal. The computer industry has a high level of demand for qualified staff and I think that the chances of a hard working and qualified person ending up redundant is low compared to other industries. Over the course of a career computer scientists in industry will earn significantly more in most cases.
+
+The sorts of problems one is solving in industry are frequently conceptually simpler. There are people in industry doing advanced research, but novelty is generally not an aim. Novelty is valued if it can be patented or is something that customers will want, but is not valued for its own sake. Most business problems are not particularly new, and engineers are have to be able to solve these simple problems quickly and efficiently.
+
+So I have said I think the average problem engineers are solving in industry is probably simpler than the average problem academics in Computer Science are working on. Does that mean that all the industrial problems are simple? Absolutely not. Just in Edinburgh we have companies writing computer games, compilers, medical imaging software, defense projects, AI and ... file sync. The best engineers will still be hired to work on the hardest problems, and there are plenty of hard problems to solve.
+
+Picking a job at the right level of novelty and challenge is a difficult task. You may have to take a pay cut to work on what you want. Being able to tolerate boring work is a skill that is financially rewarded, and every engineer must decide his or her own priorities.
 
 # What frightened me before I took the plunge
 
@@ -185,13 +187,36 @@ As I said earliier, towards the end of my PhD I was already feeling that academi
 > You can have a good academic career. Just because you can have an academic career doesn't mean you have to do it.
 >-- Ian Gent
 
-That might sound like nothing but it really helped me. It appealed to my vanity by saying that I could have a *good* academic career. It also reminded me that I can do what I like and I don't need to pursue sunk costs by having an academic career just because I started on that path. I would say the same thing to anybody just now who isn't sure they want to be in academia. You can leave and there is no shame. You can have a good career in industry that may make your happier than you are now, and that is the main thing that matters. Both industry and academia will survive without you, but you should try to be happy.
+That might sound like nothing but it really helped me. It appealed to my vanity by saying that I could have a *good* academic career. It also reminded me that I can do what I like and I don't need to pursue sunk costs by having an academic career just because I started on that path. I would say the same thing to anybody just now who isn't sure they want to be in academia. You can leave and there is no shame. You can have a good career in industry that may make your happier than you are now, and that is the thing that matters. Both industry and academia will survive without you, but you should try to be happy.
 
-.... talk about ability to go back and stagnating research skills/knowledge
+Another thing that worried me for a while was the idea that I would be unable to return to academia if my new job didn't work out for me. I cannot really confirm or deny that. I suspect it's true that the longer you spend out of academia the harder it would be to return. I have seen people return to academia who have worked in research, which I'm not really doing. So I will abstain from giving any advice on that.
+
+Do I feel able to do research again? Honestly I do. I think my improved engineering skills and focus would make me a better researcher. I think I have gained general skills in communication and decision making. Moreover the work I've been doing on file and data sync has been intellectually challenging and I have not been overwhelmed. I have read research papers on file sync and been able to relate them to my practical work, e.g. some of Benjamin Pierce's papers. When I did a little bit of work on building Venn diagrams using constraint programming I was able to read and understand the technical papers in the area. I don't feel like my time away from University has made me stupid. So I think that if you keep sharp and hone your skills you should be able to go back, but I don't know that would happen in practice.
 
 # What still bothers me about industry
 
 Autonomy is one of the great attractions of academia. As you would expect learning amongst academic researchers is expected and encouraged. I have to say that in industry I have found that there is generally little time available during work hours to investigate new technologies and ideas. That is perhaps a function of where I work and the job I do. I think it's perhaps my mistake and I should be conciously delivering less work and focussing on building my skills more during office hours. Nevertheless I do feel pressure to produce work for the project, and very little pressure to expand my skills. I think that experience may be typical in industry. That is a definite disadvantage, and it makes me feel sorry for people who have out of work responsibilities like looking after children, relatives and other committments.
 
-The other side of automomy is freedom to follow your interests. This is something that has to be earned in industry, to a great degree than in academia. I can affect the projects aims and what I work on by having good ideas and of course the implementation decisions are often down to the team I work in. However I typically can't decide to work on a new idea for a week, there are other priorities that I must advance. Hence my priorities are often external and I don't have a lot of say what they are. Again this is something that's know in academia. Academics must march to the beat of somebody else's drum too: grants must be written to be tailored to available funding; students and postdocs must work on somebody else's research agenda. What I'm complaining about is really that there are more constraints in industry, and not the fact that there are constraints at all.
+The other side of automomy is freedom to follow your interests. This is something that has to be earned in industry, to a greater degree than in academia. I can affect the project's aims and what I work on by having good ideas and of course the implementation decisions are often down to us. However I typically can't decide to work on a new idea for a week, there are other priorities that I must advance. Hence my priorities are often external and I don't have a lot of say what they are. Again this is something that's familiar in academia. Academics must march to the beat of somebody else's drum too: e.g. grants must be written to be tailored to available funding; and students and postdocs must work on somebody else's research agenda. What I'm saying is that it seems to me there are more constraints on your time in industry, compared to early stage research careers.
+
+# Conclusions
+
+So to summarise what I like most about industry I'd say 
+
+* the fact colleagues and customers care so much about the work I do, 
+* the engagement levels in projects, and
+* the salary.
+
+and what I liked about academia was
+
+* the freedom to explore and learn, and
+* the collegiate lifestyle.
+
+I would simply say that if you already love what you do then keep doing it. It's the people who are not so sure that I want to address. If you are not sure you're happy in academia or realistically you are not going to be able to make a long term career of it, then consider making a jump to industry. As I have said there is a great demand for software engineering and research skills. There is no shame in making the move and if you enjoy it then it will have been worthwhile. Otherwise you go back with improved skills in new areas.
+
+Even if you are happy in academia, consider diversifying your research. Try to be unsentimental about your previous research output and make a switch if there is an opportunity elsewhere. Even Donald Knuth has never found any application for his PhD research in subsequent work, and he seems to have recovered from that initial "setback". Perhaps do some work with industry, as I did with HP Labs, as there is a plethora of interesting problems that people want solutions for.
+
+We are lucky enough to be in an industry where there is a skills shortage. To me that is an opportunity for us to try jobs out with an expectation that we can find another job should it not suit us. Certainly in my case I tried out being an academic for 4 years, had a good time doing it but it wasn't how I wanted to spend my whole life. 
+
+
 
