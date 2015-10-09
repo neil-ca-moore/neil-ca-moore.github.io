@@ -164,7 +164,7 @@ This is why academia is not exactly like industry. There is a lot of creativity 
 
 # What I love about working in industry
 
-I've explained that I like working in industry, I'm going to go into a bit more detail on why.
+I've explained that I like working in industry, I'm going to go into a bit more detail on why. I have spent more time in industry than academia, never having even done a postdoc. I hope that my impressions of academia are not too biased.
 
 The main thing is that I like the engagement levels in industry. It's unusual for somebody not to care deeply about whatever you are working on and to be intensely interested in the results. There are frequent milestones around features, bug fixes, releases and so on. Hence there are frequent small milestones to give satisfaction every day. I felt academic research worked to longer time horizons of papers, grants and so on. Milestones in academia are much more difficult so they come along less often. You just cannot be finding novelty every day.
 
@@ -178,6 +178,20 @@ The type of perfection required in industry is different. Making code work on ev
 
 Picking a job at the right level of novelty and challenge is a difficult task. You may have to take a pay cut to work on what you want. Being able to tolerate boring work is a skill that is financially rewarded, and every engineer must decide her own priorities.
 
-Autonomy is one of the great attractions of academia. Freedom to 
+# What frightened me before I took the plunge
 
+As I said earliier, towards the end of my PhD I was already feeling that academia was perhaps not entirely for me. I was basically only reluctant to leave academia because I felt a failure. I spoke to my supervisor, Ian Gent, and he said something to me (which I will attempt to quote) that flipped my thinking and let me leave with my head held high:
+
+> You can have a good academic career. Just because you can have an academic career doesn't mean you have to do it.
+>-- Ian Gent
+
+That might sound like nothing but it really helped me. It appealed to my vanity by saying that I could have a *good* academic career. It also reminded me that I can do what I like and I don't need to pursue sunk costs by having an academic career just because I started on that path. I would say the same thing to anybody just now who isn't sure they want to be in academia. You can leave and there is no shame. You can have a good career in industry that may make your happier than you are now, and that is the main thing that matters. Both industry and academia will survive without you, but you should try to be happy.
+
+.... talk about ability to go back and stagnating research skills/knowledge
+
+# What still bothers me about industry
+
+Autonomy is one of the great attractions of academia. As you would expect learning amongst academic researchers is expected and encouraged. I have to say that in industry I have found that there is generally little time available during work hours to investigate new technologies and ideas. That is perhaps a function of where I work and the job I do. I think it's perhaps my mistake and I should be conciously delivering less work and focussing on building my skills more during office hours. Nevertheless I do feel pressure to produce work for the project, and very little pressure to expand my skills. I think that experience may be typical in industry. That is a definite disadvantage, and it makes me feel sorry for people who have out of work responsibilities like looking after children, relatives and other committments.
+
+The other side of automomy is freedom to follow your interests. This is something that has to be earned in industry, to a great degree than in academia. I can affect the projects aims and what I work on by having good ideas and of course the implementation decisions are often down to the team I work in. However I typically can't decide to work on a new idea for a week, there are other priorities that I must advance. Hence my priorities are often external and I don't have a lot of say what they are. Again this is something that's know in academia. Academics must march to the beat of somebody else's drum too: grants must be written to be tailored to available funding; students and postdocs must work on somebody else's research agenda. What I'm complaining about is really that there are more constraints in industry, and not the fact that there are constraints at all.
 
