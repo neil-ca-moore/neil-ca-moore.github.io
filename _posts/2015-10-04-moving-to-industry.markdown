@@ -1,13 +1,14 @@
 ---
 layout: post
-title:  "Moving from academia to industry"
 date:   2015-10-4 15:22:16
+exclude_from_nav: true
+title: Moving from academia to industry
 categories: me talks
 ---
 
 I am giving a talk at the event [Lost in Translation: Early Career Researchers moving from academia to industry](http://www.eventbrite.co.uk/e/lost-in-translation-early-career-researchers-moving-from-academia-to-industry-tickets-7269436079) at St Andrews university on the 14th of October. I'm writing this post to get my thoughts together about how I made the transition and any advice I might have for others to help them decide what is right for them.
 
-It's going to be partly an introduction to myself but I'll try to give not only what worked for me but try to give some reasoning that will help other people too. The personal details should help make sense of what I'm saying.
+I'm going to tell my personal story but I'll also try to give some reasoning that I hope will help other people too.
 
 ---
 
@@ -74,9 +75,9 @@ Since I left the University of Glasgow with a Computing Science degree I have wo
 
 <img src="/resources/academia-post/st_and.svg" width="100">
 
-My PhD in St Andrews directly lead from the work I did in my final year of my undergraduate degree. I had been working on the constraint satisfaction problem (CSP) for my final year project. I decided to do a PhD because I was enjoying doing academic research and enjoyed being at University. I didn't want it to stop so I started looking for a PhD place. I was lucky enough to work in St Andrews with a fantastic research group containing Ian Gent, Ian Miguel, Chris Jefferson, Pete Nightingale and Lars Kotthoff.
+My PhD in St Andrews directly was fairly closely related to the work I did in my final year of my undergraduate degree. I had been working on applications of the constraint satisfaction problem (CSP) for my final year project. I decided to do a PhD because I was enjoying doing academic research and enjoyed being at University. So I started looking for a PhD place. I was lucky enough to be introduced to a fantastic research group in St Andrews containing Ian Gent, Ian Miguel, Chris Jefferson, Pete Nightingale and Lars Kotthoff.
 
-I don't think I struggled with my PhD more than I should have. It has to be hard or it's not worthwhile. However I don't think it came naturally to me, I had to struggle and I felt like I could only ever become a mediocre researcher. Hence towards the end of my three and a half years I began to feel that while I was likely to pass my PhD, I was not sure that a postdoc was right for me.
+I don't think I struggled with my PhD more than I should have. It has to be hard or it's not worthwhile. However I don't think it came naturally to me, I had to struggle and I felt like I could only ever become a mediocre researcher. Hence towards the end of my three and a half years I began to feel that while I was likely to pass my PhD and be able to get a follow on postdoc, I was not sure that it was right for me.
 
 <!-- Slides: first pages of my papers? -->
 
@@ -84,9 +85,9 @@ I don't think I struggled with my PhD more than I should have. It has to be hard
 
 <img src="/resources/academia-post/HP_labs.png" width="100">
 
-I got essentially the simplest possible transition into industry via HP Labs in Bristol. There was a project there that called for the application of CSP techniques to security problems. This was an Industrial Mathematics knowledge transfer project, hence it was funded partly by EPSRC and partly by HP Labs. The project is described [here](https://connect.innovateuk.org/web/partnership-programmes/article-view/-/blogs/automatic-policy-enforcement-exchange). Hence I was able to dip my toe into industry while getting 6 months in industry. I would heartily recommend this to PhD student. I did mine at the end of my PhD once I'd already completed my thesis. I'm not sure whether it would have been a good idea to do this in the middle of my PhD, it might have caused me to lose momentum..
+I got essentially the simplest possible transition into industry via HP Labs in Bristol. There was a project there that called for the application of CSP techniques to security problems. This was an Industrial Mathematics knowledge transfer project, hence it was funded partly by EPSRC and partly by HP Labs. The project is described [here](https://connect.innovateuk.org/web/partnership-programmes/article-view/-/blogs/automatic-policy-enforcement-exchange). I think I found it via some kind of circular email or on the EPSRC website, I cannot exactly remember.
 
-Hence I had the opportunity to change just one variable at a time. I got to take my existing research area but apply it in industry instead of academia. How did the experiment turn out?
+Hence I was able to dip my toe into industry for 6 months without being too far out of my comfort zone. I would heartily recommend this to any PhD student. I did mine at the end of my PhD once I'd already completed my thesis. I'm not sure whether it would have been a good idea to do this in the middle of my PhD, it might have caused me to lose momentum.
 
 It was intended to be applied research with the potential of being sold to customers in a few years. I worked with some brilliant people like Helen Balinsky, David Subiros Perez and Steve Simske. While somewhere like HP Labs does value basic research, it is never research for its own sake. They valued techniques provided they worked, but had no sentimentality. Their target was 
 
@@ -95,7 +96,9 @@ It was intended to be applied research with the potential of being sold to custo
 
 Also to a lesser extent also published papers.
 
-I liked my work and the people at HP Labs but the location in Bristol was not ideal. I got used to having plenty of money unlike when I was a PhD student, which perhaps made it even less likely I'd go back to academia. Hence I interviewed with Adobe, liked the people and decided to see how that worked out.
+Hence I had the opportunity to experiment, changing just one variable at a time, i.e. I got to take my existing research area but apply it in industry instead of academia. How did the experiment turn out? I liked my work and the people at HP Labs but the location in Bristol was not ideal. So I had discovered that I could really enjoy working outside a university, and that was an eye opener. I also got used to having more money than when I was a PhD student, which perhaps made it even less likely I'd go back to academia. 
+
+I asked around a my St Andrews colleagues about potential employers, and Adobe was recommended to me by Al Dearle. I interviewed with Adobe, liked the people and decided to see how that worked out.
 
 <!-- Slides: first pages of my papers, patents and software screenshots? -->
 
@@ -103,13 +106,13 @@ I liked my work and the people at HP Labs but the location in Bristol was not id
 
 <img src="/resources/academia-post/Adobe.svg" width="100">
 
-The work I have done at Adobe has not followed on from anything I have done previously. I could have got practically the same job straight after my undergraduate degree. However the research, engineering and pragmatism that I learned at St Andrews and HP Labs definitely gave me a head start.
+The work I have done at Adobe has not followed on from anything I have done previously. I could have got practically the same job straight after my undergraduate degree, in that sense you could say I wasted a little bit of momentum. However the research, engineering and pragmatism that I learned at St Andrews and HP Labs definitely gave me a head start against new graduates.
 
 From the day I started at Adobe I have been extremely happy. From day one I have been shipping code to appreciative customers and working with great colleagues who have taught me how to work efficiently and achieve a high quality standard.
 
 I was lucky enough to have something I worked on from my second day at Adobe demonstrated at the [Adobe MAX](https://max.adobe.com/) keynote talk. From there I ended up working the strategically important file sync component of the Creative Cloud. File sync was demonstrated at Adobe MAX, along with [Typekit Desktop sync](https://typekit.com/fonts?licenses=deskto) which I was also tangentially involved with. I have also been lucky enough to give talks at two internal conferences, ship countless versions of our software to literally millions of machines (/usually/ without incident). I have volunteered to go to the USA so many times that I've lost count and seen great places like San Francisco, Los Angeles and Seattle in the process.
 
-This has made things varied, but the day to day process of specifying, writing and testing software has been what has captured my passion.
+This has made things varied, but the day to day process of specifying, writing and testing software has been what has captured my passion. I'll explain later in more detail what I like so much about working in industry in general.
 
 <!-- Slides: screenshots of MAX keynotes, software, stock price -->
 <!-- https://twitter.com/ehsankia_/status/651115066037633024 -->
@@ -118,11 +121,11 @@ This has made things varied, but the day to day process of specifying, writing a
 
 I don't know what the future holds, but I do know that I will be staying in industry and not returning to academia. I would probably enjoy a greater element of applied research in my work, but for the moment the 10 year project of becoming a great engineer is still underway.
 
-I am not sure if I would be able to return to return to academia if I wanted to. I have known people to do so, but I am not sure if I would be capable of it. I do know that if I was to do research again then I would be much more focussed on end product. This is what I have learned to do in industry where speed is essential.
+I am not sure if I would be able to return to return to academia if I wanted to. I have known people to do so and I think I would be capable of it. I do know that if I was to do research again then I would be much more focussed on end product.
 
 # High level characteristics of industry and academia
 
-I want to say what I think characterises each type of workplace.
+I want to say what I think characterises each type of workplace, to put into context the differences in the types of work and the way that people work.
 
 ## Industry
 
@@ -134,9 +137,9 @@ The positive side effects of this focus include
 - focus on finding methods that deliver good results irrespective of their novelty, and
 - focus on teamwork.
 
-However some aspects of good software development become guidelines rather than strict requirements. Unit testing, good software design, documentation and code hygiene may be sacrified to achieve faster progress. Short term progress is traded off against maintainability.
+However this means some aspects of good software development become guidelines rather than strict requirements. Unit testing, good software design, documentation and code hygiene may be sacrified to achieve faster progress. Short term progress is traded off against maintainability.
 
-Engineers must justify the use of their time. Dogmatisms like 100% test coverage are not accepted automatically and must prove their worth.
+Engineers must justify the use of their time. Dogmas like 100% test coverage are not accepted automatically and must prove their worth.
 
 But enough tributes to capitalism. What about the friendly, cuddly world of academia?
 
@@ -144,7 +147,7 @@ But enough tributes to capitalism. What about the friendly, cuddly world of acad
 
 The aims of academia are more diverse. 
 
-Turning out well educated students is a primary aim. That is valuable for a variety of reasons only tangentially related to money. A well educated populace are well behaved and fertilise successful industry. Early career researchers have a supporting role but my feeling is that education is mostly left to more established academics. 
+Turning out well educated students is a primary aim. That is valuable for a variety of reasons only tangentially related to money. A well educated populace do fertilise successful industry. Early career researchers have a supporting role but my feeling is that education is mostly left to more established academics. 
 
 Academic research is the other aim. Academic research is really what early stage researchers are spending their time doing. In my opinion such research is not for making money but rather to
 
@@ -156,11 +159,11 @@ Academic research is the other aim. Academic research is really what early stage
 
 By stating my opinions on the value of academia I am seeking to lay bare why it has different characteristics than industry as a job.
 
-You see relaxed and self indulgent styles of work in academia that are seldom seen in industry. That is because the aim is not necessarily to be as productive as possible in terms of end product, but to maximise much more nebulous aims as novelty, engagement and elegance.
+You see relaxed and self indulgent styles of work in academia that are seldom seen in industry. That is because the aim is not necessarily to be as productive as possible in terms of end product, but to maximise much more nebulous aims such as novelty, engagement and elegance.
 
 ## Vive la difference
 
-This is why academia is not exactly like industry. There is a lot of creativity in industry but directed towards business success. There is a lot of efficient working practices in academia but directed towards novelty. However the flavour is very different.
+This is why academia is not exactly like industry. There is a lot of creativity in industry but directed towards business success. There is a lot of efficient working practices in academia but directed towards novelty. However the flavour of work is very different and I think each individual needs to discover, like I have, where they fit and what they enjoy.
 
 # What I love about working in industry
 
@@ -170,9 +173,11 @@ The main thing is that I like the engagement levels in industry. It's unusual fo
 
 The other side of engagement is that you are typically producing software that is important to customers (external or internal). Customers care whether it works as their own livelihood or free time depends on it. In academia often papers can develop very little interest, I'm sure everyone has had that experience of being ignored. Some papers have a great impact that changes the world, most do not. Papers may turn out to be relevant only a niche group. 
 
-The type of perfection required in industry is different. Making code work on every conceivable platform, for every locale, for every possible input etc. is highly valued. My experience of academic software engineering is that the code is generally only used by its creator(s) hence it doesn't have to be bug free or simple to use. There is a learning curve and unique discipline to writing code that is outwardly perfect. I say outwardly perfect because the perfect interface can hide a lot of bad code underneath it.
+The type of perfection required in industry is different. Making code work on every conceivable platform, for every locale, for every possible input etc. is highly valued. My experience of academic software engineering is that the code is generally only used by its creator(s)[^recomp] hence it doesn't have to be bug free or simple to use.  There is a learning curve and unique discipline to writing code that is outwardly perfect. I say outwardly perfect because the perfect interface can hide a lot of bad code underneath it.
 
-I must mention that industry has been more financially lucrative for me. I think it is for most people. In academia you can aim for a permanent academic job, which is the closest thing to a job for life that exists today. However many people fail to achieve that goal. The computer industry has a high level of demand for qualified staff and I think that the chances of a hard working and qualified person ending up redundant is low compared to other industries. Over the course of a career computer scientists in industry will earn significantly more in most cases.
+[^recomp]: My former colleagues Ian Gent and Lars Kotthoff are trying to change that with their [Recomputation project](http://recomputation.org)
+
+I must mention that industry has been more financially lucrative for me. I think it is for most people. In academia you can aim for a permanent academic job, which is the closest thing to a job for life that exists today. However many people fail to achieve that goal. There just aren't enough academic jobs for everyone to get one. The computer industry has a high level of demand for qualified staff and I think that the chances of a hard working and qualified person ending up redundant is low compared to other industries. Over the course of a career computer scientists in industry will earn significantly more in most cases.
 
 The sorts of problems one is solving in industry are frequently conceptually simpler. There are people in industry doing advanced research, but novelty is generally not an aim. Novelty is valued if it can be patented or is something that customers will want, but is not valued for its own sake. Most business problems are not particularly new, and engineers are have to be able to solve these simple problems quickly and efficiently.
 
@@ -189,15 +194,15 @@ As I said earliier, towards the end of my PhD I was already feeling that academi
 
 That might sound like nothing but it really helped me. It appealed to my vanity by saying that I could have a *good* academic career. It also reminded me that I can do what I like and I don't need to pursue sunk costs by having an academic career just because I started on that path. I would say the same thing to anybody just now who isn't sure they want to be in academia. You can leave and there is no shame. You can have a good career in industry that may make your happier than you are now, and that is the thing that matters. Both industry and academia will survive without you, but you should try to be happy.
 
-Another thing that worried me for a while was the idea that I would be unable to return to academia if my new job didn't work out for me. I cannot really confirm or deny that. I suspect it's true that the longer you spend out of academia the harder it would be to return. I have seen people return to academia who have worked in research, which I'm not really doing. So I will abstain from giving any advice on that.
+Another thing that worried me for a while was the idea that I would be unable to return to academia if my new job didn't work out for me. I cannot really confirm or deny that. I suspect it's true that the longer you spend out of academia the harder it would be to return. However I will have to abstain from giving any advice on that, I just don't know.
 
-Do I feel able to do research again? Honestly I do. I think my improved engineering skills and focus would make me a better researcher. I think I have gained general skills in communication and decision making. Moreover the work I've been doing on file and data sync has been intellectually challenging and I have not been overwhelmed. I have read research papers on file sync and been able to relate them to my practical work, e.g. some of Benjamin Pierce's papers. When I did a little bit of work on building Venn diagrams using constraint programming I was able to read and understand the technical papers in the area. I don't feel like my time away from University has made me stupid. So I think that if you keep sharp and hone your skills you should be able to go back, but I don't know that would happen in practice.
+Do I feel able to do research again? Honestly I do. I think my improved engineering skills and focus would make me a better researcher. I think I have gained general skills in communication and decision making. Moreover the work I've been doing on file and data sync has been intellectually challenging and I have not been overwhelmed by it. I have read research papers on file sync and been able to relate them to my practical work, e.g. some of Benjamin Pierce's papers. When I did a little bit of work on building Venn diagrams using constraint programming I was able to read and understand the technical papers in the area. I don't feel like my time away from University has made me stupid. So I think that if you keep sharp and hone your skills you should be able to go back, but I don't know that would happen in practice.
 
 # What still bothers me about industry
 
-Autonomy is one of the great attractions of academia. As you would expect learning amongst academic researchers is expected and encouraged. I have to say that in industry I have found that there is generally little time available during work hours to investigate new technologies and ideas. That is perhaps a function of where I work and the job I do. I think it's perhaps my mistake and I should be conciously delivering less work and focussing on building my skills more during office hours. Nevertheless I do feel pressure to produce work for the project, and very little pressure to expand my skills. I think that experience may be typical in industry. That is a definite disadvantage, and it makes me feel sorry for people who have out of work responsibilities like looking after children, relatives and other committments.
+Autonomy is one of the great attractions of academia. As you would expect learning amongst academic researchers is expected and encouraged. I have to say that in industry I have found that there is generally little time available during work hours to investigate new technologies and ideas. That is perhaps a function of where I work and the job I do. I think it's perhaps my mistake and I should be conciously delivering less work and focussing on building my skills more during office hours. Nevertheless I do feel pressure to produce work for the project, and very little pressure to expand my skills. I think that experience may be typical in industry. That is a definite disadvantage, and it makes me feel sorry for people who have out of work responsibilities like looking after children, relatives and other committments, meaning that they haven't the free time that I have (at least for the moment!)
 
-The other side of automomy is freedom to follow your interests. This is something that has to be earned in industry, to a greater degree than in academia. I can affect the project's aims and what I work on by having good ideas and of course the implementation decisions are often down to us. However I typically can't decide to work on a new idea for a week, there are other priorities that I must advance. Hence my priorities are often external and I don't have a lot of say what they are. Again this is something that's familiar in academia. Academics must march to the beat of somebody else's drum too: e.g. grants must be written to be tailored to available funding; and students and postdocs must work on somebody else's research agenda. What I'm saying is that it seems to me there are more constraints on your time in industry, compared to early stage research careers.
+The other side of automomy is freedom to follow your interests. This is something that has to be earned in industry, to a greater degree than in academia. I can affect the project's aims and what I work on by having good ideas and of course the implementation decisions are down to us. However I typically can't decide to work on a new idea for a week, there are other priorities that I must advance. Hence my priorities are often external and I don't have a lot of say what they are. Again this is something that's familiar in academia. Academics must march to the beat of somebody else's drum too: e.g. grants must be written to be tailored to available funding; and students and postdocs must work on somebody else's research agenda. What I'm saying is that it seems to me there are more constraints on your time in industry, compared to early stage research careers.
 
 # Conclusions
 
@@ -207,16 +212,13 @@ So to summarise what I like most about industry I'd say
 * the engagement levels in projects, and
 * the salary.
 
-and what I liked about academia was
+What I liked about academia was
 
 * the freedom to explore and learn, and
 * the collegiate lifestyle.
 
 I would simply say that if you already love what you do then keep doing it. It's the people who are not so sure that I want to address. If you are not sure you're happy in academia or realistically you are not going to be able to make a long term career of it, then consider making a jump to industry. As I have said there is a great demand for software engineering and research skills. There is no shame in making the move and if you enjoy it then it will have been worthwhile. Otherwise you go back with improved skills in new areas.
 
-Even if you are happy in academia, consider diversifying your research. Try to be unsentimental about your previous research output and make a switch if there is an opportunity elsewhere. Even Donald Knuth has never found any application for his PhD research in subsequent work, and he seems to have recovered from that initial "setback". Perhaps do some work with industry, as I did with HP Labs, as there is a plethora of interesting problems that people want solutions for.
+If you are happy in academia, consider making a different type of jump by diversifying your research. Try to be unsentimental about your previous research output and make a switch if there is an opportunity elsewhere. Even Donald Knuth has never found any subsequent application for his PhD research, and he seems to have recovered from that initial "setback". Perhaps do some work with industry, as I did with HP Labs, as there is a plethora of interesting problems that people want solutions for.
 
 We are lucky enough to be in an industry where there is a skills shortage. To me that is an opportunity for us to try jobs out with an expectation that we can find another job should it not suit us. Certainly in my case I tried out being an academic for 4 years, had a good time doing it but it wasn't how I wanted to spend my whole life. 
-
-
-
