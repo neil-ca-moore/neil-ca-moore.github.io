@@ -123,10 +123,6 @@ This has made things varied, but the day to day process of specifying, writing a
 <!-- Slides: screenshots of MAX keynotes, software, stock price -->
 <!-- https://twitter.com/ehsankia_/status/651115066037633024 -->
 
-## Future
-
-I don't know what the future holds, but I do know that I will be staying in industry and not returning to academia. I would probably enjoy a greater element of applied research in my work, but for the moment the 10 year project of becoming a great engineer is still underway.
-
 # High level characteristics of industry and academia
 
 I want to say what I think characterises each type of workplace, to put into context the differences in the types of work and the way that people work.
@@ -177,7 +173,7 @@ The main thing is that I like the engagement levels in industry. It's unusual fo
 
 The other side of engagement is that you are typically producing software that is important to customers (external or internal). Customers care whether it works as their own livelihood or free time depends on it. In academia often papers can develop very little interest, I'm sure everyone has had that experience of being ignored. Some papers have a great impact that changes the world, most do not. Papers may turn out to be relevant only a niche group. 
 
-The type of perfection required in industry is different. Making code work on every conceivable platform, for every locale, for every possible input etc. is highly valued. My experience of academic software engineering is that the code is generally only used by its creator(s)[^recomp] hence it doesn't have to be bug free or simple to use.  There is a learning curve and unique discipline to writing code that is outwardly perfect. I say outwardly perfect because the perfect interface can hide a lot of bad code underneath it.
+The type of perfection required for software engineering in industry is different. Making code work on every conceivable platform, for every locale, for every possible input etc. is highly valued. My experience of academic software engineering is that the code is generally only used by its creator(s)[^recomp] hence it doesn't have to be bug free or simple to use.  There is a learning curve and unique discipline to writing code that is outwardly perfect. I say outwardly perfect because the perfect interface can hide a lot of bad code underneath it.
 
 [^recomp]: My former colleagues Ian Gent and Lars Kotthoff are trying to change that with their [Recomputation project](http://recomputation.org)
 
@@ -226,5 +222,7 @@ What I liked about academia was
 I would simply say that if you already love what you do then keep doing it. It's the people who are not so sure that I want to address. If you are not sure you're happy in academia or realistically you are not going to be able to make a long term career of it, then consider making a jump to industry. As I have said there is a great demand for software engineering and research skills. There is no shame in making the move and if you enjoy it then it will have been worthwhile. Otherwise you go back with improved skills in new areas.
 
 If you are happy in academia, consider making a different type of jump by diversifying your research. Try to be unsentimental about your previous research output and make a switch if there is an opportunity elsewhere. Even Donald Knuth has never found any subsequent application for his PhD research, and he seems to have recovered from that initial "setback". Perhaps do some work with industry, as I did with HP Labs, as there is a plethora of interesting problems that people want solutions for.
+
+I think what drove me is really the buzz of my software being used by millions of people, which is what I think I really set out to achieve with my computing skills, and that is easiest to achieve in industry.
 
 We are lucky enough to be in an industry where there is a skills shortage. To me that is an opportunity for us to try jobs out with an expectation that we can find another job should it not suit us. Certainly in my case I tried out being an academic for 4 years, had a good time doing it but it wasn't how I wanted to spend my whole life. 
