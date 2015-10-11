@@ -187,7 +187,9 @@ The sorts of problems one is solving in industry are frequently conceptually sim
 
 So I have said I think the average problem engineers are solving in industry is probably simpler than the average problem academics in Computer Science are working on. Does that mean that all the industrial problems are simple? Absolutely not. Just in Edinburgh we have companies writing computer games, compilers, medical imaging software, defense projects, AI and ... file sync. The best engineers will still be hired to work on the hardest problems, and there are plenty of hard problems to solve.
 
-Picking a job at the right level of novelty and challenge is a difficult task. You may have to take a pay cut to work on what you want. Being able to tolerate boring work is a skill that is financially rewarded, and every engineer must decide his or her own priorities.
+Further my descriptions are frequently biased by the fact that I work as an engineer, there are other specialities in industry including IT, quality assurance, engineering management, product management, statistics, etc.
+
+Overall, picking a job at the right level of novelty and challenge is a difficult task. You may have to take a pay cut to work on what you want. Being able to tolerate boring work is a skill that is financially rewarded, and every engineer must decide his or her own priorities.
 
 # What frightened me before I took the plunge
 
