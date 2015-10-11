@@ -112,31 +112,6 @@
 	"buffers":
 	[
 		{
-			"file": "_config.yml",
-			"settings":
-			{
-				"buffer_size": 384,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "README",
-			"settings":
-			{
-				"buffer_size": 94,
-				"line_ending": "Unix",
-				"name": "http://kramdown.gettalong.org/syntax.html"
-			}
-		},
-		{
-			"file": "about.md",
-			"settings":
-			{
-				"buffer_size": 392,
-				"line_ending": "Unix"
-			}
-		},
-		{
 			"file": "publications.md",
 			"settings":
 			{
@@ -241,10 +216,7 @@
 			}
 		},
 		{
-			"contents": "#include <iostream>\n#include <memory>\n#include <utility>\n#include <vector>\n\nclass ConcretePrinter {\npublic:\n     void Print() const { std::cout << \"ConcretePrinter\" << std::endl; }   \n};\n\nclass StonePrinter {\npublic:\n     void Print() const { std::cout << \"StonePrinter\" << std::endl; }     \n};\n\nclass AnyPrinter {\npublic:\n    template <typename T>\n    AnyPrinter(T x) : self_(std::make_shared<model<T>>(std::move(x))) {}\n \n    void Print() const\n    { self_->Print_(); }\n \nprivate:\n    struct concept_t {\n        virtual ~concept_t() = default;\n        virtual void Print_() const = 0;\n    };\n    template <typename T>\n    struct model : concept_t {\n        model(T x) : data_(std::move(x)) {}\n        void Print_() const override\n        { data_.Print(); }\n \n        T data_;\n    };\n   \n    std::shared_ptr<const concept_t> self_;\n};\n\nint main()\n{\n    ConcretePrinter cp;\n    \n    StonePrinter sp;\n\n    std::vector<AnyPrinter> printables;\n    printables.push_back(cp); //pushing copies\n    printables.push_back(sp);\n\n    for(const auto& p : printables) {\n        p.Print();\n    }\n}",
 			"file": "_posts/obj_ptrs_2_code/wrapper.hpp",
-			"file_size": 1083,
-			"file_write_time": 130827594650000000,
 			"settings":
 			{
 				"buffer_size": 1083,
@@ -252,10 +224,7 @@
 			}
 		},
 		{
-			"contents": "#include <boost/type_erasure/any.hpp>\n#include <boost/type_erasure/member.hpp>\n#include <iostream>\n#include <vector>\n\nusing namespace boost::type_erasure;\n\nclass ConcretePrinter {\npublic:\n	 void Print() const { std::cout << \"ConcretePrinter\" << std::endl; }		\n};\n\nclass StonePrinter {\npublic:\n	 void Print() const { std::cout << \"StonePrinter\" << std::endl; }		\n};\n\nBOOST_TYPE_ERASURE_MEMBER((has_print), Print, 0)\n\ntypedef any<has_print<void()>, _self&> AnyPrinter;\n\nint main()\n{\n	ConcretePrinter cp;\n	\n	StonePrinter sp;\n\n	std::vector<AnyPrinter> printables;\n	printables.push_back(cp); //pushing copies\n	printables.push_back(sp);\n\n	for(const auto& p : printables) {\n		p.Print();\n	}\n}\n",
 			"file": "_posts/obj_ptrs_2_code/type_erasure.hpp",
-			"file_size": 685,
-			"file_write_time": 130827579380000000,
 			"settings":
 			{
 				"buffer_size": 685,
@@ -263,10 +232,7 @@
 			}
 		},
 		{
-			"contents": "\n#include <iostream>\n#include <memory>\n#include <vector>\n\nclass Printer {\npublic:\n	virtual void Print() const { std::cout << \"Printer\" << std::endl; }		\n};\n\nclass ConcretePrinter {\npublic:\n	virtual void Print() const { std::cout << \"ConcretePrinter\" << std::endl; }		\n};\n\nclass StonePrinter {\npublic:\n	virtual void Print() const { std::cout << \"StonePrinter\" << std::endl; }		\n};\n\nint main()\n{\n	std::unique_ptr<ConcretePrinter> cp(std::make_unique<ConcretePrinter>());\n	\n	std::unique_ptr<StonePrinter> sp(std::make_unique<StonePrinter>());\n\n	std::vector<std::unique_ptr<Printer>> doesntWork;\n	//doesntWork.push_back(cp); //won't compile\n	//doesntWork.push_back(sp); //won't compile\n}",
 			"file": "_posts/obj_ptrs_2_code/unique_hetero.hpp",
-			"file_size": 683,
-			"file_write_time": 130827581210000000,
 			"settings":
 			{
 				"buffer_size": 683,
@@ -278,22 +244,6 @@
 			"settings":
 			{
 				"buffer_size": 7813,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "_drafts/2015-10-04-moving-to-industry.markdown",
-			"settings":
-			{
-				"buffer_size": 14248,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/Users/neilmoore/Library/Application Support/Sublime Text 3/Packages/GoSublime/USAGE.md",
-			"settings":
-			{
-				"buffer_size": 8539,
 				"line_ending": "Unix"
 			}
 		},
@@ -330,10 +280,61 @@
 			}
 		},
 		{
+			"contents": "---\nlayout: post\ndate:   2015-10-4 15:22:16\nexclude_from_nav: true\ntitle: Moving from academia to industry\ncategories: me talks\n---\n\nI am giving a talk at the event [Lost in Translation: Early Career Researchers moving from academia to industry](http://www.eventbrite.co.uk/e/lost-in-translation-early-career-researchers-moving-from-academia-to-industry-tickets-7269436079) at St Andrews university on the 14th of October. I'm writing this post to get my thoughts together about how I made the transition and any advice I might have for others to help them decide what is right for them.\n\nI'm going to tell my personal story but I'll also try to give some reasoning that I hope will help other people too.\n\n---\n\n<!-- \n\nOutline:\n- who am I?\n - PhD\n - HP Labs\n  - represents the first route into industry, i.e. uni-industrial partnership, dip the toe in\n - Adobe\n  - another route into industry, jumping in head first\n - ...?\n  - don't know but likely not academia again, hopefully more in the direction of research again..\n  - I cannot comment on how easy it is to move back...\n- high level\n - characteristics of industry, i.e. money as an aim\n - characteristics of academia, more diffuse purposes\n- types of role in industry\n- types of industries\n- what I love about industry\n - interest in what I do\n  - lots of people using my stuff\n  - people love it and are deeply interested that it \n - job availability, security, salary and flexibility of location etc.\n  - the problems are typically simpler, but have a high degree of complicating factors  ****got to here****\n - working within more stringent constraints\n  - less individualistic\n  - priorities are more frequently set externally\n- what frightened me before I took the plunge\n - abandoning career and feeling a failure\n  - just because you can have an academic career doesn't mean you have to\n  - nobody cares about your research as such\n   - but I found that I didn't care about that\n   - don't fall into the sunk cost fallacy\n  - nobody cares about how clever you've been, sometime you are successful by being stupid and getting it done\n- what still bothers me\n - loss of autonomy and free time\n  - flipside is that the existence of 9-5 helps ground your schedule and get back your free time\n - stagnating research skills and loss of route back\n- conclusion\n - main advantages of industry\n  - different work you may prefer\n  - salary + job availability\n - main advantages of academia\n  - self indulgence\n  - eventual job security\n - if you love what you're doing, keep doing it if you can\n - if you don't then try something new\n  - even if you do want to stay in academia, please consider abandoning your research area\n   - even Donald Knuth has never used his PhD skills at all\n   - you must be unsentimental about your previous work\n   - your previous skills make you distinctive when you do something new, even if there is a new learning curve\n  - we are in a luxury industry where skills are in demand, you can make mistakes\n  - as far as I'm concerned I lost nothing but doing a PhD\n  - if I'd kept flogging the dead horse then I would have been losing out\n-->\n\n# Who am I?\n\nSince I left the University of Glasgow with a Computing Science degree I have worked in three places.\n\n## St Andrews\n\n<img src=\"/resources/academia-post/st_and.svg\" width=\"100\">\n\nMy PhD in St Andrews directly was fairly closely related to the work I did in my final year of my undergraduate degree. I had been working on applications of the constraint satisfaction problem (CSP) for my final year project. I decided to do a PhD because I was enjoying doing academic research and enjoyed being at University. So I started looking for a PhD place. I was lucky enough to be introduced to a fantastic research group in St Andrews containing Ian Gent, Ian Miguel, Chris Jefferson, Pete Nightingale and Lars Kotthoff.\n\nI don't think I struggled with my PhD more than I should have. It has to be hard or it's not worthwhile. However I don't think it came naturally to me, I had to struggle and I felt like I could only ever become a mediocre researcher. Hence towards the end of my three and a half years I began to feel that while I was likely to pass my PhD and be able to get a follow on postdoc, I was not sure that it was right for me.\n\n<!-- Slides: first pages of my papers? -->\n\n## HP Labs\n\n<img src=\"/resources/academia-post/HP_labs.png\" width=\"100\">\n\nI got essentially the simplest possible transition into industry via HP Labs in Bristol. There was a project there that called for the application of CSP techniques to security problems. This was an Industrial Mathematics knowledge transfer project, hence it was funded partly by EPSRC and partly by HP Labs. The project is described [here](https://connect.innovateuk.org/web/partnership-programmes/article-view/-/blogs/automatic-policy-enforcement-exchange). I think I found it via some kind of circular email or on the EPSRC website, I cannot exactly remember.\n\nHence I was able to dip my toe into industry for 6 months without being too far out of my comfort zone. I would heartily recommend this to any PhD student. I did mine at the end of my PhD once I'd already completed my thesis. I'm not sure whether it would have been a good idea to do this in the middle of my PhD, it might have caused me to lose momentum.\n\nIt was intended to be applied research with the potential of being sold to customers in a few years. I worked with some brilliant people like Helen Balinsky, David Subiros Perez and Steve Simske. While somewhere like HP Labs does value basic research, it is never research for its own sake. They valued techniques provided they worked, but had no sentimentality. Their target was \n\n- quality demo's to enable to research to transition to a saleable product, and\n- patents.\n\nAlso to a lesser extent also published papers.\n\nHence I had the opportunity to experiment, changing just one variable at a time, i.e. I got to take my existing research area but apply it in industry instead of academia. How did the experiment turn out? I liked my work and the people at HP Labs but the location in Bristol was not ideal. So I had discovered that I could really enjoy working outside a university, and that was an eye opener. I also got used to having more money than when I was a PhD student, which perhaps made it even less likely I'd go back to academia. \n\nI asked around a my St Andrews colleagues about potential employers, and Adobe was recommended to me by Al Dearle. I interviewed with Adobe, liked the people and decided to see how that worked out.\n\n<!-- Slides: first pages of my papers, patents and software screenshots? -->\n\n## Adobe\n\n<img src=\"/resources/academia-post/Adobe.svg\" width=\"100\">\n\nThe work I have done at Adobe has not followed on from anything I have done previously. I could have got practically the same job straight after my undergraduate degree, in that sense you could say I wasted a little bit of momentum. However the research, engineering and pragmatism that I learned at St Andrews and HP Labs definitely gave me a head start against new graduates.\n\nFrom the day I started at Adobe I have been extremely happy. From day one I have been shipping code to appreciative customers and working with great colleagues who have taught me how to work efficiently and achieve a high quality standard.\n\nI was lucky enough to have something I worked on from my second day at Adobe demonstrated at the [Adobe MAX](https://max.adobe.com/) keynote talk. From there I ended up working the strategically important file sync component of the Creative Cloud. File sync was demonstrated at Adobe MAX, along with [Typekit Desktop sync](https://typekit.com/fonts?licenses=deskto) which I was also tangentially involved with. I have also been lucky enough to give talks at two internal conferences, ship countless versions of our software to literally millions of machines (/usually/ without incident). I have volunteered to go to the USA so many times that I've lost count and seen great places like San Francisco, Los Angeles and Seattle in the process.\n\nThis has made things varied, but the day to day process of specifying, writing and testing software has been what has captured my passion. I'll explain later in more detail what I like so much about working in industry in general.\n\n<!-- Slides: screenshots of MAX keynotes, software, stock price -->\n<!-- https://twitter.com/ehsankia_/status/651115066037633024 -->\n\n## Future\n\nI don't know what the future holds, but I do know that I will be staying in industry and not returning to academia. I would probably enjoy a greater element of applied research in my work, but for the moment the 10 year project of becoming a great engineer is still underway.\n\nI am not sure if I would be able to return to return to academia if I wanted to. I have known people to do so and I think I would be capable of it. I do know that if I was to do research again then I would be much more focussed on end product.\n\n# High level characteristics of industry and academia\n\nI want to say what I think characterises each type of workplace, to put into context the differences in the types of work and the way that people work.\n\n## Industry\n\nIn industry everything is driven directly or indirectly by the need to make money sustainably. That may sound excessively cynical but I think it's true. It's a bit like how evolution of species is driven by brutality but can also have redeeming features.\n\nThe positive side effects of this focus include\n\n- focus on customer experience,\n- focus on finding methods that deliver good results irrespective of their novelty, and\n- focus on teamwork.\n\nHowever this means some aspects of good software development become guidelines rather than strict requirements. Unit testing, good software design, documentation and code hygiene may be sacrified to achieve faster progress. Short term progress is traded off against maintainability.\n\nEngineers must justify the use of their time. Dogmas like 100% test coverage are not accepted automatically and must prove their worth.\n\nBut enough tributes to capitalism. What about the friendly, cuddly world of academia?\n\n## Academia\n\nThe aims of academia are more diverse. \n\nTurning out well educated students is a primary aim. That is valuable for a variety of reasons only tangentially related to money. A well educated populace do fertilise successful industry. Early career researchers have a supporting role but my feeling is that education is mostly left to more established academics. \n\nAcademic research is the other aim. Academic research is really what early stage researchers are spending their time doing. In my opinion such research is not for making money but rather to\n\n- take people's undergraduate education to the next level;\n- provide a vibrant background for teaching;\n- to satisfy the innate need to discover and communicate;\n- national vanity; and \n- to provide ideas and people to industry.\n\nBy stating my opinions on the value of academia I am seeking to lay bare why it has different characteristics than industry as a job.\n\nYou see relaxed and self indulgent styles of work in academia that are seldom seen in industry. That is because the aim is not necessarily to be as productive as possible in terms of end product, but to maximise much more nebulous aims such as novelty, engagement and elegance.\n\n## Vive la difference\n\nThis is why academia is not exactly like industry. There is a lot of creativity in industry but directed towards business success. There is a lot of efficient working practices in academia but directed towards novelty. However the flavour of work is very different and I think each individual needs to discover, like I have, where they fit and what they enjoy.\n\n# What I love about working in industry\n\nI've explained that I like working in industry, I'm going to go into a bit more detail on why. I have spent more time in industry than academia, never having even done a postdoc. I hope that my impressions of academia are not too biased.\n\nThe main thing is that I like the engagement levels in industry. It's unusual for somebody not to care deeply about whatever you are working on and to be intensely interested in the results. There are frequent milestones around features, bug fixes, releases and so on. Hence there are frequent small milestones to give satisfaction every day. I felt academic research worked to longer time horizons of papers, grants and so on. Milestones in academia are much more difficult so they come along less often. You just cannot be finding novelty every day.\n\nThe other side of engagement is that you are typically producing software that is important to customers (external or internal). Customers care whether it works as their own livelihood or free time depends on it. In academia often papers can develop very little interest, I'm sure everyone has had that experience of being ignored. Some papers have a great impact that changes the world, most do not. Papers may turn out to be relevant only a niche group. \n\nThe type of perfection required in industry is different. Making code work on every conceivable platform, for every locale, for every possible input etc. is highly valued. My experience of academic software engineering is that the code is generally only used by its creator(s)[^recomp] hence it doesn't have to be bug free or simple to use.  There is a learning curve and unique discipline to writing code that is outwardly perfect. I say outwardly perfect because the perfect interface can hide a lot of bad code underneath it.\n\n[^recomp]: My former colleagues Ian Gent and Lars Kotthoff are trying to change that with their [Recomputation project](http://recomputation.org)\n\nI must mention that industry has been more financially lucrative for me. I think it is for most people. In academia you can aim for a permanent academic job, which is the closest thing to a job for life that exists today. However many people fail to achieve that goal. There just aren't enough academic jobs for everyone to get one. The computer industry has a high level of demand for qualified staff and I think that the chances of a hard working and qualified person ending up redundant is low compared to other industries. Over the course of a career computer scientists in industry will earn significantly more in most cases.\n\nThe sorts of problems one is solving in industry are frequently conceptually simpler. There are people in industry doing advanced research, but novelty is generally not an aim. Novelty is valued if it can be patented or is something that customers will want, but is not valued for its own sake. Most business problems are not particularly new, and engineers are have to be able to solve these simple problems quickly and efficiently.\n\nSo I have said I think the average problem engineers are solving in industry is probably simpler than the average problem academics in Computer Science are working on. Does that mean that all the industrial problems are simple? Absolutely not. Just in Edinburgh we have companies writing computer games, compilers, medical imaging software, defense projects, AI and ... file sync. The best engineers will still be hired to work on the hardest problems, and there are plenty of hard problems to solve.\n\nPicking a job at the right level of novelty and challenge is a difficult task. You may have to take a pay cut to work on what you want. Being able to tolerate boring work is a skill that is financially rewarded, and every engineer must decide his or her own priorities.\n\n# What frightened me before I took the plunge\n\nAs I said earliier, towards the end of my PhD I was already feeling that academia was perhaps not entirely for me. I was basically only reluctant to leave academia because I felt a failure. I spoke to my supervisor, Ian Gent, and he said something to me (which I will attempt to quote) that flipped my thinking and let me leave with my head held high:\n\n> You can have a good academic career. Just because you can have an academic career doesn't mean you have to do it.\n>-- Ian Gent\n\nThat might sound like nothing but it really helped me. It appealed to my vanity by saying that I could have a *good* academic career. It also reminded me that I can do what I like and I don't need to pursue sunk costs by having an academic career just because I started on that path. I would say the same thing to anybody just now who isn't sure they want to be in academia. You can leave and there is no shame. You can have a good career in industry that may make your happier than you are now, and that is the thing that matters. Both industry and academia will survive without you, but you should try to be happy.\n\nAnother thing that worried me for a while was the idea that I would be unable to return to academia if my new job didn't work out for me. I cannot really confirm or deny that. I suspect it's true that the longer you spend out of academia the harder it would be to return. However I will have to abstain from giving any advice on that, I just don't know.\n\nDo I feel able to do research again? Honestly I do. I think my improved engineering skills and focus would make me a better researcher. I think I have gained general skills in communication and decision making. Moreover the work I've been doing on file and data sync has been intellectually challenging and I have not been overwhelmed by it. I have read research papers on file sync and been able to relate them to my practical work, e.g. some of Benjamin Pierce's papers. When I did a little bit of work on building Venn diagrams using constraint programming I was able to read and understand the technical papers in the area. I don't feel like my time away from University has made me stupid. So I think that if you keep sharp and hone your skills you should be able to go back, but I don't know that would happen in practice.\n\n# What still bothers me about industry\n\nAutonomy is one of the great attractions of academia. As you would expect learning amongst academic researchers is expected and encouraged. I have to say that in industry I have found that there is generally little time available during work hours to investigate new technologies and ideas. That is perhaps a function of where I work and the job I do. I think it's perhaps my mistake and I should be conciously delivering less work and focussing on building my skills more during office hours. Nevertheless I do feel pressure to produce work for the project, and very little pressure to expand my skills. I think that experience may be typical in industry. That is a definite disadvantage, and it makes me feel sorry for people who have out of work responsibilities like looking after children, relatives and other committments, meaning that they haven't the free time that I have (at least for the moment!)\n\nThe other side of automomy is freedom to follow your interests. This is something that has to be earned in industry, to a greater degree than in academia. I can affect the project's aims and what I work on by having good ideas and of course the implementation decisions are down to us. However I typically can't decide to work on a new idea for a week, there are other priorities that I must advance. Hence my priorities are often external and I don't have a lot of say what they are. Again this is something that's familiar in academia. Academics must march to the beat of somebody else's drum too: e.g. grants must be written to be tailored to available funding; and students and postdocs must work on somebody else's research agenda. What I'm saying is that it seems to me there are more constraints on your time in industry, compared to early stage research careers.\n\n# Conclusions\n\nSo to summarise what I like most about industry I'd say \n\n* the fact colleagues and customers care so much about the work I do, \n* the engagement levels in projects, and\n* the salary.\n\nWhat I liked about academia was\n\n* the freedom to explore and learn, and\n* the collegiate lifestyle.\n\nI would simply say that if you already love what you do then keep doing it. It's the people who are not so sure that I want to address. If you are not sure you're happy in academia or realistically you are not going to be able to make a long term career of it, then consider making a jump to industry. As I have said there is a great demand for software engineering and research skills. There is no shame in making the move and if you enjoy it then it will have been worthwhile. Otherwise you go back with improved skills in new areas.\n\nIf you are happy in academia, consider making a different type of jump by diversifying your research. Try to be unsentimental about your previous research output and make a switch if there is an opportunity elsewhere. Even Donald Knuth has never found any subsequent application for his PhD research, and he seems to have recovered from that initial \"setback\". Perhaps do some work with industry, as I did with HP Labs, as there is a plethora of interesting problems that people want solutions for.\n\nWe are lucky enough to be in an industry where there is a skills shortage. To me that is an opportunity for us to try jobs out with an expectation that we can find another job should it not suit us. Certainly in my case I tried out being an academic for 4 years, had a good time doing it but it wasn't how I wanted to spend my whole life. \n",
+			"file": "_drafts/2015-10-04-moving-to-industry.markdown",
+			"file_size": 21382,
+			"file_write_time": 130889753040000000,
+			"settings":
+			{
+				"buffer_size": 21382,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "Sample Markdown Cheat Sheet\n=========================== \n\nThis is a sample markdown file to help you write Markdown quickly :)\n\nIf you use the fabulous [Sublime Text 2/3 editor][ST] along with the [Markdown Preview plugin][MarkdownPreview], open your ST2 Palette with `CMD+⇧+P` then choose `Markdown Preview in browser` to see the result in your browser.\n\n## Text basics\nthis is *italic* and this is **bold** .  another _italic_ and another __bold__\n\nthis is `important` text. and percentage signs : % and `%`\n\nThis is a paragraph with a footnote (builtin parser only). [^note-id]\n\nInsert `[ TOC ]` without spaces to generate a table of contents (builtin parsers only).\n\n## Indentation\n> Here is some indented text\n>> even more indented\n\n## Titles\n# Big title (h1)\n## Middle title (h2)\n### Smaller title (h3)\n#### and so on (hX)\n##### and so on (hX)\n###### and so on (hX)\n\n## Example lists (1)\n\n - bullets can be `-`, `+`, or `*`\n - bullet list 1\n - bullet list 2\n    - sub item 1\n    - sub item 2\n\n        with indented text inside\n\n - bullet list 3\n + bullet list 4\n * bullet list 5\n\n## Links\n\nThis is an [example inline link](http://lmgtfy.com/) and [another one with a title](http://lmgtfy.com/ \"Hello, world\").\n\nLinks can also be reference based : [reference 1][ref1] or [reference 2 with title][ref2].\n\nReferences are usually placed at the bottom of the document\n\n## Images\n\nA sample image :\n\n![revolunet logo](http://www.revolunet.com/static/parisjs8/img/logo-revolunet-carre.jpg \"revolunet logo\")\n\nAs links, images can also use references instead of inline links :\n\n![revolunet logo][revolunet-logo]\n\n\n## Code\n\nIt's quite easy to show code in markdown files.\n\nBackticks can be used to `highlight` some words.\n\nAlso, any indented block is considered a code block.  If `enable_highlight` is `true`, syntax highlighting will be included (for the builtin parser - the github parser does this automatically).\n\n    <script>\n        document.location = 'http://lmgtfy.com/?q=markdown+cheat+sheet';\n    </script>\n\n## Math\n\nWhen `enable_mathjax` is `true`, inline math can be included \\\\(\\frac{\\pi}{2}\\\\) $\\pi$\n\nAlternatively, math can be written on its own line:\n\n$$F(\\omega) = \\frac{1}{\\sqrt{2\\pi}} \\int_{-\\infty}^{\\infty} f(t) \\, e^{ - i \\omega t}dt$$\n\n\\\\[\\int_0^1 f(t) \\mathrm{d}t\\\\]\n\n\\\\[\\sum_j \\gamma_j^2/d_j\\\\]\n\n\n\n## GitHub Flavored Markdown\n\nIf you use the Github parser, you can use some of [Github Flavored Markdown][gfm] syntax :\n\n * User/Project@SHA: revolunet/sublimetext-markdown-preview@7da61badeda468b5019869d11000307e07e07401\n * User/Project#Issue: revolunet/sublimetext-markdown-preview#1\n * User : @revolunet\n\nSome Python code :\n\n```python\nimport random\n\nclass CardGame(object):\n    \"\"\" a sample python class \"\"\"\n    NB_CARDS = 32\n    def __init__(self, cards=5):\n        self.cards = random.sample(range(self.NB_CARDS), 5)\n        print 'ready to play'\n```\n\nSome Javascript code :\n\n```js\nvar config = {\n    duration: 5,\n    comment: 'WTF'\n}\n// callbacks beauty un action\nasync_call('/path/to/api', function(json) {\n    another_call(json, function(result2) {\n        another_another_call(result2, function(result3) {\n            another_another_another_call(result3, function(result4) {\n                alert('And if all went well, i got my result :)');\n            });\n        });\n    });\n})\n```\n\nThe Github Markdown also brings some [nice Emoji support][emoji] : :+1: :heart: :beer:\n\n[^note-id]: This is the text of the note. \n\n## Parsers and Extensions\n\nMarkdown Preview comes with **Python-Markdown** preloaded.\n\n### *Python-Markdown*\n\nThe [Python-Markdown Parser][] provides support for several extensions.\n\n[Python-Markdown Parser]: https://github.com/waylan/Python-Markdown\n\n#### Extra Extensions\n\n* `abbr` -- [Abbreviations][]\n* `attr_list` -- [Attribute Lists][]\n* `def_list` -- [Definition Lists][]\n* `fenced_code` -- [Fenced Code Blocks][]\n* `footnotes` -- [Footnotes][]\n* `tables` -- [Tables][]\n* `smart_strong` -- [Smart Strong][]\n\n[Abbreviations]: http://pythonhosted.org/Markdown/extensions/abbreviations.html\n[Attribute Lists]: http://pythonhosted.org/Markdown/extensions/attr_list.html\n[Definition Lists]: http://pythonhosted.org/Markdown/extensions/definition_lists.html\n[Fenced Code Blocks]: http://pythonhosted.org/Markdown/extensions/fenced_code_blocks.html\n[Footnotes]: http://pythonhosted.org/Markdown/extensions/footnotes.html\n[Tables]: http://pythonhosted.org/Markdown/extensions/tables.html\n[Smart Strong]: http://pythonhosted.org/Markdown/extensions/smart_strong.html\n\n\nYou can enable them all at once using the `extra` keyword.\n\n    extensions: [ 'extra' ]\n\nIf you want all the extras plus the `toc` extension,\nyour settings would look like this:\n\n    {\n        ...\n        parser: 'markdown',\n        extensions: ['extra', 'toc'],\n        ...\n    }\n\n\n#### Other Extensions\n\nThere are also some extensions that are not included in Markdown Extra\nbut come in the standard Python-Markdown library.\n\n* `code-hilite` -- [CodeHilite][]\n* `html-tidy` -- [HTML Tidy][]\n* `header-id` -- [HeaderId][]\n* `meta_data` -- [Meta-Data][]\n* `nl2br` -- [New Line to Break][]\n* `rss` -- [RSS][]\n* `sane_lists` -- [Sane Lists][]\n* `smarty` -- [Smarty][]\n* `toc` -- [Table of Contents][]\n* `wikilinks` -- [WikiLinks][]\n\n[CodeHilite]:  http://pythonhosted.org/Markdown/extensions/code_hilite.html\n[HTML Tidy]:  http://pythonhosted.org/Markdown/extensions/html_tidy.html\n[HeaderId]:  http://pythonhosted.org/Markdown/extensions/header_id.html\n[Meta-Data]:  http://pythonhosted.org/Markdown/extensions/meta_data.html\n[New Line to Break]:  http://pythonhosted.org/Markdown/extensions/nl2br.html\n[RSS]:  http://pythonhosted.org/Markdown/extensions/rss.html\n[Sane Lists]:  http://pythonhosted.org/Markdown/extensions/sane_lists.html\n[Table of Contents]:  http://pythonhosted.org/Markdown/extensions/toc.html\n[WikiLinks]:  http://pythonhosted.org/Markdown/extensions/wikilinks.html\n[Smarty]: https://pythonhosted.org/Markdown/extensions/smarty.html\n\n#### 3rd Party Extensions\n\n*Python-Markdown* is designed to be extended.\n\nSome included ones are:\n\n* `delete` -- github style delte support via `~~word~~`\n* `githubemoji` --  github emoji support\n* `tasklist` -- github style tasklists\n* `magiclink` -- github style auto link conversion of http|ftp links\n* `headeranchor` -- github style header anchor links\n* `github` -- Adds the above extensions in one shot\n* `b64` -- convert and embed local images to base64.  Setup by adding this `b64(base_path=${BASE_PATH})`\n\nThere are also a number of others available:\n\nJust fork this repo and add your extensions inside the `.../Packages/Markdown Preview/markdown/extensions/` folder.\n\nCheck out the list of [3rd Party extensions](\nhttps://github.com/waylan/Python-Markdown/wiki/Third-Party-Extensions).\n\n\n#### Default Extensions\n\nThe default extensions are:\n\n* `footnotes` -- [Footnotes]\n* `toc` -- [Table of Contents]\n* `fenced_code` -- [Fenced Code Blocks] \n* `tables` -- [Tables]\n\nUse the `default` keyword, to select them all.\nIf you want all the defaults plus the `definition_lists` extension,\nyour settings would look like this:\n\n    {\n        ...\n        parser: 'markdown',\n        extensions: ['default', 'definition_lists'],\n        ...\n    }\n\n## Examples\n\n### Tables\n\nThe `tables` extension of the *Python-Markdown* parser is activated by default,\nbut is currently **not** available in *Markdown2*.\n\nThe syntax was adopted from the [php markdown project](http://michelf.ca/projects/php-markdown/extra/#table),\nand is also used in github flavoured markdown.\n\n| Year | Temperature (low) | Temperature (high) |  \n| ---- | ----------------- | -------------------|  \n| 1900 |               -10 |                 25 |  \n| 1910 |               -15 |                 30 |  \n| 1920 |               -10 |                 32 |  \n\n\n### Wiki Tables\n\nIf you are using *Markdown2* with the `wiki-tables` extra activated you should see a table below:\n\n|| *Year* || *Temperature (low)* || *Temperature (high)* ||  \n||   1900 ||                 -10 ||                   25 ||  \n||   1910 ||                 -15 ||                   30 ||  \n||   1920 ||                 -10 ||                   32 ||  \n\n\n### Definition Lists\n\nThis example requires *Python Markdown*'s `def_list` extension.\n\nApple\n:   Pomaceous fruit of plants of the genus Malus in \n    the family Rosaceae.\n\nOrange\n:   The fruit of an evergreen tree of the genus Citrus.\n\n\n## About\n\nThis plugin and this sample file is proudly brought to you by the [revolunet team][revolunet]\n\n [ref1]: http://revolunet.com\n [ref2]: http://revolunet.com \"rich web apps\"\n [MarkdownREF]: http://daringfireball.net/projects/markdown/basics\n [MarkdownPreview]: https://github.com/revolunet/sublimetext-markdown-preview\n [ST]: http://sublimetext.com\n [revolunet]: http://revolunet.com\n [revolunet-logo]: http://www.revolunet.com/static/parisjs8/img/logo-revolunet-carre.jpg \"revolunet logo\"\n [gfm]: http://github.github.com/github-flavored-markdown/\n [emoji]: http://www.emoji-cheat-sheet.com/\n\n",
+			"settings":
+			{
+				"buffer_size": 8996,
+				"line_ending": "Unix",
+				"name": "Markdown Cheatsheet",
+				"scratch": true
+			}
+		},
+		{
+			"contents": "Sample Markdown Cheat Sheet\n=========================== \n\nThis is a sample markdown file to help you write Markdown quickly :)\n\nIf you use the fabulous [Sublime Text 2/3 editor][ST] along with the [Markdown Preview plugin][MarkdownPreview], open your ST2 Palette with `CMD+⇧+P` then choose `Markdown Preview in browser` to see the result in your browser.\n\n## Text basics\nthis is *italic* and this is **bold** .  another _italic_ and another __bold__\n\nthis is `important` text. and percentage signs : % and `%`\n\nThis is a paragraph with a footnote (builtin parser only). [^note-id]\n\nInsert `[ TOC ]` without spaces to generate a table of contents (builtin parsers only).\n\n## Indentation\n> Here is some indented text\n>> even more indented\n\n## Titles\n# Big title (h1)\n## Middle title (h2)\n### Smaller title (h3)\n#### and so on (hX)\n##### and so on (hX)\n###### and so on (hX)\n\n## Example lists (1)\n\n - bullets can be `-`, `+`, or `*`\n - bullet list 1\n - bullet list 2\n    - sub item 1\n    - sub item 2\n\n        with indented text inside\n\n - bullet list 3\n + bullet list 4\n * bullet list 5\n\n## Links\n\nThis is an [example inline link](http://lmgtfy.com/) and [another one with a title](http://lmgtfy.com/ \"Hello, world\").\n\nLinks can also be reference based : [reference 1][ref1] or [reference 2 with title][ref2].\n\nReferences are usually placed at the bottom of the document\n\n## Images\n\nA sample image :\n\n![revolunet logo](http://www.revolunet.com/static/parisjs8/img/logo-revolunet-carre.jpg \"revolunet logo\")\n\nAs links, images can also use references instead of inline links :\n\n![revolunet logo][revolunet-logo]\n\n\n## Code\n\nIt's quite easy to show code in markdown files.\n\nBackticks can be used to `highlight` some words.\n\nAlso, any indented block is considered a code block.  If `enable_highlight` is `true`, syntax highlighting will be included (for the builtin parser - the github parser does this automatically).\n\n    <script>\n        document.location = 'http://lmgtfy.com/?q=markdown+cheat+sheet';\n    </script>\n\n## Math\n\nWhen `enable_mathjax` is `true`, inline math can be included \\\\(\\frac{\\pi}{2}\\\\) $\\pi$\n\nAlternatively, math can be written on its own line:\n\n$$F(\\omega) = \\frac{1}{\\sqrt{2\\pi}} \\int_{-\\infty}^{\\infty} f(t) \\, e^{ - i \\omega t}dt$$\n\n\\\\[\\int_0^1 f(t) \\mathrm{d}t\\\\]\n\n\\\\[\\sum_j \\gamma_j^2/d_j\\\\]\n\n\n\n## GitHub Flavored Markdown\n\nIf you use the Github parser, you can use some of [Github Flavored Markdown][gfm] syntax :\n\n * User/Project@SHA: revolunet/sublimetext-markdown-preview@7da61badeda468b5019869d11000307e07e07401\n * User/Project#Issue: revolunet/sublimetext-markdown-preview#1\n * User : @revolunet\n\nSome Python code :\n\n```python\nimport random\n\nclass CardGame(object):\n    \"\"\" a sample python class \"\"\"\n    NB_CARDS = 32\n    def __init__(self, cards=5):\n        self.cards = random.sample(range(self.NB_CARDS), 5)\n        print 'ready to play'\n```\n\nSome Javascript code :\n\n```js\nvar config = {\n    duration: 5,\n    comment: 'WTF'\n}\n// callbacks beauty un action\nasync_call('/path/to/api', function(json) {\n    another_call(json, function(result2) {\n        another_another_call(result2, function(result3) {\n            another_another_another_call(result3, function(result4) {\n                alert('And if all went well, i got my result :)');\n            });\n        });\n    });\n})\n```\n\nThe Github Markdown also brings some [nice Emoji support][emoji] : :+1: :heart: :beer:\n\n[^note-id]: This is the text of the note. \n\n## Parsers and Extensions\n\nMarkdown Preview comes with **Python-Markdown** preloaded.\n\n### *Python-Markdown*\n\nThe [Python-Markdown Parser][] provides support for several extensions.\n\n[Python-Markdown Parser]: https://github.com/waylan/Python-Markdown\n\n#### Extra Extensions\n\n* `abbr` -- [Abbreviations][]\n* `attr_list` -- [Attribute Lists][]\n* `def_list` -- [Definition Lists][]\n* `fenced_code` -- [Fenced Code Blocks][]\n* `footnotes` -- [Footnotes][]\n* `tables` -- [Tables][]\n* `smart_strong` -- [Smart Strong][]\n\n[Abbreviations]: http://pythonhosted.org/Markdown/extensions/abbreviations.html\n[Attribute Lists]: http://pythonhosted.org/Markdown/extensions/attr_list.html\n[Definition Lists]: http://pythonhosted.org/Markdown/extensions/definition_lists.html\n[Fenced Code Blocks]: http://pythonhosted.org/Markdown/extensions/fenced_code_blocks.html\n[Footnotes]: http://pythonhosted.org/Markdown/extensions/footnotes.html\n[Tables]: http://pythonhosted.org/Markdown/extensions/tables.html\n[Smart Strong]: http://pythonhosted.org/Markdown/extensions/smart_strong.html\n\n\nYou can enable them all at once using the `extra` keyword.\n\n    extensions: [ 'extra' ]\n\nIf you want all the extras plus the `toc` extension,\nyour settings would look like this:\n\n    {\n        ...\n        parser: 'markdown',\n        extensions: ['extra', 'toc'],\n        ...\n    }\n\n\n#### Other Extensions\n\nThere are also some extensions that are not included in Markdown Extra\nbut come in the standard Python-Markdown library.\n\n* `code-hilite` -- [CodeHilite][]\n* `html-tidy` -- [HTML Tidy][]\n* `header-id` -- [HeaderId][]\n* `meta_data` -- [Meta-Data][]\n* `nl2br` -- [New Line to Break][]\n* `rss` -- [RSS][]\n* `sane_lists` -- [Sane Lists][]\n* `smarty` -- [Smarty][]\n* `toc` -- [Table of Contents][]\n* `wikilinks` -- [WikiLinks][]\n\n[CodeHilite]:  http://pythonhosted.org/Markdown/extensions/code_hilite.html\n[HTML Tidy]:  http://pythonhosted.org/Markdown/extensions/html_tidy.html\n[HeaderId]:  http://pythonhosted.org/Markdown/extensions/header_id.html\n[Meta-Data]:  http://pythonhosted.org/Markdown/extensions/meta_data.html\n[New Line to Break]:  http://pythonhosted.org/Markdown/extensions/nl2br.html\n[RSS]:  http://pythonhosted.org/Markdown/extensions/rss.html\n[Sane Lists]:  http://pythonhosted.org/Markdown/extensions/sane_lists.html\n[Table of Contents]:  http://pythonhosted.org/Markdown/extensions/toc.html\n[WikiLinks]:  http://pythonhosted.org/Markdown/extensions/wikilinks.html\n[Smarty]: https://pythonhosted.org/Markdown/extensions/smarty.html\n\n#### 3rd Party Extensions\n\n*Python-Markdown* is designed to be extended.\n\nSome included ones are:\n\n* `delete` -- github style delte support via `~~word~~`\n* `githubemoji` --  github emoji support\n* `tasklist` -- github style tasklists\n* `magiclink` -- github style auto link conversion of http|ftp links\n* `headeranchor` -- github style header anchor links\n* `github` -- Adds the above extensions in one shot\n* `b64` -- convert and embed local images to base64.  Setup by adding this `b64(base_path=${BASE_PATH})`\n\nThere are also a number of others available:\n\nJust fork this repo and add your extensions inside the `.../Packages/Markdown Preview/markdown/extensions/` folder.\n\nCheck out the list of [3rd Party extensions](\nhttps://github.com/waylan/Python-Markdown/wiki/Third-Party-Extensions).\n\n\n#### Default Extensions\n\nThe default extensions are:\n\n* `footnotes` -- [Footnotes]\n* `toc` -- [Table of Contents]\n* `fenced_code` -- [Fenced Code Blocks] \n* `tables` -- [Tables]\n\nUse the `default` keyword, to select them all.\nIf you want all the defaults plus the `definition_lists` extension,\nyour settings would look like this:\n\n    {\n        ...\n        parser: 'markdown',\n        extensions: ['default', 'definition_lists'],\n        ...\n    }\n\n## Examples\n\n### Tables\n\nThe `tables` extension of the *Python-Markdown* parser is activated by default,\nbut is currently **not** available in *Markdown2*.\n\nThe syntax was adopted from the [php markdown project](http://michelf.ca/projects/php-markdown/extra/#table),\nand is also used in github flavoured markdown.\n\n| Year | Temperature (low) | Temperature (high) |  \n| ---- | ----------------- | -------------------|  \n| 1900 |               -10 |                 25 |  \n| 1910 |               -15 |                 30 |  \n| 1920 |               -10 |                 32 |  \n\n\n### Wiki Tables\n\nIf you are using *Markdown2* with the `wiki-tables` extra activated you should see a table below:\n\n|| *Year* || *Temperature (low)* || *Temperature (high)* ||  \n||   1900 ||                 -10 ||                   25 ||  \n||   1910 ||                 -15 ||                   30 ||  \n||   1920 ||                 -10 ||                   32 ||  \n\n\n### Definition Lists\n\nThis example requires *Python Markdown*'s `def_list` extension.\n\nApple\n:   Pomaceous fruit of plants of the genus Malus in \n    the family Rosaceae.\n\nOrange\n:   The fruit of an evergreen tree of the genus Citrus.\n\n\n## About\n\nThis plugin and this sample file is proudly brought to you by the [revolunet team][revolunet]\n\n [ref1]: http://revolunet.com\n [ref2]: http://revolunet.com \"rich web apps\"\n [MarkdownREF]: http://daringfireball.net/projects/markdown/basics\n [MarkdownPreview]: https://github.com/revolunet/sublimetext-markdown-preview\n [ST]: http://sublimetext.com\n [revolunet]: http://revolunet.com\n [revolunet-logo]: http://www.revolunet.com/static/parisjs8/img/logo-revolunet-carre.jpg \"revolunet logo\"\n [gfm]: http://github.github.com/github-flavored-markdown/\n [emoji]: http://www.emoji-cheat-sheet.com/\n\n",
+			"settings":
+			{
+				"buffer_size": 8996,
+				"line_ending": "Unix",
+				"name": "Markdown Cheatsheet",
+				"scratch": true
+			}
+		},
+		{
+			"contents": "Sample Markdown Cheat Sheet\n=========================== \n\nThis is a sample markdown file to help you write Markdown quickly :)\n\nIf you use the fabulous [Sublime Text 2/3 editor][ST] along with the [Markdown Preview plugin][MarkdownPreview], open your ST2 Palette with `CMD+⇧+P` then choose `Markdown Preview in browser` to see the result in your browser.\n\n## Text basics\nthis is *italic* and this is **bold** .  another _italic_ and another __bold__\n\nthis is `important` text. and percentage signs : % and `%`\n\nThis is a paragraph with a footnote (builtin parser only). [^note-id]\n\nInsert `[ TOC ]` without spaces to generate a table of contents (builtin parsers only).\n\n## Indentation\n> Here is some indented text\n>> even more indented\n\n## Titles\n# Big title (h1)\n## Middle title (h2)\n### Smaller title (h3)\n#### and so on (hX)\n##### and so on (hX)\n###### and so on (hX)\n\n## Example lists (1)\n\n - bullets can be `-`, `+`, or `*`\n - bullet list 1\n - bullet list 2\n    - sub item 1\n    - sub item 2\n\n        with indented text inside\n\n - bullet list 3\n + bullet list 4\n * bullet list 5\n\n## Links\n\nThis is an [example inline link](http://lmgtfy.com/) and [another one with a title](http://lmgtfy.com/ \"Hello, world\").\n\nLinks can also be reference based : [reference 1][ref1] or [reference 2 with title][ref2].\n\nReferences are usually placed at the bottom of the document\n\n## Images\n\nA sample image :\n\n![revolunet logo](http://www.revolunet.com/static/parisjs8/img/logo-revolunet-carre.jpg \"revolunet logo\")\n\nAs links, images can also use references instead of inline links :\n\n![revolunet logo][revolunet-logo]\n\n\n## Code\n\nIt's quite easy to show code in markdown files.\n\nBackticks can be used to `highlight` some words.\n\nAlso, any indented block is considered a code block.  If `enable_highlight` is `true`, syntax highlighting will be included (for the builtin parser - the github parser does this automatically).\n\n    <script>\n        document.location = 'http://lmgtfy.com/?q=markdown+cheat+sheet';\n    </script>\n\n## Math\n\nWhen `enable_mathjax` is `true`, inline math can be included \\\\(\\frac{\\pi}{2}\\\\) $\\pi$\n\nAlternatively, math can be written on its own line:\n\n$$F(\\omega) = \\frac{1}{\\sqrt{2\\pi}} \\int_{-\\infty}^{\\infty} f(t) \\, e^{ - i \\omega t}dt$$\n\n\\\\[\\int_0^1 f(t) \\mathrm{d}t\\\\]\n\n\\\\[\\sum_j \\gamma_j^2/d_j\\\\]\n\n\n\n## GitHub Flavored Markdown\n\nIf you use the Github parser, you can use some of [Github Flavored Markdown][gfm] syntax :\n\n * User/Project@SHA: revolunet/sublimetext-markdown-preview@7da61badeda468b5019869d11000307e07e07401\n * User/Project#Issue: revolunet/sublimetext-markdown-preview#1\n * User : @revolunet\n\nSome Python code :\n\n```python\nimport random\n\nclass CardGame(object):\n    \"\"\" a sample python class \"\"\"\n    NB_CARDS = 32\n    def __init__(self, cards=5):\n        self.cards = random.sample(range(self.NB_CARDS), 5)\n        print 'ready to play'\n```\n\nSome Javascript code :\n\n```js\nvar config = {\n    duration: 5,\n    comment: 'WTF'\n}\n// callbacks beauty un action\nasync_call('/path/to/api', function(json) {\n    another_call(json, function(result2) {\n        another_another_call(result2, function(result3) {\n            another_another_another_call(result3, function(result4) {\n                alert('And if all went well, i got my result :)');\n            });\n        });\n    });\n})\n```\n\nThe Github Markdown also brings some [nice Emoji support][emoji] : :+1: :heart: :beer:\n\n[^note-id]: This is the text of the note. \n\n## Parsers and Extensions\n\nMarkdown Preview comes with **Python-Markdown** preloaded.\n\n### *Python-Markdown*\n\nThe [Python-Markdown Parser][] provides support for several extensions.\n\n[Python-Markdown Parser]: https://github.com/waylan/Python-Markdown\n\n#### Extra Extensions\n\n* `abbr` -- [Abbreviations][]\n* `attr_list` -- [Attribute Lists][]\n* `def_list` -- [Definition Lists][]\n* `fenced_code` -- [Fenced Code Blocks][]\n* `footnotes` -- [Footnotes][]\n* `tables` -- [Tables][]\n* `smart_strong` -- [Smart Strong][]\n\n[Abbreviations]: http://pythonhosted.org/Markdown/extensions/abbreviations.html\n[Attribute Lists]: http://pythonhosted.org/Markdown/extensions/attr_list.html\n[Definition Lists]: http://pythonhosted.org/Markdown/extensions/definition_lists.html\n[Fenced Code Blocks]: http://pythonhosted.org/Markdown/extensions/fenced_code_blocks.html\n[Footnotes]: http://pythonhosted.org/Markdown/extensions/footnotes.html\n[Tables]: http://pythonhosted.org/Markdown/extensions/tables.html\n[Smart Strong]: http://pythonhosted.org/Markdown/extensions/smart_strong.html\n\n\nYou can enable them all at once using the `extra` keyword.\n\n    extensions: [ 'extra' ]\n\nIf you want all the extras plus the `toc` extension,\nyour settings would look like this:\n\n    {\n        ...\n        parser: 'markdown',\n        extensions: ['extra', 'toc'],\n        ...\n    }\n\n\n#### Other Extensions\n\nThere are also some extensions that are not included in Markdown Extra\nbut come in the standard Python-Markdown library.\n\n* `code-hilite` -- [CodeHilite][]\n* `html-tidy` -- [HTML Tidy][]\n* `header-id` -- [HeaderId][]\n* `meta_data` -- [Meta-Data][]\n* `nl2br` -- [New Line to Break][]\n* `rss` -- [RSS][]\n* `sane_lists` -- [Sane Lists][]\n* `smarty` -- [Smarty][]\n* `toc` -- [Table of Contents][]\n* `wikilinks` -- [WikiLinks][]\n\n[CodeHilite]:  http://pythonhosted.org/Markdown/extensions/code_hilite.html\n[HTML Tidy]:  http://pythonhosted.org/Markdown/extensions/html_tidy.html\n[HeaderId]:  http://pythonhosted.org/Markdown/extensions/header_id.html\n[Meta-Data]:  http://pythonhosted.org/Markdown/extensions/meta_data.html\n[New Line to Break]:  http://pythonhosted.org/Markdown/extensions/nl2br.html\n[RSS]:  http://pythonhosted.org/Markdown/extensions/rss.html\n[Sane Lists]:  http://pythonhosted.org/Markdown/extensions/sane_lists.html\n[Table of Contents]:  http://pythonhosted.org/Markdown/extensions/toc.html\n[WikiLinks]:  http://pythonhosted.org/Markdown/extensions/wikilinks.html\n[Smarty]: https://pythonhosted.org/Markdown/extensions/smarty.html\n\n#### 3rd Party Extensions\n\n*Python-Markdown* is designed to be extended.\n\nSome included ones are:\n\n* `delete` -- github style delte support via `~~word~~`\n* `githubemoji` --  github emoji support\n* `tasklist` -- github style tasklists\n* `magiclink` -- github style auto link conversion of http|ftp links\n* `headeranchor` -- github style header anchor links\n* `github` -- Adds the above extensions in one shot\n* `b64` -- convert and embed local images to base64.  Setup by adding this `b64(base_path=${BASE_PATH})`\n\nThere are also a number of others available:\n\nJust fork this repo and add your extensions inside the `.../Packages/Markdown Preview/markdown/extensions/` folder.\n\nCheck out the list of [3rd Party extensions](\nhttps://github.com/waylan/Python-Markdown/wiki/Third-Party-Extensions).\n\n\n#### Default Extensions\n\nThe default extensions are:\n\n* `footnotes` -- [Footnotes]\n* `toc` -- [Table of Contents]\n* `fenced_code` -- [Fenced Code Blocks] \n* `tables` -- [Tables]\n\nUse the `default` keyword, to select them all.\nIf you want all the defaults plus the `definition_lists` extension,\nyour settings would look like this:\n\n    {\n        ...\n        parser: 'markdown',\n        extensions: ['default', 'definition_lists'],\n        ...\n    }\n\n## Examples\n\n### Tables\n\nThe `tables` extension of the *Python-Markdown* parser is activated by default,\nbut is currently **not** available in *Markdown2*.\n\nThe syntax was adopted from the [php markdown project](http://michelf.ca/projects/php-markdown/extra/#table),\nand is also used in github flavoured markdown.\n\n| Year | Temperature (low) | Temperature (high) |  \n| ---- | ----------------- | -------------------|  \n| 1900 |               -10 |                 25 |  \n| 1910 |               -15 |                 30 |  \n| 1920 |               -10 |                 32 |  \n\n\n### Wiki Tables\n\nIf you are using *Markdown2* with the `wiki-tables` extra activated you should see a table below:\n\n|| *Year* || *Temperature (low)* || *Temperature (high)* ||  \n||   1900 ||                 -10 ||                   25 ||  \n||   1910 ||                 -15 ||                   30 ||  \n||   1920 ||                 -10 ||                   32 ||  \n\n\n### Definition Lists\n\nThis example requires *Python Markdown*'s `def_list` extension.\n\nApple\n:   Pomaceous fruit of plants of the genus Malus in \n    the family Rosaceae.\n\nOrange\n:   The fruit of an evergreen tree of the genus Citrus.\n\n\n## About\n\nThis plugin and this sample file is proudly brought to you by the [revolunet team][revolunet]\n\n [ref1]: http://revolunet.com\n [ref2]: http://revolunet.com \"rich web apps\"\n [MarkdownREF]: http://daringfireball.net/projects/markdown/basics\n [MarkdownPreview]: https://github.com/revolunet/sublimetext-markdown-preview\n [ST]: http://sublimetext.com\n [revolunet]: http://revolunet.com\n [revolunet-logo]: http://www.revolunet.com/static/parisjs8/img/logo-revolunet-carre.jpg \"revolunet logo\"\n [gfm]: http://github.github.com/github-flavored-markdown/\n [emoji]: http://www.emoji-cheat-sheet.com/\n\n",
+			"settings":
+			{
+				"buffer_size": 8996,
+				"line_ending": "Unix",
+				"name": "Markdown Cheatsheet",
+				"scratch": true
+			}
+		},
+		{
+			"contents": "Sample Markdown Cheat Sheet\n=========================== \n\nThis is a sample markdown file to help you write Markdown quickly :)\n\nIf you use the fabulous [Sublime Text 2/3 editor][ST] along with the [Markdown Preview plugin][MarkdownPreview], open your ST2 Palette with `CMD+⇧+P` then choose `Markdown Preview in browser` to see the result in your browser.\n\n## Text basics\nthis is *italic* and this is **bold** .  another _italic_ and another __bold__\n\nthis is `important` text. and percentage signs : % and `%`\n\nThis is a paragraph with a footnote (builtin parser only). [^note-id]\n\nInsert `[ TOC ]` without spaces to generate a table of contents (builtin parsers only).\n\n## Indentation\n> Here is some indented text\n>> even more indented\n\n## Titles\n# Big title (h1)\n## Middle title (h2)\n### Smaller title (h3)\n#### and so on (hX)\n##### and so on (hX)\n###### and so on (hX)\n\n## Example lists (1)\n\n - bullets can be `-`, `+`, or `*`\n - bullet list 1\n - bullet list 2\n    - sub item 1\n    - sub item 2\n\n        with indented text inside\n\n - bullet list 3\n + bullet list 4\n * bullet list 5\n\n## Links\n\nThis is an [example inline link](http://lmgtfy.com/) and [another one with a title](http://lmgtfy.com/ \"Hello, world\").\n\nLinks can also be reference based : [reference 1][ref1] or [reference 2 with title][ref2].\n\nReferences are usually placed at the bottom of the document\n\n## Images\n\nA sample image :\n\n![revolunet logo](http://www.revolunet.com/static/parisjs8/img/logo-revolunet-carre.jpg \"revolunet logo\")\n\nAs links, images can also use references instead of inline links :\n\n![revolunet logo][revolunet-logo]\n\n\n## Code\n\nIt's quite easy to show code in markdown files.\n\nBackticks can be used to `highlight` some words.\n\nAlso, any indented block is considered a code block.  If `enable_highlight` is `true`, syntax highlighting will be included (for the builtin parser - the github parser does this automatically).\n\n    <script>\n        document.location = 'http://lmgtfy.com/?q=markdown+cheat+sheet';\n    </script>\n\n## Math\n\nWhen `enable_mathjax` is `true`, inline math can be included \\\\(\\frac{\\pi}{2}\\\\) $\\pi$\n\nAlternatively, math can be written on its own line:\n\n$$F(\\omega) = \\frac{1}{\\sqrt{2\\pi}} \\int_{-\\infty}^{\\infty} f(t) \\, e^{ - i \\omega t}dt$$\n\n\\\\[\\int_0^1 f(t) \\mathrm{d}t\\\\]\n\n\\\\[\\sum_j \\gamma_j^2/d_j\\\\]\n\n\n\n## GitHub Flavored Markdown\n\nIf you use the Github parser, you can use some of [Github Flavored Markdown][gfm] syntax :\n\n * User/Project@SHA: revolunet/sublimetext-markdown-preview@7da61badeda468b5019869d11000307e07e07401\n * User/Project#Issue: revolunet/sublimetext-markdown-preview#1\n * User : @revolunet\n\nSome Python code :\n\n```python\nimport random\n\nclass CardGame(object):\n    \"\"\" a sample python class \"\"\"\n    NB_CARDS = 32\n    def __init__(self, cards=5):\n        self.cards = random.sample(range(self.NB_CARDS), 5)\n        print 'ready to play'\n```\n\nSome Javascript code :\n\n```js\nvar config = {\n    duration: 5,\n    comment: 'WTF'\n}\n// callbacks beauty un action\nasync_call('/path/to/api', function(json) {\n    another_call(json, function(result2) {\n        another_another_call(result2, function(result3) {\n            another_another_another_call(result3, function(result4) {\n                alert('And if all went well, i got my result :)');\n            });\n        });\n    });\n})\n```\n\nThe Github Markdown also brings some [nice Emoji support][emoji] : :+1: :heart: :beer:\n\n[^note-id]: This is the text of the note. \n\n## Parsers and Extensions\n\nMarkdown Preview comes with **Python-Markdown** preloaded.\n\n### *Python-Markdown*\n\nThe [Python-Markdown Parser][] provides support for several extensions.\n\n[Python-Markdown Parser]: https://github.com/waylan/Python-Markdown\n\n#### Extra Extensions\n\n* `abbr` -- [Abbreviations][]\n* `attr_list` -- [Attribute Lists][]\n* `def_list` -- [Definition Lists][]\n* `fenced_code` -- [Fenced Code Blocks][]\n* `footnotes` -- [Footnotes][]\n* `tables` -- [Tables][]\n* `smart_strong` -- [Smart Strong][]\n\n[Abbreviations]: http://pythonhosted.org/Markdown/extensions/abbreviations.html\n[Attribute Lists]: http://pythonhosted.org/Markdown/extensions/attr_list.html\n[Definition Lists]: http://pythonhosted.org/Markdown/extensions/definition_lists.html\n[Fenced Code Blocks]: http://pythonhosted.org/Markdown/extensions/fenced_code_blocks.html\n[Footnotes]: http://pythonhosted.org/Markdown/extensions/footnotes.html\n[Tables]: http://pythonhosted.org/Markdown/extensions/tables.html\n[Smart Strong]: http://pythonhosted.org/Markdown/extensions/smart_strong.html\n\n\nYou can enable them all at once using the `extra` keyword.\n\n    extensions: [ 'extra' ]\n\nIf you want all the extras plus the `toc` extension,\nyour settings would look like this:\n\n    {\n        ...\n        parser: 'markdown',\n        extensions: ['extra', 'toc'],\n        ...\n    }\n\n\n#### Other Extensions\n\nThere are also some extensions that are not included in Markdown Extra\nbut come in the standard Python-Markdown library.\n\n* `code-hilite` -- [CodeHilite][]\n* `html-tidy` -- [HTML Tidy][]\n* `header-id` -- [HeaderId][]\n* `meta_data` -- [Meta-Data][]\n* `nl2br` -- [New Line to Break][]\n* `rss` -- [RSS][]\n* `sane_lists` -- [Sane Lists][]\n* `smarty` -- [Smarty][]\n* `toc` -- [Table of Contents][]\n* `wikilinks` -- [WikiLinks][]\n\n[CodeHilite]:  http://pythonhosted.org/Markdown/extensions/code_hilite.html\n[HTML Tidy]:  http://pythonhosted.org/Markdown/extensions/html_tidy.html\n[HeaderId]:  http://pythonhosted.org/Markdown/extensions/header_id.html\n[Meta-Data]:  http://pythonhosted.org/Markdown/extensions/meta_data.html\n[New Line to Break]:  http://pythonhosted.org/Markdown/extensions/nl2br.html\n[RSS]:  http://pythonhosted.org/Markdown/extensions/rss.html\n[Sane Lists]:  http://pythonhosted.org/Markdown/extensions/sane_lists.html\n[Table of Contents]:  http://pythonhosted.org/Markdown/extensions/toc.html\n[WikiLinks]:  http://pythonhosted.org/Markdown/extensions/wikilinks.html\n[Smarty]: https://pythonhosted.org/Markdown/extensions/smarty.html\n\n#### 3rd Party Extensions\n\n*Python-Markdown* is designed to be extended.\n\nSome included ones are:\n\n* `delete` -- github style delte support via `~~word~~`\n* `githubemoji` --  github emoji support\n* `tasklist` -- github style tasklists\n* `magiclink` -- github style auto link conversion of http|ftp links\n* `headeranchor` -- github style header anchor links\n* `github` -- Adds the above extensions in one shot\n* `b64` -- convert and embed local images to base64.  Setup by adding this `b64(base_path=${BASE_PATH})`\n\nThere are also a number of others available:\n\nJust fork this repo and add your extensions inside the `.../Packages/Markdown Preview/markdown/extensions/` folder.\n\nCheck out the list of [3rd Party extensions](\nhttps://github.com/waylan/Python-Markdown/wiki/Third-Party-Extensions).\n\n\n#### Default Extensions\n\nThe default extensions are:\n\n* `footnotes` -- [Footnotes]\n* `toc` -- [Table of Contents]\n* `fenced_code` -- [Fenced Code Blocks] \n* `tables` -- [Tables]\n\nUse the `default` keyword, to select them all.\nIf you want all the defaults plus the `definition_lists` extension,\nyour settings would look like this:\n\n    {\n        ...\n        parser: 'markdown',\n        extensions: ['default', 'definition_lists'],\n        ...\n    }\n\n## Examples\n\n### Tables\n\nThe `tables` extension of the *Python-Markdown* parser is activated by default,\nbut is currently **not** available in *Markdown2*.\n\nThe syntax was adopted from the [php markdown project](http://michelf.ca/projects/php-markdown/extra/#table),\nand is also used in github flavoured markdown.\n\n| Year | Temperature (low) | Temperature (high) |  \n| ---- | ----------------- | -------------------|  \n| 1900 |               -10 |                 25 |  \n| 1910 |               -15 |                 30 |  \n| 1920 |               -10 |                 32 |  \n\n\n### Wiki Tables\n\nIf you are using *Markdown2* with the `wiki-tables` extra activated you should see a table below:\n\n|| *Year* || *Temperature (low)* || *Temperature (high)* ||  \n||   1900 ||                 -10 ||                   25 ||  \n||   1910 ||                 -15 ||                   30 ||  \n||   1920 ||                 -10 ||                   32 ||  \n\n\n### Definition Lists\n\nThis example requires *Python Markdown*'s `def_list` extension.\n\nApple\n:   Pomaceous fruit of plants of the genus Malus in \n    the family Rosaceae.\n\nOrange\n:   The fruit of an evergreen tree of the genus Citrus.\n\n\n## About\n\nThis plugin and this sample file is proudly brought to you by the [revolunet team][revolunet]\n\n [ref1]: http://revolunet.com\n [ref2]: http://revolunet.com \"rich web apps\"\n [MarkdownREF]: http://daringfireball.net/projects/markdown/basics\n [MarkdownPreview]: https://github.com/revolunet/sublimetext-markdown-preview\n [ST]: http://sublimetext.com\n [revolunet]: http://revolunet.com\n [revolunet-logo]: http://www.revolunet.com/static/parisjs8/img/logo-revolunet-carre.jpg \"revolunet logo\"\n [gfm]: http://github.github.com/github-flavored-markdown/\n [emoji]: http://www.emoji-cheat-sheet.com/\n\n",
+			"settings":
+			{
+				"buffer_size": 8996,
+				"line_ending": "Unix",
+				"name": "Markdown Cheatsheet",
+				"scratch": true
+			}
+		},
+		{
 			"contents": "---\nlayout: post\ntitle:  \"Objects and pointers part II\"\ndate:   2015-7-21 21:29:19\ncategories: c++\n---\n\n<!--\nOutline:\n\n- static polymorphism\n - set the scene\n  - value semantics\n  - polymorphism\n  - not polymorphism\n - unique_ptr\n  - cannot go into homogeneous container\n  - assignment doesn't work as expected\n - hand rolled\n - boost any\n-->\n\nI described in a [previous post]({% post_url 2014-11-30-objects-and-pointers %}) how difficult it is to work with dynamic dispatch in c++. I described various ways to deal with it. However I've been reading about an even more powerful and easy to use way to do things.\n\nLets say that I want the following properties of a variable for an object:\n\n* dynamic dispatch of its methods\n* memory safety\n\nWe can achieve combinations of those properties using the techniques I described last time: i.e. use of safe pointers (dynamic dispatch + memory safety), CRTP (memory safety and inheritance but dispatch done statically) or inclusion (memory safety but static dispatch and no inheritance).\n\nHowever my eyes have been opened a bit after watching Sean Parent's talk called [\"C++ seasoning\"](http://channel9.msdn.com/Events/GoingNative/2013/Cpp-Seasoning). Now I also want to achieve *value semantics*. Value semantics means that assigning a value to a different variable copies it (or, with std::move, moves it without copying). The opposite is reference semantics meaning that only the pointer is copied. With value semantics a value is guaranteed to be the sole way to access the corresponding area of memory.\n\n{% highlight c++ linenos %}\n{% include_relative obj_ptrs_2_code/value.cpp %}\n{% endhighlight %}\n\nUsing value semantics helps to make code easy to understand, since you don't need to check what other variables (possibly on other threads) might be sharing the same data. There is no sharing.\n\nAlso you don't have to worry about cleaning up pointers any longer, because there are none. \n\nI said in my earlier post that in C++ polymorphism is only available via a pointer/reference variable. That is true, but there are a variety of techniques to maintain value semantics without losing polymorphism, and the purpose of this post is to describe those.\n\nunique_ptr\n===========\nThe simplest way to get closer to value semantics with pointers is definitely std::unique_ptr. An area of memory is guaranteed to be uniquely owned. \n\n{% highlight c++ linenos %}\n{% include_relative obj_ptrs_2_code/unique.cpp %}\n{% endhighlight %}\n\nHowever we haven't really achieved proper value semantics, because assigning a value doesn't work and we have to move it around explicitly.\n\nLet's look for a better solution.\n\nHand rolled value semantics with polymorphism\n=============================================\n\nLets make a type with value semantics that can take anything with a Print() method:\n\n{% highlight c++ linenos %}\n{% include_relative obj_ptrs_2_code/wrapper.cpp %}\n{% endhighlight %}\n\nThere is no such thing as a free lunch though. Polymorphism is still achieved using a pointer, but it is hidden away so that it doesn't contaminate client code.\n\nWe get value semantics. There is no inheritance in the printable objects. We can also make heterogeneous containers.\n\nboost type_erasure\n==================\n\nThe only problem is that the code is rather long and laborious, every time we have a different concept, we would have to define 3 new classes for it.\n\nLet's check out boost::type_erasure to make it short and sweet.\n\n{% highlight c++ linenos %}\n{% include_relative obj_ptrs_2_code/type_erasure.cpp %}\n{% endhighlight %}\n\nConclusion\n========\n\nNormally in C++, polymorphism brings an unwelcome friend along with it - pointers. But I've described a couple of ways to get polymorphism without pointers being in view (at least in the client code).\n\n\nReferences\n==========\n[Boost.TypeErasure](http://www.boost.org/doc/libs/1_58_0/doc/html/boost_typeerasure.html)\n\n[C++ Seasoning](http://channel9.msdn.com/Events/GoingNative/2013/Cpp-Seasoning)\n\nC++ in a nutshell - O'Reilly\n\n[Inheritance is the Base Class of Evil code sample](https://gist.github.com/berkus/7041546)\n\n[Intrusive value semantic polymorphism example.](https://gist.github.com/sean-parent/6798797)\n\n[Value semantics](https://akrzemi1.wordpress.com/2012/02/03/value-semantics/)\n\n[What is value semantics?](https://isocpp.org/wiki/faq/value-vs-ref-semantics#val-vs-ref-semantics)\n\n[Minion AnyVarRef](https://bitbucket.org/stacs_cp/minion/src/c64e2526b4b0156b9881e3ebe0fc9d55709335aa/minion/variables/AnyVarRef.h?at=default)\n",
 			"file": "_posts/2015-06-10-objects-and-pointers-2 copy.markdown",
 			"file_size": 4523,
-			"file_write_time": 130830012750000000,
+			"file_write_time": 130889754760000000,
 			"settings":
 			{
 				"buffer_size": 4523,
@@ -341,13 +342,18 @@
 			}
 		},
 		{
-			"contents": "#include <iostream>\n#include <memory>\n\nclass Printer {\npublic:\n	virtual void Print() const { std::cout << \"Printer\" << std::endl; }	\n};\n\nclass ConcretePrinter : public Printer {\npublic:\n	virtual void Print() const { std::cout << \"ConcretePrinter\" << std::endl; }		\n};\n\nint main()\n{\n	std::unique_ptr<ConcretePrinter> cp(std::make_unique<ConcretePrinter>());\n	cp->Print(); //prints: ConcretePrinter\n	\n	//std::unique_ptr<ConcretePrinter> notACopy = cp; //doesn't work\n	\n	std::unique_ptr<ConcretePrinter> notACopy2 = std::move(cp);\n	notACopy2->Print(); //prints: ConcretePrinter\n	\n	cp->Print(); //dangerous, cp isn't there any more\n}\n",
 			"file": "_posts/obj_ptrs_2_code/unique.hpp",
-			"file_size": 630,
-			"file_write_time": 130827592820000000,
 			"settings":
 			{
 				"buffer_size": 630,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/neilmoore67/Work/scala-cource/doodle-develop/README.md",
+			"settings":
+			{
+				"buffer_size": 2350,
 				"line_ending": "Unix"
 			}
 		},
@@ -360,10 +366,42 @@
 			}
 		},
 		{
+			"file": "_site/personal/2015/03/16/wedding-honeymoon.html",
+			"settings":
+			{
+				"buffer_size": 15937,
+				"line_ending": "Unix"
+			}
+		},
+		{
 			"file": "index.html",
 			"settings":
 			{
-				"buffer_size": 539,
+				"buffer_size": 614,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "feed.xml",
+			"settings":
+			{
+				"buffer_size": 1410,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "_posts/2015-10-04-moving-to-industry.markdown",
+			"settings":
+			{
+				"buffer_size": 21384,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "about.md",
+			"settings":
+			{
+				"buffer_size": 392,
 				"line_ending": "Unix"
 			}
 		},
@@ -382,14 +420,6 @@
 				"buffer_size": 408,
 				"line_ending": "Unix",
 				"name": "<script>"
-			}
-		},
-		{
-			"file": "_includes/mailchimp.html",
-			"settings":
-			{
-				"buffer_size": 616,
-				"line_ending": "Unix"
 			}
 		},
 		{
@@ -466,13 +496,21 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 187.0,
-		"last_filter": "markdown",
+		"height": 307.0,
+		"last_filter": "mark",
 		"selected_items":
 		[
 			[
+				"mark",
+				"Markdown Preview: Open Markdown Cheat sheet"
+			],
+			[
 				"markdown",
 				"Markdown Preview: Preview in Browser"
+			],
+			[
+				"markcheat",
+				"Markdown Preview: Open Markdown Cheat sheet"
 			],
 			[
 				"Package Control: ",
@@ -523,18 +561,24 @@
 		"show_minimap": false,
 		"show_open_files": false,
 		"show_tabs": false,
-		"side_bar_visible": false,
+		"side_bar_visible": true,
 		"status_bar_visible": false
 	},
 	"expanded_folders":
 	[
-		"/Users/neilmoore/src/neil-ca-moore.github.io",
-		"/Users/neilmoore/src/neil-ca-moore.github.io/_drafts"
+		"/Users/neilmoore67/Work/personal-homepage",
+		"/Users/neilmoore67/Work/personal-homepage/_includes",
+		"/Users/neilmoore67/Work/personal-homepage/_posts",
+		"/Users/neilmoore67/Work/personal-homepage/_sass",
+		"/Users/neilmoore67/Work/personal-homepage/css"
 	],
 	"file_history":
 	[
-		"/Users/neilmoore/src/neil-ca-moore.github.io/_site/personal/2015/03/16/wedding-honeymoon.html",
-		"/Users/neilmoore67/Work/scala-cource/doodle-develop/README.md",
+		"/Users/neilmoore67/Work/personal-homepage/_includes/mailchimp.html",
+		"/Users/neilmoore67/Work/personal-homepage/README",
+		"/Users/neilmoore67/Work/personal-homepage/_config.yml",
+		"/Users/neilmoore67/Work/personal-homepage/about.md",
+		"/Users/neilmoore67/Work/personal-homepage/_site/c++/2014/11/30/objects-and-pointers.html",
 		"/Users/neilmoore67/Work/personal-homepage/_drafts/2014-11-30-objects-and-pointers.markdown",
 		"/Users/neilmoore67/Work/personal-homepage/_drafts/type_erasure.hpp",
 		"/Users/neilmoore67/Work/personal-homepage/_drafts/value.hpp",
@@ -624,6 +668,10 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"note-id",
+			"emoji",
+			"images",
+			"comment",
 			"stone",
 			"std::unique_ptr",
 			"boost",
@@ -679,96 +727,11 @@
 	"groups":
 	[
 		{
-			"selected": 21,
+			"selected": 36,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "_config.yml",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 384,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								384,
-								384
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/YAML/YAML.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 31,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "README",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 94,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"auto_name": "http://kramdown.gettalong.org/syntax.html",
-							"syntax": "Packages/Text/Plain text.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 29,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "about.md",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 392,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								392,
-								392
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Markdown/Markdown.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 32,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
 					"file": "publications.md",
 					"semi_transient": false,
 					"settings":
@@ -786,18 +749,19 @@
 						],
 						"settings":
 						{
-							"sorttabs_lastactivated": 1438285754.56,
+							"function_name_status_row": 9,
+							"sorttabs_lastactivated": 1444501610.78,
 							"syntax": "Packages/Markdown/Markdown.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 25,
+					"stack_index": 10,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
+					"buffer": 1,
 					"file": "_posts/2014-11-19-vector-append.markdown",
 					"semi_transient": false,
 					"settings":
@@ -825,11 +789,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 18,
 					"type": "text"
 				},
 				{
-					"buffer": 5,
+					"buffer": 2,
 					"file": "_posts/2014-11-30-objects-and-pointers.markdown",
 					"semi_transient": false,
 					"settings":
@@ -855,11 +819,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 19,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
+					"buffer": 3,
 					"file": "_posts/obj_ptrs_1_code/sixth.cpp",
 					"semi_transient": false,
 					"settings":
@@ -886,11 +850,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 18,
+					"stack_index": 30,
 					"type": "text"
 				},
 				{
-					"buffer": 7,
+					"buffer": 4,
 					"file": "_posts/obj_ptrs_2_code/unique.cpp",
 					"semi_transient": false,
 					"settings":
@@ -916,11 +880,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 12,
+					"stack_index": 24,
 					"type": "text"
 				},
 				{
-					"buffer": 8,
+					"buffer": 5,
 					"file": "_posts/obj_ptrs_2_code/type_erasure_with_inherit.cpp",
 					"semi_transient": false,
 					"settings":
@@ -946,11 +910,11 @@
 						"translation.y": 316.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 11,
+					"stack_index": 23,
 					"type": "text"
 				},
 				{
-					"buffer": 9,
+					"buffer": 6,
 					"file": "_posts/obj_ptrs_2_code/type_erasure.cpp",
 					"semi_transient": false,
 					"settings":
@@ -976,11 +940,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 10,
+					"stack_index": 22,
 					"type": "text"
 				},
 				{
-					"buffer": 10,
+					"buffer": 7,
 					"file": "_posts/obj_ptrs_1_code/fifth.cpp",
 					"semi_transient": false,
 					"settings":
@@ -1007,11 +971,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 14,
+					"stack_index": 26,
 					"type": "text"
 				},
 				{
-					"buffer": 11,
+					"buffer": 8,
 					"file": "_posts/obj_ptrs_1_code/fourth.cpp",
 					"semi_transient": false,
 					"settings":
@@ -1037,11 +1001,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 13,
+					"stack_index": 25,
 					"type": "text"
 				},
 				{
-					"buffer": 12,
+					"buffer": 9,
 					"file": "_posts/obj_ptrs_1_code/third.cpp",
 					"semi_transient": false,
 					"settings":
@@ -1067,11 +1031,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 16,
+					"stack_index": 28,
 					"type": "text"
 				},
 				{
-					"buffer": 13,
+					"buffer": 10,
 					"file": "_posts/obj_ptrs_1_code/second.cpp",
 					"semi_transient": false,
 					"settings":
@@ -1097,11 +1061,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 17,
+					"stack_index": 29,
 					"type": "text"
 				},
 				{
-					"buffer": 14,
+					"buffer": 11,
 					"file": "_posts/obj_ptrs_1_code/first.cpp",
 					"semi_transient": false,
 					"settings":
@@ -1128,11 +1092,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 15,
+					"stack_index": 27,
 					"type": "text"
 				},
 				{
-					"buffer": 15,
+					"buffer": 12,
 					"file": "_posts/obj_ptrs_1_code/earlydefs.hpp",
 					"semi_transient": false,
 					"settings":
@@ -1159,11 +1123,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 19,
+					"stack_index": 31,
 					"type": "text"
 				},
 				{
-					"buffer": 16,
+					"buffer": 13,
 					"file": "_posts/obj_ptrs_2_code/wrapper.hpp",
 					"semi_transient": false,
 					"settings":
@@ -1190,11 +1154,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 20,
+					"stack_index": 32,
 					"type": "text"
 				},
 				{
-					"buffer": 17,
+					"buffer": 14,
 					"file": "_posts/obj_ptrs_2_code/type_erasure.hpp",
 					"semi_transient": false,
 					"settings":
@@ -1220,11 +1184,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 21,
+					"stack_index": 33,
 					"type": "text"
 				},
 				{
-					"buffer": 18,
+					"buffer": 15,
 					"file": "_posts/obj_ptrs_2_code/unique_hetero.hpp",
 					"semi_transient": false,
 					"settings":
@@ -1249,11 +1213,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 24,
+					"stack_index": 36,
 					"type": "text"
 				},
 				{
-					"buffer": 19,
+					"buffer": 16,
 					"file": "_posts/2015-03-16-wedding-honeymoon.markdown",
 					"semi_transient": false,
 					"settings":
@@ -1273,83 +1237,20 @@
 						{
 							"function_name_status_row": 118,
 							"parser": "github",
-							"sorttabs_lastactivated": 1444135292.74,
+							"sorttabs_lastactivated": 1443968434.4,
 							"syntax": "Packages/Markdown/Markdown.tmLanguage",
 							"target": "browser",
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1824.0,
+						"translation.y": 2102.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 17,
 					"type": "text"
 				},
 				{
-					"buffer": 20,
-					"file": "_drafts/2015-10-04-moving-to-industry.markdown",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 14248,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								14248,
-								14248
-							]
-						],
-						"settings":
-						{
-							"function_name_status_row": 183,
-							"sorttabs_lastactivated": 1444202212.82,
-							"syntax": "Packages/Markdown/Markdown.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 3167.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 21,
-					"file": "/Users/neilmoore/Library/Application Support/Sublime Text 3/Packages/GoSublime/USAGE.md",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 8539,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								829,
-								829
-							]
-						],
-						"settings":
-						{
-							"function_name_status_row": 15,
-							"sorttabs_lastactivated": 1444202219.65,
-							"syntax": "Packages/Markdown/Markdown.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 22,
+					"buffer": 17,
 					"file": "_posts/2015-03-29-TT-scorer.markdown",
 					"semi_transient": false,
 					"settings":
@@ -1375,11 +1276,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 20,
 					"type": "text"
 				},
 				{
-					"buffer": 23,
+					"buffer": 18,
 					"file": "_posts/2015-04-6-types.markdown",
 					"semi_transient": false,
 					"settings":
@@ -1397,7 +1298,8 @@
 						],
 						"settings":
 						{
-							"sorttabs_lastactivated": 1439368934.18,
+							"function_name_status_row": 146,
+							"sorttabs_lastactivated": 1444502270.52,
 							"syntax": "Packages/Markdown/Markdown.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
@@ -1405,11 +1307,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 8,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
-					"buffer": 24,
+					"buffer": 19,
 					"file": "_posts/2015-06-10-objects-and-pointers-2.markdown",
 					"semi_transient": false,
 					"settings":
@@ -1427,7 +1329,8 @@
 						],
 						"settings":
 						{
-							"sorttabs_lastactivated": 1439368954.91,
+							"function_name_status_row": 3,
+							"sorttabs_lastactivated": 1444502269.91,
 							"syntax": "Packages/Markdown/Markdown.tmLanguage"
 						},
 						"translation.x": 0.0,
@@ -1438,7 +1341,7 @@
 					"type": "text"
 				},
 				{
-					"buffer": 25,
+					"buffer": 20,
 					"file": "_posts/2015-08-10-talk-slides.markdown",
 					"semi_transient": false,
 					"settings":
@@ -1450,15 +1353,15 @@
 						"selection":
 						[
 							[
-								0,
-								0
+								112,
+								112
 							]
 						],
 						"settings":
 						{
-							"function_name_status_row": 7,
+							"function_name_status_row": 5,
 							"parser": "github",
-							"sorttabs_lastactivated": 1443865511.5,
+							"sorttabs_lastactivated": 1444502274.76,
 							"syntax": "Packages/Markdown/Markdown.tmLanguage",
 							"target": "browser"
 						},
@@ -1466,7 +1369,163 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 21,
+					"file": "_drafts/2015-10-04-moving-to-industry.markdown",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 21382,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								127,
+								127
+							]
+						],
+						"settings":
+						{
+							"function_name_status_row": 5,
+							"parser": "github",
+							"sorttabs_lastactivated": 1444501849.59,
+							"syntax": "Packages/Markdown/Markdown.tmLanguage",
+							"tab_size": 2,
+							"target": "disk",
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 22,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8996,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3405,
+								3412
+							]
+						],
+						"settings":
+						{
+							"default_dir": "/Users/neilmoore67/Work/personal-homepage",
+							"function_name_status_row": 129,
+							"sorttabs_lastactivated": 1444499996.93,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 1655.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 12,
+					"type": "text"
+				},
+				{
+					"buffer": 23,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8996,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								580,
+								570
+							]
+						],
+						"settings":
+						{
+							"default_dir": "/Users/neilmoore67/Work/personal-homepage",
+							"function_name_status_row": 12,
+							"sorttabs_lastactivated": 1444424420.2,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 13,
+					"type": "text"
+				},
+				{
+					"buffer": 24,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8996,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6126,
+								6137
+							]
+						],
+						"settings":
+						{
+							"default_dir": "/Users/neilmoore67/Work/personal-homepage",
+							"function_name_status_row": 209,
+							"sorttabs_lastactivated": 1444072316.68,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 3163.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 15,
+					"type": "text"
+				},
+				{
+					"buffer": 25,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8996,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1749,
+								1751
+							]
+						],
+						"settings":
+						{
+							"default_dir": "/Users/neilmoore67/Work/personal-homepage",
+							"function_name_status_row": 54,
+							"sorttabs_lastactivated": 1443971328.92,
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 16,
 					"type": "text"
 				},
 				{
@@ -1495,7 +1554,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 9,
+					"stack_index": 21,
 					"type": "text"
 				},
 				{
@@ -1525,11 +1584,41 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 22,
+					"stack_index": 34,
 					"type": "text"
 				},
 				{
 					"buffer": 28,
+					"file": "/Users/neilmoore67/Work/scala-cource/doodle-develop/README.md",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2350,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Markdown/Markdown.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 39,
+					"type": "text"
+				},
+				{
+					"buffer": 29,
 					"file": "Gemfile",
 					"semi_transient": false,
 					"settings":
@@ -1547,34 +1636,37 @@
 						],
 						"settings":
 						{
+							"function_name_status_row": 6,
+							"sorttabs_lastactivated": 1444072404.04,
 							"syntax": "Packages/Ruby/Ruby.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 30,
+					"stack_index": 14,
 					"type": "text"
 				},
 				{
-					"buffer": 29,
-					"file": "index.html",
+					"buffer": 30,
+					"file": "_site/personal/2015/03/16/wedding-honeymoon.html",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 539,
+						"buffer_size": 15937,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								190,
-								222
+								0,
+								0
 							]
 						],
 						"settings":
 						{
+							"function_name_status_row": 0,
 							"syntax": "Packages/HTML/HTML.tmLanguage",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
@@ -1583,11 +1675,137 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 39,
+					"stack_index": 40,
 					"type": "text"
 				},
 				{
-					"buffer": 30,
+					"buffer": 31,
+					"file": "index.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 614,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								310,
+								310
+							]
+						],
+						"settings":
+						{
+							"function_name_status_row": 14,
+							"sorttabs_lastactivated": 1444501854.49,
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 32,
+					"file": "feed.xml",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1410,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								665,
+								665
+							]
+						],
+						"settings":
+						{
+							"function_name_status_row": 14,
+							"sorttabs_lastactivated": 1444502165.14,
+							"syntax": "Packages/XML/XML.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 33,
+					"file": "_posts/2015-10-04-moving-to-industry.markdown",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 21384,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								17922,
+								17886
+							]
+						],
+						"settings":
+						{
+							"function_name_status_row": 200,
+							"sorttabs_lastactivated": 1444554629.58,
+							"syntax": "Packages/Markdown/Markdown.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3793.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 34,
+					"file": "about.md",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 392,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"function_name_status_row": 0,
+							"sorttabs_lastactivated": 1444502405.37,
+							"syntax": "Packages/Markdown/Markdown.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 35,
 					"file": "_layouts/default.html",
 					"semi_transient": false,
 					"settings":
@@ -1613,11 +1831,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 33,
+					"stack_index": 41,
 					"type": "text"
 				},
 				{
-					"buffer": 31,
+					"buffer": 36,
 					"file": "_includes/analytics.html",
 					"semi_transient": false,
 					"settings":
@@ -1636,45 +1854,19 @@
 						"settings":
 						{
 							"auto_name": "<script>",
+							"function_name_status_row": 9,
+							"sorttabs_lastactivated": 1444554709.27,
 							"syntax": "Packages/HTML/HTML.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 36,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 32,
-					"file": "_includes/mailchimp.html",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 616,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								616,
-								616
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 40,
-					"type": "text"
-				},
-				{
-					"buffer": 33,
+					"buffer": 37,
 					"file": "_layouts/post.html",
 					"semi_transient": false,
 					"settings":
@@ -1700,11 +1892,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 38,
+					"stack_index": 44,
 					"type": "text"
 				},
 				{
-					"buffer": 34,
+					"buffer": 38,
 					"file": "_includes/head.html",
 					"semi_transient": false,
 					"settings":
@@ -1730,11 +1922,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 26,
+					"stack_index": 37,
 					"type": "text"
 				},
 				{
-					"buffer": 35,
+					"buffer": 39,
 					"file": "_includes/footer.html",
 					"semi_transient": false,
 					"settings":
@@ -1760,11 +1952,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 35,
+					"stack_index": 43,
 					"type": "text"
 				},
 				{
-					"buffer": 36,
+					"buffer": 40,
 					"semi_transient": false,
 					"settings":
 					{
@@ -2016,14 +2208,14 @@
 							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 5610.0,
+						"translation.y": 5286.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 23,
+					"stack_index": 35,
 					"type": "text"
 				},
 				{
-					"buffer": 37,
+					"buffer": 41,
 					"file": "_sass/_layout.scss",
 					"semi_transient": false,
 					"settings":
@@ -2049,11 +2241,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 34,
+					"stack_index": 42,
 					"type": "text"
 				},
 				{
-					"buffer": 38,
+					"buffer": 42,
 					"file": "untitled.sublime-project",
 					"semi_transient": false,
 					"settings":
@@ -2071,17 +2263,19 @@
 						],
 						"settings":
 						{
+							"function_name_status_row": 0,
+							"sorttabs_lastactivated": 1444501607.28,
 							"syntax": "Packages/JavaScript/JSON.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 37,
+					"stack_index": 11,
 					"type": "text"
 				},
 				{
-					"buffer": 39,
+					"buffer": 43,
 					"file": "_sass/_syntax-highlighting.scss",
 					"semi_transient": false,
 					"settings":
@@ -2099,6 +2293,8 @@
 						],
 						"settings":
 						{
+							"function_name_status_row": 68,
+							"sorttabs_lastactivated": 1444501839.88,
 							"syntax": "Packages/Text/Plain text.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
@@ -2107,11 +2303,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 27,
+					"stack_index": 9,
 					"type": "text"
 				},
 				{
-					"buffer": 40,
+					"buffer": 44,
 					"file": "CNAME",
 					"semi_transient": false,
 					"settings":
@@ -2135,7 +2331,7 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 28,
+					"stack_index": 38,
 					"type": "text"
 				}
 			]
@@ -2228,10 +2424,6 @@
 	{
 		"height": 100.0
 	},
-	"output.GoSublime-output":
-	{
-		"height": 112.0
-	},
 	"output.MarGo-output":
 	{
 		"height": 100.0
@@ -2261,6 +2453,22 @@
 		"last_filter": "",
 		"selected_items":
 		[
+			[
+				"con",
+				"_config.yml"
+			],
+			[
+				"gemfi",
+				"Gemfile"
+			],
+			[
+				"",
+				"_drafts/2015-10-04-moving-to-industry.markdown"
+			],
+			[
+				"poi",
+				"_site/c++/2014/11/30/objects-and-pointers.html"
+			],
 			[
 				"third",
 				"_posts/obj_ptrs_1_code/third.cpp"
@@ -2328,10 +2536,6 @@
 			[
 				"gamest",
 				"src/bigoh.co.uk/scoot/http/static/js/models/gamestate.js"
-			],
-			[
-				"",
-				"src/bigoh.co.uk/scoot/http/static/css/style.css"
 			],
 			[
 				"scoo",
