@@ -129,15 +129,15 @@ I want to say what I think characterises each type of workplace, to put into con
 
 ## Industry
 
-In industry everything is driven directly or indirectly by the need to make money sustainably. That may sound excessively cynical but I think it's true. It's a bit like how evolution of species is driven by brutality but can also have redeeming features.
+In industry everything is driven directly or indirectly by the need to make money sustainably. That may sound excessively cynical but I think it's true.
 
 The positive side effects of this focus include
 
-- focus on customer experience,
-- focus on finding methods that deliver good results irrespective of their novelty, and
-- focus on teamwork.
+- focus on customer experience (customers will only pay for something that is valuable to them),
+- focus on finding methods that deliver good results irrespective of their novelty (customers don't care how you do it as long as you do it well), and
+- focus on teamwork (so that no one person is too crucial to the business).
 
-However this means some aspects of good software development become guidelines rather than strict requirements. Unit testing, good software design, documentation and code hygiene may be sacrificed to achieve faster progress. Short term progress is traded off against maintainability.
+However the negative aspect is that some aspects of good software development are considered to be guidelines rather than strict requirements. Unit testing, good software design, documentation and code hygiene may be sacrificed occasionally to achieve faster short term progress.
 
 Engineers must justify the use of their time. Dogmas like 100% test coverage are not accepted automatically and must prove their worth.
 
@@ -154,7 +154,7 @@ Academic research is the other aim. Academic research is really what early stage
 - take people's undergraduate education to the next level;
 - provide a vibrant background for teaching;
 - to satisfy the innate need to discover and communicate;
-- national vanity; and 
+- enhance international competitiveness; and 
 - to provide ideas and people to industry.
 
 By stating my opinions on the value of academia I am seeking to lay bare why it has different characteristics than industry as a job.
@@ -163,7 +163,7 @@ You see relaxed and self indulgent styles of work in academia that are seldom se
 
 ## Vive la difference
 
-This is why academia is not exactly like industry. There is a lot of creativity in industry but directed towards business success. There is a lot of efficient working practices in academia but directed towards novelty. However the flavour of work is very different and I think each individual needs to discover, like I have, where they fit and what they enjoy.
+This is why academia is not exactly like industry. There is a lot of creativity in industry but directed towards pleasing customers. There are a lot of efficient working practices in academia but directed towards novelty. However the flavour of work is very different and I think each individual needs to discover, like I have, where they fit and what they enjoy.
 
 # What I love about working in industry
 
@@ -177,7 +177,7 @@ The type of perfection required for software engineering in industry is differen
 
 [^recomp]: My former colleagues Ian Gent and Lars Kotthoff are trying to change that with their [Recomputation project](http://recomputation.org)
 
-I must mention that industry has been more financially lucrative for me. I think it is for most people. In academia you can aim for a permanent academic job, which is the closest thing to a job for life that exists today. However many people fail to achieve that goal. There just aren't enough academic jobs for everyone to get one. The computer industry has a high level of demand for qualified staff and I think that the chances of a hard working and qualified person ending up redundant is low compared to other industries. Over the course of a career computer scientists in industry will earn significantly more in most cases.
+I must mention that industry has been more financially lucrative for me. I think it is for most people. In academia you can aim for a permanent academic job, which is the closest thing to a job for life that exists today. However many people fail to achieve that goal. There just aren't enough academic jobs for everyone to get one. The computer industry has a high level of demand for qualified staff and I think that the chances of a hard working and qualified person ending up redundant is low compared to other industries. I think that over the course of a career equivalently talented computer scientists in industry will earn more in most cases.
 
 The sorts of problems one is solving in industry are frequently conceptually simpler. There are people in industry doing advanced research, but novelty is generally not an aim. Novelty is valued if it can be patented or is something that customers will want, but is not valued for its own sake. Most business problems are not particularly new, and engineers are have to be able to solve these simple problems quickly and efficiently.
 
@@ -194,9 +194,9 @@ As I said earlier, towards the end of my PhD I was already feeling that academia
 > You can have a good academic career. Just because you can have an academic career doesn't mean you have to do it.
 >-- Ian Gent
 
-That might sound like nothing but it really helped me. It appealed to my vanity by saying that I could have a *good* academic career. It also reminded me that I can do what I like and I don't need to pursue sunk costs by having an academic career just because I started on that path. I would say the same thing to anybody just now who isn't sure they want to be in academia. You can leave and there is no shame. You can have a good career in industry that may make your happier than you are now, and that is the thing that matters. Both industry and academia will survive without you, but you should try to be happy.
+That might sound like nothing but it really helped me. Ian was kind and reassuring to me by saying that I could have a *good* academic career. It also reminded me that I can do what I like and I don't need to pursue sunk costs by having an academic career just because I started on that path. I would say the same thing to anybody just now who isn't sure they want to be in academia. You can leave and there is no shame. You can have a good career in industry that may make your happier than you are now, and that is the thing that matters. Both industry and academia will survive without you, but you should try to be happy.
 
-Another thing that worried me for a while was the idea that I would be unable to return to academia if my new job didn't work out for me. I cannot really confirm or deny that. I suspect it's true that the longer you spend out of academia the harder it would be to return. However I will have to abstain from giving any advice on that, I just don't know.
+Another thing that worried me for a while was the idea that I would be unable to return to academia if my new job didn't work out for me. I cannot really confirm or deny that from personal experience. I suspect it's true that the longer you spend out of academia the harder it would be to return. However I have been told by various people that suitably qualified people coming back from industry will be welcomed back.
 
 Do I feel able to do research again? Honestly I do. I think my improved engineering skills and focus would make me a better researcher. I think I have gained general skills in communication and decision making. Moreover the work I've been doing on file and data sync has been intellectually challenging and I have not been overwhelmed by it. I have read research papers on file sync and been able to relate them to my practical work, e.g. some of Benjamin Pierce's papers. When I did a little bit of work on building Venn diagrams using constraint programming I was able to read and understand the technical papers in the area. I don't feel like my time away from University has made me stupid. So I think that if you keep sharp and hone your skills you should be able to go back, but I don't know that would happen in practice.
 
