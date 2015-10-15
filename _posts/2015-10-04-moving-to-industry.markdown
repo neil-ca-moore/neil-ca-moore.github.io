@@ -1,7 +1,6 @@
 ---
 layout: post
 date:   2015-10-4 15:22:16
-exclude_from_nav: true
 title: "Moving from academia to industry"
 categories: me talks
 ---
