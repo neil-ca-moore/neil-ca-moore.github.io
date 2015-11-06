@@ -38,6 +38,14 @@ Example code for each and every one
 - - - quicker to write
 - - - less likely to harbour bugs
 
+- premature optimisation (SPEED)
+- - pareto principal
+- - actually use a profiler live?
+- - when to stop? there is such a thing as fast enough
+- - http://programmers.stackexchange.com/questions/89620/clean-readable-code-vs-fast-hard-to-read-code-when-to-cross-the-line
+- - opinion: It's probably easier to optimise a clean program written without excessive attention to performance, than to optimise a program written for speed from the outset. But it's definitely easier to maintain the clean program.
+- - http://c2.com/cgi/wiki?PrematureOptimization
+
 - maximise short term progress, fix later
 - - we need to complete projects
 - - - prototypes, optimise for quick feedback
@@ -66,12 +74,6 @@ Example code for each and every one
 - - - e.g. being more abstracted lets the compiler/runtime optimise
 - - - e.g. modern languages can recover the losses that come from vagueness
 - - - e.g. domain specific languages like constraints
-
-- premature optimisation (SPEED)
-- - actually use a profiler live?
-- - when to stop? there is such a thing as fast enough
-- - http://programmers.stackexchange.com/questions/89620/clean-readable-code-vs-fast-hard-to-read-code-when-to-cross-the-line
-- - opinion: It's probably easier to optimise a clean program written without excessive attention to performance, than to optimise a program written for speed from the outset. But it's definitely easier to maintain the clean program.
 
 - not work efficient (WORK EFFICIENCY)
 - - e.g. bittorrent, can't find any reference to this
@@ -121,7 +123,81 @@ But as I've said above there is always a serious tension. We can save users' ene
 
 How do we decide where to draw the line?
 
-I'm going to go through a few places where I think there is an defensible argument for letting efficiency drop a little bit, but never at the expense of software working poorly.
+I'm going to go through a few places where I think there is an defensible argument for letting efficiency drop a little bit, but never at the expense of software working poorly. 
 
-# Code simplicity
+# Code maintainability
+
+By maintainability I mean features of the code that make it easier to change later, such as loose coupling, simplicity, good naming, cohesion and so on.
+
+Often there is a good argument for taking maintainability over efficiency. Maintainable software tends to be contain fewer bugs, and when bugs do creep in they are easier to fix. It is quicker to change and quicker to find and fix bugs. These properties allow you to deliver real benefits to users that they will probably value more than a little bit of performance. 
+
+If there is one thing that I didn't fully appreciate from doing my degree in Computer Science, it is definitely that maintainability of code is a very important issue in day to day software engineering. I spent probably 90% of my time learning algorithms and techniques that I don't use on a day to day basis. However, I got just a handful of lectures on structuring code for simplicity, plus a few practical projects that were supposed to give us focussed practice by having another person make changes to our code. However it didn't really sink in until I was working on the same code for months and years, having to change what it does very frequently. You are constantly having to think what changes might be made in the future and how best to write something so that another engineer can understand it quickly just by reading the code.
+
+How do we decide when to reduce maintainability in favour of efficiency? I would say never to do it, unless the project cannot be achieved without blistering speed and only then if you've already learned to do things maintainably first. This is almost never true in practice.
+
+This is a ludicrously bad program that probably uses [very little extra memory](http://www.catb.org/esr/structure-packing/) to get the job done:
+
+{% highlight c++ linenos %}
+#define READABLE    (1)
+#define WRITABLE    (2)
+#define CUSTOM_ICON (4)
+#define MAX_NAME_LEN (1024)
+
+struct MyData {
+  //bitfield
+  char savedToDisk:1; //is this saved to disk?
+  char settings:3;    //bit mask of settings
+  char* name;         //On Windows this UTF-16, on Mac it's UTF-8.
+};
+
+int myFunc() {
+  MyData data;
+  data.savedToDisk = 0;
+  data.settings = READABLE | WRITABLE;
+  data.name = malloc(MAX_NAME_LEN);
+#ifdef _MSC_DEV
+  *data.name = L"neil";
+#else
+  *data.name = "neil";
+#endif
+}
+
+void printReadable(MyData* data) {
+  if(data->settings & READABLE != 0) {
+    printf("it's readable\n");
+  } 
+}
+{% endhighlight %}
+
+but there is almost never a scenario where you wouldn't be better off with this code (and it can be still improved):
+
+{% highlight c++ linenos %}
+#include <string>
+#include <ostream>
+
+class MyData {
+public:
+  MyData() : savedToDisk(false), isReadable(false), isWritable(false), hasCustomIcon(false) {}
+  
+  bool savedToDisk;
+  bool isReadable;
+  bool isWritable;
+  bool hasCustomIcon;
+  std::string name;   //UTF-8
+};
+
+int myFunc() {
+  MyData data;
+  data.savedToDisk = true;
+  data.isReadable = true;
+  data.isWritable = true;
+  data.name = "neil";
+}
+
+void printReadable(MyData data) {
+  if(data.isReadable) {
+    std::cout << "it's readable" << std::endl;
+  } 
+}
+{% endhighlight %}
 
