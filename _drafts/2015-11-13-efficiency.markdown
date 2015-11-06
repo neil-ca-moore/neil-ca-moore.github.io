@@ -178,7 +178,7 @@ but there is almost never a scenario where you wouldn't be better off with this 
 class MyData {
 public:
   MyData() : savedToDisk(false), isReadable(false), isWritable(false), hasCustomIcon(false) {}
-  
+
   bool savedToDisk;
   bool isReadable;
   bool isWritable;
@@ -200,4 +200,22 @@ void printReadable(MyData data) {
   } 
 }
 {% endhighlight %}
+
+# Premature optimisation
+
+The great thing about choosing maintainability over efficiency is that usually it doesn't matter anyway. You can optimise your way out of problems with a relatively small number of changes. I am going to quote again perhaps the most used quote in Computer Science:
+
+> Programmers waste enormous amounts of time thinking about, or worrying about, the speed of noncritical parts of their programs, and these attempts at efficiency actually have a strong negative impact when debugging and maintenance are considered. We should forget about small efficiencies, say about 97% of the time: premature optimization is the root of all evil. Yet we should not pass up our opportunities in that critical 3%. -- Donald Knuth
+
+What he is getting at is that programs actually tend to spend a lot of their runtime in a relatively small number of code paths. Even with a lot of experience it can be hard to guess in advance what these will be. Imagine we optimise the start up code for our program. We could get it to run in 50 microseconds, when it might take 500 microseconds if we didn't bother. That code will only run once, nobody will notice it. Yet we spent our valuable time making it faster and it will probably suck up more time later in maintenance.
+
+There is a principle called the [Pareto Principle](https://en.wikipedia.org/wiki/Pareto_principle) that says 80% of the effects can often be had for 20% of the effort. This definitely applies to software optimisation in the sense that we can generally optimise a handful of pieces of code (probably less 20% of all code) and reduce our program's runtime by a large amount (80% is not unrealistic).
+
+Hence the best way to engineer a program is write for maintainability, then optimise according to the Pareto Principle. 
+
+The tool for doing this is a profiler and it's something every software engineer needs learn to use properly and use often. Profilers can find code that uses a CPU, memory, energy and much more. Examples of such tools include [Instruments in XCode](https://developer.apple.com/library/watchos/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/index.html), [valgrind](http://valgrind.org) and they are typically can be found for all languages and platforms with a bit of investigation.
+
+It's often hard to know when to stop. But if you removed the obvious and significant bottlenecks, and the program is subjectively good enough, then you can stop and the job is done.
+
+I'm going to make a rather bold statement. That is that you will end up with a more efficient program by writing it for maintainability without any interest in efficiency, than by writing for efficiency from the start. This definitely does not apply to everyone. Chris Jefferson wrote [minion](http://constraintmodelling.org/minion/) for speed, and that is exactly what he got, but that is because he is an expert. But for normal programmers working on normal problems if code is well structured then performance optimisations are easy because changes in general are easy. Conversely already optimised code is hard to change and the correct way to make a performance optimisation may be hard to fathom.
 
