@@ -46,25 +46,6 @@ Example code for each and every one
 - - opinion: It's probably easier to optimise a clean program written without excessive attention to performance, than to optimise a program written for speed from the outset. But it's definitely easier to maintain the clean program.
 - - http://c2.com/cgi/wiki?PrematureOptimization
 
-- maximise short term progress, fix later
-- - we need to complete projects
-- - - prototypes, optimise for quick feedback
-- - we can fix it up later once we know it's the right thing
-- - usually we don't get an opportunity to rewrite so it's a good idea to make the code nice but slow
-
-- in a pinch to speed development (VELOCITY)
-- - this is the worst kind because we are just trying to complete the functionality without paying attention to speed, it could turn out to be a mistake
-
-- small problem (VELOCITY)
-- - If the problem is and will remain small then it doesn't matter how it's written.
-- - if the constant factor is small then worse algorithms might be better e.g. map vs vector
-- - - e.g. memory locality, etc.
-- - - show storage hierarchy charts
-- - example: talk about the Sabre thing of writing to disk vs. sending over named pipe
-
-- safety (SAFETY)
-- - runtime checking to make sure it's not being used as an attack vector
-
 - choice of language (MAINTAINABILITY + VELOCITY)
 - - big area
 - - maintainable languages are not always slow, but they tend to be
@@ -75,11 +56,33 @@ Example code for each and every one
 - - - e.g. modern languages can recover the losses that come from vagueness
 - - - e.g. domain specific languages like constraints
 
+- safety (SAFETY)
+- - runtime checking to make sure it's not being used as an attack vector
+
+- maximise short term progress, fix later
+- - we need to complete projects
+- - - prototypes, optimise for quick feedback
+- - we can fix it up later once we know it's the right thing
+- - usually we don't get an opportunity to rewrite so it's a good idea to make the code nice but slow
+
+- in a pinch to speed development (VELOCITY)
+- - this is the worst kind because we are just trying to complete the functionality without paying attention to speed, it could turn out to be a mistake
+
 - not work efficient (WORK EFFICIENCY)
 - - e.g. bittorrent, can't find any reference to this
 - - https://en.wikipedia.org/wiki/Algorithmic_efficiency
+- - is precaching an example of this? We may get data that is never needed. That is optimising time at the expense of network.
+
+- small problem (VELOCITY)
+- - If the problem is and will remain small then it doesn't matter how it's written.
+- - if the constant factor is small then worse algorithms might be better e.g. map vs vector
+- - - e.g. memory locality, etc.
+- - - show storage hierarchy charts
+- - example: talk about the Sabre thing of writing to disk vs. sending over named pipe
 
 conclusion:
+- - for me writing efficient programs is fun, I like thinking up efficient algorithms, using profilers and using powerful languages like C++
+- - but there are many good reasons not to take it too far
 - - please leave a comment if you can think of anything else
 -->
 
@@ -217,5 +220,45 @@ The tool for doing this is a profiler and it's something every software engineer
 
 It's often hard to know when to stop. But if you removed the obvious and significant bottlenecks, and the program is subjectively good enough, then you can stop and the job is done.
 
-I'm going to make a rather bold statement. That is that you will end up with a more efficient program by writing it for maintainability without any interest in efficiency, than by writing for efficiency from the start. This definitely does not apply to everyone. Chris Jefferson wrote [minion](http://constraintmodelling.org/minion/) for speed, and that is exactly what he got, but that is because he is an expert. But for normal programmers working on normal problems if code is well structured then performance optimisations are easy because changes in general are easy. Conversely already optimised code is hard to change and the correct way to make a performance optimisation may be hard to fathom.
+You will probably end up with a more efficient program by writing it for maintainability without any interest in efficiency, than by writing for efficiency from the start. This definitely does not apply to everyone. [Chris Jefferson](https://caj.host.cs.st-andrews.ac.uk) wrote [minion](http://constraintmodelling.org/minion/) for speed, and that is exactly what he got, but that is because he is an expert. But for normal programmers working on normal problems if code is well structured then performance optimisations are easier because changes in general are easier. Conversely already optimised code is hard to change and the correct way to make a performance optimisation may be hard to fathom.
+
+# Choice of implementation language
+
+It's well known that using particular languages helps to improve development speed, maintainability, efficiency and various other attributes we need to choose between. New and better languages mean we need to make fewer trade offs, for example maybe C++ does better than [whitespace](http://compsoc.dur.ac.uk/whitespace/tutorial.html) on all those axes[^lang-note]. 
+
+[^lang-note]: This is a really weak example, it's actually hard to think of any language that everybody would agree is strictly better than any other.
+
+Some languages that people find to be highly maintainable are not as fast as they could be. For something like ruby which you can use to create very simple and short programs, the cost is that the language is interpreted and optimisations involving types are not as advanced as a statically typed language like C++. The language has a lot of powerful abstractions which may or may not be fast. Some of the reasons why maintainable languages are slower are intrinsic, for example abstraction costs a little in runtime because of the indirection involved.  Conversely super fast languages like C++ require you to take control of many aspects of programming like memory management, decisions about how functions are resolved and so on. There are many choices and you can take less for granted. These all make a program a little more brittle than when the language designers have decided for you.
+
+Types are interesting because depending on your viewpoint they add both maintainability and efficiency. Maintainability because you can be more sure that changes you make still make semantic sense if the compiler is checking types. Efficiency because static type checking avoids runtime overhead and allows more optimisation by the compiler. But many people would disagree that statically typed programs are more maintainable, because they are perhaps more verbose. This is where modern languages like Haskell, go, rust and C++11 save the day by providing type inference, letting you leave out explicit types in many cases, but still get static checking.
+
+Other times we have the exact opposite problem, that using a very maintainable language buys you great performance characteristics. Domain specific languages like regular expressions, logic programs, constraint programs and so on are likely to get a far better result than you could achieve writing an algorithm from scratch in a conventional type of language, as well as being much clearer to read and maintain.
+
+This is a huge area and I've only touched on a few issues briefly. However it's clear that choice of language is important and that you have to choose a language that you can use to meet your efficiency requirements. For performance critical code it may be necessary to pick an efficient language, but for most problems you have a lot of choices of language that will be fast enough and you can freely choose to optimise for other goals besides efficiency.
+
+# Safety
+
+Customers care about safety in our programs. They shouldn't crash; they shouldn't allow cross site scripting or code injection or buffer overflow attacks. This is one feature that often costs efficiency, but is not a trade off. Programs just have to be safe. You just have to take the efficiency hit of using encryption, checking parameters carefully, not overfilling buffers, etc. Using a modern safe language makes this easier but often costs in efficiency (rust is notable counterexample to this).
+
+# Maximising short time progress
+
+Now for a bit of a change of direction. Sometimes we need to write code fast, rather than write fast code. In businesses big and small you've got to meet deadlines and compete to get something finished fast. 
+
+The agile mindset is very widespread in the computer industry, where getting something in front of customers quickly is considered to be really important. This is not supposed to mean a reduction is quality, just a reduction in scope. But sometimes the pressure to work fast comes at the expense of software quality. In this case I would personally priorise various aims over efficiency. Correctness, maintainability, safety are all much more important than efficiency when deadlines loom. Hopefully performance problems will be uncovered by informal testing. The key thing is that performance needs to be *good enough* for most people.
+
+Prototypes are another problem. They are code that is designed to demonstrate the functionality rather than to become the product. In my experience there is no such thing as a good prototype, if it looks good then it is by definition not a prototype because somebody will try to make it the product. The same reasoning w.r.t. efficiency applies though, make the code as good as possible because performance can usually be fixed later.
+
+For desktop software that runs on users' machines it is more crucial to get performance right first time, because it costs users time and money to put up with the problem, then even more when they have to install an update to fix the problem. For server side code it costs us money, so it's not so crucial and also easier to fix later with an update. 
+
+# Work efficiency
+
+Work efficiency basically means doing within a constant factor of the same amount of work as the fastest possible algorithm. So why would we ever choose to do more work than we need to? One good reason is for usability. Let me give a few examples:
+
+Precaching
+: We read from disk or download data that the user doesn't necessarily need. This is choosing time over disk or network bandwidth. We do it because we perceive that one of resources we want to be efficient with is more important than the others. For example Adobe Illustrator can be seen loading various plugins at start up (including Adobe Idea File Format which I helped write), because we perceive that users would prefer to put up with a little slowness in getting started, rather than have to wait later on once they're in the zone. 
+
+Redundancy
+: I can't find any reference to this written down, but some towards the end of downloads some Bittorrent clients used to download chunks multiple times. Say that you're down to the last 2 chunks but you have enough bandwidth to fetch from 4 peers. You can request each chunk from two different peers then if one of them happens to be faster than the others you finish sooner. 
+
+# Small problems
 
