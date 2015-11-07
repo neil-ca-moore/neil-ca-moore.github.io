@@ -262,3 +262,45 @@ Redundancy
 
 # Small problems
 
+The next reason to give up efficiency is a bit of a trick. The advice is simply not to assume that because a particular approach looks best on paper means that it's best in practice, that is it is perfectly fine to write something with theoretically bad worst case or average case performance, if you problem sizes are always small.
+
+The most basic example of this is not to worry about constant size problems, e.g. what is the time complexity of a lookup in this code?
+
+{% highlight c++ linenos %}
+enum class Colour {
+  Red,
+  Blue,
+  Green,
+  Magenta,
+  Cyan,
+  Yellow,
+  Ochre
+};
+
+unsigned colourFrequency(Colour c) {
+  std::vector<<std::pair<Colour, unsigned>> frequency = {{Red, 1}, {Blue, 2}, {Green,3}, {Magenta,4}, {Cyan,5}, {Yellow,6}, {Ochre,7}};
+  for(size_t i = 0; i < frequency.size(); i++) {
+    if(frequency[i].first == c) {
+      return frequency[i].second;
+    }
+  }
+  return 0;
+}
+{% endhighlight %}
+
+Hopefully at least somebody who reads this will think it's O(n) or linear time. But it's actually constant time because there are a finite number of colours. This is also true of 32 bit integers, there are a constant number of them, so searching a list of integers with no repeats is also constant time, but usually we don't say it is. 
+
+The point is simply that small constant sized problems have to be treated apart from variable size large problems.
+
+The other point I have to make about time complexity is to do with constant factors. An algorithm that runs in exactly $100n^2 + n$ steps is actually $O(n^2)$, whereas an algorithm that runs in $2n^2.log(n) + 53$ is O(n^2.log(n)). But the value of n for which the O(n^2) algorithm is faster is something like $5 * 10^21$ which is an absolutely enormous number, around the number of [grains of sand on earth](https://en.wikipedia.org/wiki/Orders_of_magnitude_(numbers)#1021) or the number of transistors in the world.
+
+This is not purely a theoretical issue. Although balanced binary trees might appear on paper to be brilliantly efficient, they are often going to be beaten by an array, even when the array is theoretically $O(n)$ to do an operation where the binary tree is $O(log(n)). That is just because an array tends to keep data together in memory, whereas a binary tree is likely to spread it around. Memory is fast isn't it? Surely that's not a problem? Well the problem with spreading data around is basically down to caching. If we have to jump around in memory the chances of a cache hit are somewhat lower, and it takes maybe 200 times longer to get data from memory than from the L1 cache. Note that this 200 factor is larger than the constant factor of 100 that I used above, so it might not be a crazy constant factor after all!
+
+Peter Norvig has given various [constant factors to do operations](http://norvig.com/21-days.html#answers) and it's worth keeping these in mind when programming for efficiency, because they frequently overwhelm theoretical big O efficiency measures.
+
+I have a nice example of this type of reasoning from my job recently. A colleague found that a particular IPC message was very slow to send, maybe 3 seconds for a reasonable problem size. This is too much for customers to put up with. He wrote an alternative version that wrote the data to disk, and that sped things up quite nicely. But this bothered me deeply, because I know from Peter Norvig's table that writing to disk should be millions of nanoseconds, whereas writing to memory should be hundreds. So I just couldn't understand how the disk version could possibly be faster. Eventually I figured it out though, the version using only IPC was writing many lines of debug output, whereas the disk version didn't. The debug output is being written to disk and that's what makes the code slow. Removing these disk operations leaving only memory operations made the code much faster. So it's worth having a feel for what should be fast and slow, and then check later with a profiler.
+
+# Conclusion
+
+I hope this essay has not been too contrary. I think efficiency is an incredibly important aim to have in programming, partly so that greybeard hackers won't shake their head in despair at the current generation of wasteful programmers, but also because it's what users want and need. I love working with efficient languages that let me control the computer carefully, like C++. I also love figuring out efficient algorithms for doing things. That's perhaps why these rules of thumb about when efficiency is not so central are good for me too keep in mind, to combat my tendency towards small minded optimisation. 
+
