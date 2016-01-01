@@ -1,0 +1,10 @@
+---
+layout: post
+date:   2015-12-31 15:22:16
+title: "This year - 2015"
+categories: personal
+---
+
+Here's a photo montage of the last year (created with [Lightroom](https://lightroom.adobe.com)). Sorry to mobile users for the massive pic.
+
+<a href="/resources/2015.jpg" data-lightbox="montage">Montage</a><br/>
