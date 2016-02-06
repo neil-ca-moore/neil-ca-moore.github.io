@@ -1,6 +1,6 @@
 ---
 layout: post
-date:   2015-12-31 15:22:16
+date:   2016-02-05 15:22:16
 title: "St Andrews Alumni Stories"
 categories: personal
 ---
