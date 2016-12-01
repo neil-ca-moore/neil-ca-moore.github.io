@@ -19,15 +19,17 @@ Our use case
 - Sabre
 - characteristics of the problem
 - - entities, coordination, concurrency on the desktop
-- - vulcan messaging bridge
 
 How it works
+- vulcan messaging bridge
 - messaging - boost signals
 - actors - boost asio, locks, actor structures and ownership, tasks
 - knotty issues - deadlocks, ordering parent and child operations
 
 Improvements
 - threading design
+- strongly typed notifications
+- using more C++ concurrency primitives like lambda, task queue
 
 -->
 
@@ -58,6 +60,8 @@ in turn to get the job done.
 
 Actors should handle messages without blocking, so that the processing of later messages is not delayed. Messages should be immutable data, so that concurrency control
 of messages is not required. 
+
+INSERT DIAGRAM HERE
 
 Alternatives to actors
 ======================
@@ -118,6 +122,8 @@ Erlang popularised actors in contemporary practice. If Java is object-oriented, 
 Akka is a Java toolkit specifically providing actors. It is included with the Play web framework. In Play actors are used for server side background processes, for
 example in a chat system messages might be published by using a web API (not implemented using actors) and then a message would be propagated to recipients via actors using web sockets.
 
+[insert diagram here]
+
 Our use case - Sabre
 ====================
 
@@ -130,7 +136,254 @@ The Sabre project was intended to replace the old UI and IPC-related code with a
 - sending out updates of job status to interested listeners; and
 - receive general application settings like setting an HTTP proxy.
 
+[insert diagram]
+
 In depth on Sabre
 =================
 
+The sync program already had objects for users, authentication tokens, sync jobs, IPC messages and so on. What we need to do is to implement handlers for a new
+IPC message protocol, to let jobs be created, enabled, disabled, queried, etc. For example the following message will create a new sync job:
 
+{% highlight xml linenos %}
+<?xml version="1.0" encoding="utf-8"?>
+<message>
+  <userid>blah@domain.com</userid>
+  <cloudid>00000000-0000-0000-0000-000000000000</cloudid>
+  <job>files</job>
+  <localpath>/Users/username/CCfiles</localpath>
+  <remotepath>/files</remotepath>
+  <requestid>690382b3-95a5-4626-824c-3d17ea38a307</requestid>
+  <type>sync.in.request.job.create</type>
+  <version>1.1.4</version>
+</message>
+{% endhighlight %}
+
+After this is received new data structures and threads are set up for the sync job, and the following response is sent later:
+
+{% highlight xml linenos %}
+<?xml version="1.0" encoding="utf-8"?>
+<message>
+  <userid>blah@domain.com</userid>
+  <cloudid>00000000-0000-0000-0000-000000000000</cloudid>
+  <job>files</job>
+  <status>success</status>
+  <requestid>690382b3-95a5-4626-824c-3d17ea38a307</requestid>
+  <type>sync.out.response.job.create</type>
+  <version>1.1.4</version>
+</message>
+{% endhighlight %}
+
+We need to expect that these messages will be received at any time, perhaps several at once. Handling messages may take some time while HTTP requests are made, IO is performed and so on. Hence some responses will be delayed but meanwhile other work should proceed.
+
+Our solution - components
+=========================
+
+We created a number of reusable components in C++:
+
+- internal notification/messaging engine,
+- actor,
+- IPC controller, 
+- IPC observers and observation bridge,
+- task class, and
+- timer class.
+
+I'm going to describe the actor class, notification system and IPC controllers in a bit more detail.
+
+There are also a set of components to handle our particular problem of spinning up sync jobs, I'm going to describe the 
+app controller, user controller and job controller but leave out other details.
+
+Our solution - notification centre
+==================================
+
+The notification centre is implemented on top of boost signals. A notification is an immutable key-value map, with a type and name to allowing similar notifications to be identified.
+
+Classes that are interested in particular types and/or names of notification will register with the NotificationEngine to receive them via callback function (boost::function).
+
+When a notification is dispatched, all the registered listeners will be provided with a copy. Dispatching a notification to all registered listeners is synchronous for the dispatching caller. Hence listeners are encouraged not to take a long time.
+
+The class API is:
+
+{% highlight xml linenos %}
+typedef boost::function<void(const Notification &event)> NotificationListener;
+
+class NotificationEngine
+{
+public:
+	virtual void dispatch(const Notification &notification) const = 0;
+
+	virtual connection_t registerListener(const NotificationType &type,
+		NotificationListener listener) = 0;
+
+	virtual connection_t registerListener(const NotificationType &type,
+		const NotificationName &name, NotificationListener listener) = 0;
+
+};
+{% endhighlight %}
+
+Our solution - actor class
+==========================
+
+The actor class has the following abridged API:
+
+{% highlight xml linenos %}
+class Actor : private boost::noncopyable
+{
+public:
+	Actor(jura::NotificationEngineWeakPtr notificationEngine,
+		const jura::NotificationType& timerNotificationType);
+
+	void stop();
+    
+	void post(const Functor& handler);
+
+private:
+	void runWorker();
+
+private:
+	jura::NotificationCenter _notificationCenter;
+	boost::asio::io_service _io_service;
+	boost::scoped_ptr< boost::asio::io_service::work > _work;
+	boost::asio::io_service::strand _strand;
+	boost::thread _worker;
+	boost::uint32_t _hasStopped;
+};
+{% endhighlight %}
+
+As soon as it is constructed, a dedicated thread is created for the actor (this is unnecessary, more detail later).
+Work represented by a Functor object can be "posted" to the actor, i.e. get it to run a piece of code.
+
+This Actor object does not capture with purity the concept of actor described above, because it runs arbitrary pieces of code rather than handling messages. In this sense it is more like a task queue.
+
+The intention is that another class type RealActor will extend or contain Actor, making RealActor conform to the concept of an actor. When other code wants to send a message to a RealActor it will be dispatched via the notification centre. RealActor
+will be a subscriber for this message type, and when it receives the message it will immediately post the work to be done to
+its internal actor.
+
+I think there is a simpler implementation of Actor possible, using a virtual method 
+
+{% highlight C++ %}
+void handle(const Notification &notification) = 0;
+{% endhighlight %}
+
+to process messages received. However I have presented the code as it currently exists. It would not be a difficult refactoring to achieve that.
+
+Our solution - IPC bridge
+=========================
+
+I mentioned above that Sabre is handler for an IPC protocol. IPC messages can be converted to internal notifications and vice-versa. For that reason, we have an IPC bridge class to 
+
+- convert incoming IPC into internal notifications, and
+- convert internal notifications with a particular IPC type back into IPC.
+
+Hence we have restricted IPC handling to a single class, making it quite easy to switch the underlying IPC transport provider or change the details of the IPC protocol.
+
+Putting the reusable pieces together
+====================================
+
+Now I will present how we put the reusable notifications, actor and IPC bridge pieces together to create an asynchronous
+protocol handler for the Sabre protocol.
+
+The classes required were the app controller, user controller and job controller.
+
+The following sequence diagram shows how IPC message and notifications are sent between components. I have left the notification engine out of the diagram for brevity. Instead of showing a message going to the engine and then to the recipient, it is shown as being sent directly.
+
+<!--
+https://bramp.github.io/js-sequence-diagrams/
+
+participant Client
+participant IPCBridge
+participant AppController
+participant SyncController
+participant JobController
+Client->IPCBridge: job.create IPC msg
+IPCBridge->IPCBridge: convert to notification
+IPCBridge->AppController: send job.create notification
+AppController->AppController: does user's SyncController exist?
+AppController->SyncController: create a new SyncController
+AppController->SyncController: send job.create notification
+SyncController->SyncController: queue internally
+SyncController->SyncController: handle job.create
+SyncController->SyncController: does JobController exist?
+SyncController->JobController: create a new JobController
+SyncController->JobController: send job.create notification
+JobController->JobController: queue internally
+JobController->JobController: handle job.create
+JobController->JobController: set up sync job data structures
+JobController->IPCBridge: send job.create response notification
+IPCBridge->IPCBridge: convert to IPC message
+IPCBridge->Client: send job.create IPC response msg
+-->
+
+<img src="/resources/tech-summit-img/Screen Shot 2016-12-01 at 14.44.08.png" />
+
+Steps:
+
+1. The client sends an IPC message of type job.create
+2. The IPCBridge received it and converts it into a notification
+3. The IPC bridge sends it to the AppController actor
+4. The AppController makes sure that a SyncController actor exists for the user whose job it is
+5. Since no such actor exists, it is created
+6. The notification is forwarded to the new SyncController
+7. The SyncController receives the notification and checks that a JobController actor exists for the job
+8. It doesn't because the job is only just being created, so a new JobController actor is created
+9. The notification is forwarded to the new JobController
+10. The JobController will handle the message, by setting up a new sync job
+11. The JobController builds a response as a notification and sends it to the IPCBridge
+12. The IPCBridge converts it to IPC and sends it
+
+It is noticable that notifications relating to a job are being touched by the AppController and SyncController. That is necessary
+in the case of job creation because the JobController actor does not yet exist, it is created by its parent. It is also necessary for various other requests such as destroying a job, where the the JobController actor is destroyed. Hence we take this approach for all messages to make the processing uniform. The intermediate processing in quite light, so the loss of efficiency should be small.
+
+Now imagine that users dispatch a number of mutating IPC requests, such as job.enable and job.disable for the same job. These have a big effect on the underlying job's data structures: they cause threads to be created or terminated, various state variables to be set, etc. Hence this is a case where careful concurrency control is required. The vaunted advantage of actors was that we could get concurrency controls without explicit locking, so how does this work. Let's show by way of another sequence diagram (assuming that the AppController and JobController already exist):
+
+<!--
+https://bramp.github.io/js-sequence-diagrams/
+
+participant Client1
+participant Client2
+participant IPCBridge
+participant JobController
+Client1->IPCBridge: job.disable IPC msg
+IPCBridge->IPCBridge: convert to notification
+IPCBridge->AppController: send job.disable notification
+JobController->JobController: queue internally
+Client2->IPCBridge: job.enable IPC msg
+IPCBridge->IPCBridge: convert to notification
+IPCBridge->AppController: send job.enable notification
+JobController->JobController: queue internally
+JobController->JobController: handle job.disable
+JobController->JobController: disable job: kill threads, set state, etc.
+JobController->IPCBridge: send job.disable response notification
+IPCBridge->IPCBridge: convert to IPC message
+IPCBridge->Client1: send job.disable IPC response msg
+JobController->JobController: handle job.enable
+JobController->JobController: enable job: start threads, set state, etc.
+JobController->IPCBridge: send job.enable response notification
+IPCBridge->IPCBridge: convert to IPC message
+IPCBridge->Client2: send job.enable IPC response msg
+-->
+
+<img src="/resources/tech-summit-img/Screen Shot 2016-12-01 at 15.33.58.png" />
+
+The interesting part of this is that although the job.disable and job.enable messages come from different clients potentially simultaneously, they are serialised by the JobController actor. Hence although they mutate state in the job data structures without any locking that is completely safe, because only one can run at any time.
+
+This is the main advantage of actors: by sharing state only via immutable notifications and by serialising access to state inside actors, you can avoid having to have explicit concurrency control in your code.
+
+Knotty issues with actors
+=========================
+
+TODO
+
+Improvements in our actors implementation
+=========================================
+
+The most obvious limitation in our current design is that each actor uses a thread. This is not necessary and it wastes 
+reasonably expensive resources. It would be better to use a smaller pool of threads, but still ensure that tasks for a particular actor are serialised. However we have to be careful to choose the size of the threadpool to avoid deadlock. Deadlock could occur if actor A is waiting on actor B finishing something. This could be implemented in practice by actor A repeatedly sending a message to actor B asking if something is complete and repeatedly receiving a negative result. If there is only one thread then actor B has no chance to do the work though, as actor A is hogging the sole thread. Ideally actor A would not block the thread but would asynchronously await the response, giving B a chance to do the work. However in principle actors can block, so it is simplest to ensure there are enough threads.
+
+Another limitation is that notifications are untyped. They always consist of a key-value map. If notifications could be arbitrary types we would benefit from typechecking. 
+
+A final limitation in our implementation is that we have not used C++'s new concurrency primitives like futures. We wrote our own because compiler support was not good at the time.
+
+TODOs:
+- add various more diagrams above
+- add knotty issues with actors section above
+- review and improve
