@@ -61,7 +61,7 @@ in turn to get the job done.
 Actors should handle messages without blocking, so that the processing of later messages is not delayed. Messages should be immutable data, so that concurrency control
 of messages is not required. 
 
-INSERT DIAGRAM HERE
+<img src="/resources/tech-summit-img/Screen Shot 2016-12-05 at 15.42.41.png" />
 
 Alternatives to actors
 ======================
@@ -119,10 +119,8 @@ I will just give a couple of examples of actor implementations that I'm most fam
 
 Erlang popularised actors in contemporary practice. If Java is object-oriented, then Erlang is process-oriented. Processes and messages are build into the language, processes are essentially actors. Erlang is used widely in industry for server side code, frequently for applications such a messaging, chat, telephony. For example Facebook Chat and Whatsapp run at huge scale and are implementing using Erlang. 
 
-Akka is a Java toolkit specifically providing actors. It is included with the Play web framework. In Play actors are used for server side background processes, for
+Akka is a Java toolkit specifically providing actors. It is included with the Play web framework. In Play, actors are used for server side background processes, for
 example in a chat system messages might be published by using a web API (not implemented using actors) and then a message would be propagated to recipients via actors using web sockets.
-
-[insert diagram here]
 
 Our use case - Sabre
 ====================
@@ -136,7 +134,7 @@ The Sabre project was intended to replace the old UI and IPC-related code with a
 - sending out updates of job status to interested listeners; and
 - receive general application settings like setting an HTTP proxy.
 
-[insert diagram]
+<img src="/resources/tech-summit-img/sync-against-multiple-endpoints.png" />
 
 In depth on Sabre
 =================
@@ -384,6 +382,5 @@ Another limitation is that notifications are untyped. They always consist of a k
 A final limitation in our implementation is that we have not used C++'s new concurrency primitives like futures. We wrote our own because compiler support was not good at the time.
 
 TODOs:
-- add various more diagrams above
 - add knotty issues with actors section above
 - review and improve
