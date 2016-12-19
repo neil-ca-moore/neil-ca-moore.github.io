@@ -22,9 +22,10 @@ Here are the bottles I chose to make:
 - *Pasta shapes* - Makes a nice sound.
 - *Polystyrene balls* - Very light but makes a sound when shaked.
 - *Sticks* - Make a sound and are pleasing to shake.
-- *Bells* - Are colourful and make a sound.
+- *[Bells](https://www.aliexpress.com/item/Hot-Sale-50Pcs-lot-Colorful-Iron-Loose-Beads-Small-Jingle-Bells-Christmas-Decoration-Pendants-DIY-Crafts/32726160762.html?spm=2114.13010608.0.0.AW6Zhl)* - Are colourful and make a sound.
 - *Cloves and cinnamon* - Made a tiny hole in the bottle to let the smell out.
-- *Tiny ladybird toys* - Look interesting and make a sound.
+- *[Balls](https://www.aliexpress.com/item/50pcs-10-12mm-Pearl-Shaped-Soft-Crystal-Soil-Grow-Magic-Jelly-Ball-Hydrogel-Water-Beads-Plant/32726644313.html?spm=2114.13010608.0.0.AW6Zhl)* - Balls that move around and settle to the bottom, but don't make a sound.
+- *[Tiny ladybird toys](https://www.aliexpress.com/item/6-piece-More-meat-micro-landscape-ornaments-accessories-ornaments-ornaments-wood-crafts-Ladybird-Beetle-Coccinella/32658864790.html?spm=2114.13010608.0.0.bhFNRE)* - Look interesting and make a sound.
 - *Soy sauce* - Liquid covers the inside of the bottle when shaked.
 - *Sugar* - Fine powder is fun to shake.
 - *Water with red food colouring* - Is heavy and behaves like water.
