@@ -9,7 +9,7 @@ I made a set of 12 baby sensory bottles for 9 month old Katie. The bottles came 
 
 Each bottle is supposed to have an interesting and different look, weight, smell or sound.
 
-Practically, I just used up all the bottles, washed and dried them. I especially had to try the one that contain powder so the powder didn't clump. After filling them I put epoxy resin glue into the inside of the thread, so that the lids are permanently closed. I chose [Gorilla epoxy glue](https://www.amazon.co.uk/Gorilla-Glue-6044001-25ml-Epoxy/dp/B009NQQJFC) because it's non-toxic once set. I don't expect the glue ever to be exposed but I wanted to make sure it wouldn't give off any bad smells or be toxic if I somehow comes loose.
+Practically, I just used up all the bottles, washed and dried them. I especially had to dry the one that contain powder so the powder didn't clump. After filling them I put epoxy resin glue into the inside of the thread, so that the lids are permanently closed. I chose [Gorilla epoxy glue](https://www.amazon.co.uk/Gorilla-Glue-6044001-25ml-Epoxy/dp/B009NQQJFC) because it's non-toxic once set. I don't expect the glue ever to be exposed but I wanted to make sure it wouldn't give off any bad smells or be toxic if I somehow comes loose.
 
 <a href="/resources/sensory/cleaning.jpg" data-lightbox="cleaning">Cleaning picture</a><br/>
 
