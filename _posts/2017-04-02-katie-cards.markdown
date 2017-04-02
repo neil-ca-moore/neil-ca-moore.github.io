@@ -29,7 +29,7 @@ Here are pictures of Katie with all her milestone cards. You can open any pictur
 <a href="/resources/katiecards/katie-21.jpg" data-lightbox="montage">Eight months and first tooth</a><br/>
 <a href="/resources/katiecards/katie-22.jpg" data-lightbox="montage">Nine months</a><br/>
 <a href="/resources/katiecards/katie-23.jpg" data-lightbox="montage">10 months</a><br/>
-<a href="/resources/katiecards/katie-24.jpg" data-lightbox="montage">11 months week</a><br/>
+<a href="/resources/katiecards/katie-24.jpg" data-lightbox="montage">11 months</a><br/>
 <a href="/resources/katiecards/katie-25.jpg" data-lightbox="montage">Said mama FTFT</a><br/>
 <a href="/resources/katiecards/katie-26.jpg" data-lightbox="montage">Stood FTFT</a><br/>
 <a href="/resources/katiecards/katie-27.jpg" data-lightbox="montage">Walked FTFT</a><br/>
