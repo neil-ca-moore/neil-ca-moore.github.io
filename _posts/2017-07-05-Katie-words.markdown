@@ -51,6 +51,7 @@ plus animal noises for particular animals:
 * Roar
 * Ooh aah (monkey)
 * Quack quack
+* Snap snap (crocodile)
 * Twit twoo 
 
 and songs she can sing to the tune so they are recognisable, although the the words are garbled:
