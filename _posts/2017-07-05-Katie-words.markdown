@@ -43,6 +43,7 @@ Katie is almost 16 months old. Here is a list of all the words she knows to date
 * Celtic
 * Jump
 * Chute
+* Frog
 
 plus animal noises for particular animals:
 
