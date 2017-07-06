@@ -5,7 +5,7 @@ title: "Katie words"
 categories: personal
 ---
 
-Katie is almost 16 months old. Here is a list of all the words she knows to date.
+Katie is almost 16 months old. Here is a list of all the words she can say to date. There is a bigger list that she understands when listening, but I there are probably a lot I don't know because she picks them up at nursery.
 
 * Ok
 * Star
