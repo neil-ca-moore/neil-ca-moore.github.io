@@ -50,6 +50,7 @@ plus animal noises for particular animals:
 * Woof
 * Roar
 * Ooh aah (monkey)
+* Quack quack
 * Twit twoo 
 
 and songs she can sing to the tune so they are recognisable, although the the words are garbled:
