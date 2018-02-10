@@ -20,6 +20,8 @@ To get the updates do the following
 7. Download the instructions, map updates and software updates.
 8. Follow the instructions (these are complex as well, but the instructions are clear unlike finding the files themselves - see below).
 
+[This page](http://citroen.cricou.net/NAC/Tutorial_NAC_Mise_à_jour_firmware_ou_cartographie.pdf) in french is handy. [This page in English](http://c4owners.org/plugins/forum/forum_viewtopic.php?226475) also looks handy!
+
 The instructions are [here](https://mycitroen-uk.citroen.com/Resources/Content/GB/ESP/04_Services/ConnectNAV/Citroën_Navigation_Map_Download_Instruction_Manual.pdf).
 
 The map file is called PSA_map-eur_7.0.0-NAC_EUR_WAVE2.tar
