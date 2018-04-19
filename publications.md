@@ -7,7 +7,7 @@ permalink: /pub/
 |---
 | Date | Venue | Title | DL | Notes
 |-|-|-|-|:-:
-|May 2018|Theory and Practice of Logic Programming (TPLP|A Review of Literature on Parallel Constraint Solving|[PDF](/resources/1803.10981.pdf)
+|May 2018|Theory and Practice of Logic Programming (TPLP)|A Review of Literature on Parallel Constraint Solving|[PDF](/resources/1803.10981.pdf)
 |April 2012 | US Patent Application US20130291051 A1 | System call interception | [PDF](/resources/US20130291051.pdf)	
 |June 2012 | AI Communications | An Empirical Study of Learning and Forgetting Constraints | [PDF](/resources/aicom.pdf)
 |December 2011 | TrustCom 2011 | Intelligent Assistant for Context Aware Policies | [PDF](/resources/trustcom.pdf) | [^1]
