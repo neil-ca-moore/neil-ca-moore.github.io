@@ -49,7 +49,7 @@ An actor is a software entity that can receive messages and when it does it can
 - send new messages to other actors, and
 - create other actors.
 
-Actors encapsulate state and behaviour, in much the same way an object does in object oriented programming. However in addition they have messaging capabilites.
+Actors encapsulate state and behaviour, in much the same way an object does in object oriented programming. However in addition they have messaging capabilities.
 Messaging capabilities are analogous to member functions in object oriented programming, in that they enable mutating and accessing the state of the actor.
 The messaging is asynchronous: actors have in incoming task queue that they take messages from in order. Sending actors do not have to wait for a response to their message, indeed there may be no response.
 
@@ -193,7 +193,7 @@ app controller, user controller and job controller but leave out other details.
 Our solution - notification centre
 ==================================
 
-The notification centre is implemented on top of boost signals. A notification is an immutable key-value map, with a type and name to allowing similar notifications to be identified.
+The notification centre is implemented on top of boost signals. A notification is an immutable key-value map, with a type and name. The type is used to group similar notifications.
 
 Classes that are interested in particular types and/or names of notification will register with the NotificationEngine to receive them via callback function (boost::function).
 
@@ -369,18 +369,37 @@ This is the main advantage of actors: by sharing state only via immutable notifi
 Knotty issues with actors
 =========================
 
-TODO
+One thing that is important to bear in mind is that although each actor has its own thread, it is best to avoid blocking operations inside message handlers. This is simply to ensure that other later messages are processed in a timely fashion. 
+
+[See restart handler for an issue?]
 
 Improvements in our actors implementation
 =========================================
 
 The most obvious limitation in our current design is that each actor uses a thread. This is not necessary and it wastes 
-reasonably expensive resources. It would be better to use a smaller pool of threads, but still ensure that tasks for a particular actor are serialised. However we have to be careful to choose the size of the threadpool to avoid deadlock. Deadlock could occur if actor A is waiting on actor B finishing something. This could be implemented in practice by actor A repeatedly sending a message to actor B asking if something is complete and repeatedly receiving a negative result. If there is only one thread then actor B has no chance to do the work though, as actor A is hogging the sole thread. Ideally actor A would not block the thread but would asynchronously await the response, giving B a chance to do the work. However in principle actors can block, so it is simplest to ensure there are enough threads.
+reasonably expensive resources. It would be better to use a smaller pool of threads, but still ensure that tasks for a particular actor are serialised. However we have to be careful to choose the size of the threadpool to avoid deadlock. Deadlock could occur if actor A is waiting on actor B finishing something. This could happen in practice by actor A repeatedly sending a message to actor B asking if something is complete and repeatedly receiving a negative result. If there is only one thread then actor B has no chance to do the work, as actor A is hogging the sole thread. Ideally actor A would not block the thread but would asynchronously await the response, giving B a chance to do the work. However in principle actors can block, so it is simplest to ensure there are enough threads.
 
 Another limitation is that notifications are untyped. They always consist of a key-value map. If notifications could be arbitrary types we would benefit from typechecking. 
 
 A final limitation in our implementation is that we have not used C++'s new concurrency primitives like futures. We wrote our own because compiler support was not good at the time.
 
 TODOs:
-- add knotty issues with actors section above
 - review and improve
+- write abstract
+- submit to speaker portal
+
+{% highlight xml linenos %}
+void createHandler(const jura::Notification& request, 
+				   jura::Notification& response) {
+				   
+	LOG_SCOPER_INFO("job", "Creating " << jobIdentifier());
+
+	_job->m_settings.SetSignedInUser(_jobIdentifier.userId());
+	_job->m_settings.SetLocalUrl(sLocalUrl);
+	_job->m_settings.SetRemoteUrl(sRemoteUrl, sRemotePath);
+	_job->m_settings.SetConnectedState(true);
+    auto concurrentTransfers = _data.concurrentTransfers();
+	
+    sibcrux::CsSetupJob(_job->m_settings, *_job);
+}
+{% endhighlight %}
