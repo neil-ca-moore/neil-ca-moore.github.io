@@ -1,0 +1,10 @@
+---
+layout: post
+date:   2018-08-06 13:22:16
+title: "This year - 2017"
+categories: personal
+---
+
+Most of 2018 is gone but here's a montage of photos from last year.
+
+<a href="/resources/2017.jpg" data-lightbox="montage">Montage</a><br/>
