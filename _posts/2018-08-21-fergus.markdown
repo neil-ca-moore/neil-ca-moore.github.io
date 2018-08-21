@@ -7,7 +7,7 @@ categories: personal
 
 Here is a picture and video of our new baby boy Fergus Samuel Moore.
 
-<a href="/resources/fergus.jpg" data-lightbox="montage">Montage</a><br/>
+<a href="/resources/fergus.jpg" data-lightbox="montage">Photo with Toucan</a><br/>
 
-<a class="embedly-card" href="https://youtu.be/3RQCXNk5T5s">TT Scorer</a>
+<a class="embedly-card" href="https://youtu.be/3RQCXNk5T5s">Video montage</a>
 <script async src="//cdn.embedly.com/widgets/platform.js" charset="UTF-8"></script>
