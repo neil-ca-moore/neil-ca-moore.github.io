@@ -1,13 +1,13 @@
 ---
 layout: post
 date:   2018-08-21 13:22:16
-title: "Ukelele"
+title: "Ukulele"
 categories: personal
 ---
 
-I got a [Ukelele kit from Ali Express](https://www.aliexpress.com/item/21-Inches-DIY-Ukulele-Small-Guitar-Kit-Set-DIY-Ukulele-Musical-Instruments-Packing-With-Ukulele-Accessories/32832521073.html?). Probably not any cheaper than an assembled one, but I felt like putting it together myself. 
+I got a [Ukulele kit from Ali Express](https://www.aliexpress.com/item/21-Inches-DIY-Ukulele-Small-Guitar-Kit-Set-DIY-Ukulele-Musical-Instruments-Packing-With-Ukulele-Accessories/32832521073.html?). Probably not any cheaper than an assembled one, but I felt like putting it together myself. 
 
-<a href="/resources/ukulele/00-parts.jpg" data-lightbox="montage">All parts</a><br/>
+<a href="/resources/ukulele/00-parts.JPG" data-lightbox="montage">All parts</a><br/>
 
 However it came with no instructions. Not even to say what kind it was, because it turns out there are several types of ukulele! It didn't say what positions to stick things either, but that is crucial because it would affect the intonation of the ukulele if the positions were not quite right.
 
@@ -17,32 +17,32 @@ Since the parts came unfinished, I should have begun by painting or varnishing t
 
 First of all glue the body and neck together. There should be only one way to attach it.
 
-<a href="/resources/ukulele/01-body.jpg" data-lightbox="montage">Body and neck glued together</a><br/>
+<a href="/resources/ukulele/01-body.JPG" data-lightbox="montage">Body and neck glued together</a><br/>
 
 Second glue the fretboard onto the neck. It should be easy to figure out the position, because the neck and fretboard surfaces match. Just slide the fretboard until it fits and glue it.
 
-<a href="/resources/ukulele/02-fretboard.jpg" data-lightbox="montage">Neck and fretboard glued together</a><br/>
+<a href="/resources/ukulele/02-fretboard.JPG" data-lightbox="montage">Neck and fretboard glued together</a><br/>
 
 Third, stick the nut immediately at the top of the fretboard.
 
-<a href="/resources/ukulele/03-nut.jpg" data-lightbox="montage">Stick the nut on it!</a><br/>
+<a href="/resources/ukulele/03-nut.JPG" data-lightbox="montage">Stick the nut on it!</a><br/>
 
 Fourth, install the tuning keys. This is a bit more complicated, but the holes are pre-drilled so just insert into the holes, screw into place and then glue the caps over the pegs.
 
-<a href="/resources/ukulele/04-tuning-keys.jpg" data-lightbox="montage">Tuning keys front</a><br/>
-<a href="/resources/ukulele/05-tuning-keys-rear.jpg" data-lightbox="montage">Tuning keys rear</a><br/>
+<a href="/resources/ukulele/04-tuning-keys.JPG" data-lightbox="montage">Tuning keys front</a><br/>
+<a href="/resources/ukulele/05-tuning-keys-rear.JPG" data-lightbox="montage">Tuning keys rear</a><br/>
 
-Sixth, glue the bridge into position. This one is difficult, it took me a while to figure out what to do. It is located below the bottom of the fretboard, and needs to be put on straight, i.e. exactly perpendicular to the main axis of symmetry of the guitar. But how far down? This was what took me a while. What I eventually read somewhere is that the 12th fret is exactly halfway down the string. You can verify this on a guitar or ukelele because you can achieve a [harmonic at that position](https://en.wikipedia.org/wiki/String_harmonic). So measure the distance from the nut to the 12th fret, then draw a line that distance from the 12th fret. It will be somewhat below the sound hole. 
+Sixth, glue the bridge into position. This one is difficult, it took me a while to figure out what to do. It is located below the bottom of the fretboard, and needs to be put on straight, i.e. exactly perpendicular to the main axis of symmetry of the guitar. But how far down? This was what took me a while. What I eventually read somewhere is that the 12th fret is exactly halfway down the string. You can verify this on a guitar or ukulele because you can achieve a [harmonic at that position](https://en.wikipedia.org/wiki/String_harmonic). So measure the distance from the nut to the 12th fret, then draw a line that distance from the 12th fret. It will be somewhat below the sound hole. 
 
-<a href="/resources/ukulele/06-bridge.jpg" data-lightbox="montage">Bridge</a><br/>
+<a href="/resources/ukulele/06-bridge.JPG" data-lightbox="montage">Bridge</a><br/>
 
 Seventh, another tricky stage. How to attach the strings. For this stage it would be too difficult to explain using words, so here is a link to a video I found useful. It is by Ken Cameron from Hiloguitars. He seems to have been born Scottish, but has picked up a American accent. Visit the youtube [here](https://www.youtube.com/watch?v=lDJywsNAF1g) to learn how to string it. Before starting to attach them, check out the following step though!
 
-<a href="/resources/ukulele/07-strings.jpg" data-lightbox="montage">String attachment at bridge</a><br/>
-<a href="/resources/ukulele/08-strings-2.jpg" data-lightbox="montage">String attachment at nut</a><br/>
+<a href="/resources/ukulele/07-strings.JPG" data-lightbox="montage">String attachment at bridge</a><br/>
+<a href="/resources/ukulele/08-strings-2.JPG" data-lightbox="montage">String attachment at nut</a><br/>
 
 Eighth, in what order to attach the string? The strings in my kit came completely unlabelled, I imagine that is not the case if you buy a set of strings from a shop. Likely each string would come in an envelope with . I could see that they were each a different thickness. Again it took a while to find out what string thicknesses will be. The standard tuning is G4 C4 E4 A4. That means G is the the top string while playing or leftmost string with the ukulele pointing upwards. I eventually found thicknesses of the individual strings on a [message board post](https://forum.ukuleleunderground.com/showthread.php?15343-String-Thickness). This post stated that the thicknesses of the strings as as follows in inches: G = .026, C = .037, E = .030, A = .024. In other words in increasing order of thickness we have the A string, G string, E string and then C string. 
 
-<a href="/resources/ukulele/09-string-thicknesses.jpg" data-lightbox="montage">String thicknesses</a><br/>
+<a href="/resources/ukulele/09-string-thicknesses.JPG" data-lightbox="montage">String thicknesses</a><br/>
 
 If you get the kit then I hope yours comes with instructions, but if not the above should get you fairly close.
