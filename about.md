@@ -4,7 +4,7 @@ title: About
 permalink: /about/
 ---
 
-I work for Adobe as a Computer Scientist. I was recently involved in the Adobe Creative Cloud project and work mainly on file synchronisation. I finished my PhD on constraint programming in early 2011.
+I work for Amazon as a Software Development Engineer. Until 2019 I worked for Adobe on various things. I finished my PhD on constraint programming in early 2011.
 
 Contact
 =======
