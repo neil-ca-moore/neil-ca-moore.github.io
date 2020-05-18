@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-ruby "1.9.3"
+ruby "2.7.1"
 gem "github-pages"
 gem "jekyll"
-gem "mini_magick"
+gem "mini_magick"   
