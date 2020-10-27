@@ -4,7 +4,7 @@ title: About
 permalink: /about/
 ---
 
-I work for Amazon as a Software Development Engineer. Until 2019 I worked for Adobe on various things. I finished my PhD on constraint programming in early 2011.
+I work for Adobe. I finished my PhD on constraint programming in early 2011.
 
 Contact
 =======
