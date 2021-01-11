@@ -7,6 +7,8 @@ permalink: /pub/
 |---
 | Date | Venue | Title | DL | Notes
 |-|-|-|-|:-:
+|Nov 2020|US Patent US10834236B2 | Server-driven custom context menus |[PDF](/resources/US10834236.pdf)
+|Dec 2018|US Patent US20180107560A1| Extensible file synchronization  |[PDF](/resources/US20180107560A1.pdf)
 |May 2018|Theory and Practice of Logic Programming (TPLP)|A Review of Literature on Parallel Constraint Solving|[PDF](/resources/1803.10981.pdf)
 |April 2012 | US Patent Application US20130291051 A1 | System call interception | [PDF](/resources/US20130291051.pdf)	
 |June 2012 | AI Communications | An Empirical Study of Learning and Forgetting Constraints | [PDF](/resources/aicom.pdf)
