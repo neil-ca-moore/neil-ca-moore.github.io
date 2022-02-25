@@ -4,7 +4,7 @@ email: neil@cfconline.co.uk
 description: > # this means to ignore newlines until "baseurl:"
   Programming and stuff.
 baseurl: "" # the subpath of your site, e.g. /blog/
-url: "http://www.bigoh.co.uk" # the base hostname & protocol for your site
+url: "http://www.cfconline.co.uk" # the base hostname & protocol for your site
 twitter_username: neilmoore67
 github_username:  neil-ca-moore
 
