@@ -20,6 +20,8 @@ To get the updates do the following
 7. Download the instructions, map updates and software updates.
 8. Follow the instructions (these are complex as well, but the instructions are clear unlike finding the files themselves - see below).
 
+Edit: if the instructions above don't give you the files, try this link: https://github.com/ludwig-v/psa-nac-firmware-reverse-engineering
+
 [This page](http://citroen.cricou.net/NAC/Tutorial_NAC_Mise_à_jour_firmware_ou_cartographie.pdf) in french is handy. [This page in English](http://c4owners.org/plugins/forum/forum_viewtopic.php?226475) and [this page](https://en.discussions.tomtom.com/built-in-car-navigation-25/citroen-c4-picasso-connect-nav-usability-1010966/index5.html) also look handy!
 
 The instructions are [here](https://mycitroen-uk.citroen.com/Resources/Content/GB/ESP/04_Services/ConnectNAV/Citroën_Navigation_Map_Download_Instruction_Manual.pdf).
