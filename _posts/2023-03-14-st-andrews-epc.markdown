@@ -9,12 +9,12 @@ I phoned every surveyor I could find in St Andrews and asked them for the price 
 
 This data is obviously only accurate at the time of writing.
 
-standrewspropertycentre - £120 incl VAT
-Allied Surveyors Scotland - £132 incl VAT
-Shepherd Chartered Surveyors - £125 incl VAT 
-Bradburne Chartered Surveyors - £126 incl VAT
+- standrewspropertycentre - £120 incl VAT
+- Allied Surveyors Scotland - £132 incl VAT
+- Shepherd Chartered Surveyors - £125 incl VAT 
+- Bradburne Chartered Surveyors - £126 incl VAT
 
-I also found openrent.co.uk that charged £69 incl VAT.
+I also found openrent.co.uk that charged *£69 incl VAT*.
 
 Their service was excellent and they also offer other fixed prices landlord services like gas safety, etc.
 
